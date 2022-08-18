@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HarmonyTools\HarmonyTools.csproj" />
+    <ProjectReference Include="..\HarmonyTools.Analyzers\HarmonyTools.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

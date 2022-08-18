@@ -34,7 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HarmonyTools.CodeFixes\HarmonyTools.CodeFixes.csproj" />
-    <ProjectReference Include="..\HarmonyTools\HarmonyTools.csproj" />
+    <ProjectReference Include="..\HarmonyTools.Analyzers\HarmonyTools.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
