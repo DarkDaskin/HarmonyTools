@@ -24,10 +24,15 @@ namespace HarmonyTools.Test
             => CSharpAnalyzerVerifier<TAnalyzer, MSTestVerifier>.Diagnostic(descriptor);
 
         /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+        public static Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+            => VerifyAnalyzerAsync(source, null,  expected);
+
+        /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
+        public static async Task VerifyAnalyzerAsync(string source, ReferenceAssemblies referenceAssemblies = null, params DiagnosticResult[] expected)
         {
             var test = new Test
             {
+                ReferenceAssemblies = referenceAssemblies ?? CSharpVerifierHelper.DefaultReferenceAssemblies,
                 TestCode = source,
             };
 

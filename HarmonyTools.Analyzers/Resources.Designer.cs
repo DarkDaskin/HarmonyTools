@@ -61,29 +61,20 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type names should be all uppercase..
+        ///   Looks up a localized string similar to Target method &apos;{0}&apos; does not exist in type &apos;{1}&apos;..
         /// </summary>
-        internal static string AnalyzerDescription {
+        internal static string MethodMustExistMessageFormat {
             get {
-                return ResourceManager.GetString("AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("MethodMustExistMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name &apos;{0}&apos; contains lowercase letters.
+        ///   Looks up a localized string similar to Target method does not exist.
         /// </summary>
-        internal static string AnalyzerMessageFormat {
+        internal static string MethodMustExistTitle {
             get {
-                return ResourceManager.GetString("AnalyzerMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type name contains lowercase letters.
-        /// </summary>
-        internal static string AnalyzerTitle {
-            get {
-                return ResourceManager.GetString("AnalyzerTitle", resourceCulture);
+                return ResourceManager.GetString("MethodMustExistTitle", resourceCulture);
             }
         }
     }

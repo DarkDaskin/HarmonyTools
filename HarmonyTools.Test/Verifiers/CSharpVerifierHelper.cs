@@ -1,7 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using Microsoft.CodeAnalysis.Testing;
+using System.Threading;
 
 namespace HarmonyTools.Test
 {
@@ -18,7 +22,7 @@ namespace HarmonyTools.Test
 
         private static ImmutableDictionary<string, ReportDiagnostic> GetNullableWarningsFromCompiler()
         {
-            string[] args = { "/warnaserror:nullable" };
+            string[] args = ["/warnaserror:nullable"];
             var commandLineArguments = CSharpCommandLineParser.Default.Parse(args, baseDirectory: Environment.CurrentDirectory, sdkDirectory: Environment.CurrentDirectory);
             var nullableWarnings = commandLineArguments.CompilationOptions.SpecificDiagnosticOptions;
 
@@ -28,6 +32,18 @@ namespace HarmonyTools.Test
                 .SetItem("CS8669", ReportDiagnostic.Error);
 
             return nullableWarnings;
+        }
+
+        public static readonly ReferenceAssemblies DefaultReferenceAssemblies =
+            ReferenceAssemblies.NetFramework.Net472.Default;
+
+        public static IEnumerable<MetadataReference> Resolve(ReferenceAssemblies referenceAssemblies, string language)
+        {
+            // TODO: get rid of this hack
+            if (referenceAssemblies.Assemblies.Any(assembly => !assembly.EndsWith(".dll")))
+                return referenceAssemblies.ResolveAsync(language, CancellationToken.None).Result;
+
+            return referenceAssemblies.Assemblies.Select(assembly => MetadataReference.CreateFromFile(assembly));
         }
     }
 }

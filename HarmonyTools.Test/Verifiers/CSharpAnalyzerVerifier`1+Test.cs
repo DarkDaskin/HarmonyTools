@@ -1,6 +1,8 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
+using System.Linq;
 
 namespace HarmonyTools.Test
 {
@@ -13,10 +15,13 @@ namespace HarmonyTools.Test
             {
                 SolutionTransforms.Add((solution, projectId) =>
                 {
-                    var compilationOptions = solution.GetProject(projectId).CompilationOptions;
+                    var project = solution.GetProject(projectId)!;
+                    var compilationOptions = project.CompilationOptions!;
                     compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(
                         compilationOptions.SpecificDiagnosticOptions.SetItems(CSharpVerifierHelper.NullableWarnings));
-                    solution = solution.WithProjectCompilationOptions(projectId, compilationOptions);
+                    solution = solution
+                        .WithProjectCompilationOptions(projectId, compilationOptions)
+                        .WithProjectMetadataReferences(projectId, CSharpVerifierHelper.Resolve(ReferenceAssemblies, "C#"));
 
                     return solution;
                 });
