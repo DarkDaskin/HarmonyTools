@@ -1,6 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace HarmonyTools.Analyzers;
@@ -13,12 +15,17 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 #pragma warning disable RS2008
     private static readonly DiagnosticDescriptor MethodMustExistRule = 
         CreateRule(DiagnosticIds.MethodMustExist, nameof(Resources.MethodMustExistTitle), nameof(Resources.MethodMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor MethodMustNotBeAmbiguousRule = 
+        CreateRule(DiagnosticIds.MethodMustNotBeAmbiguous, nameof(Resources.MethodMustNotBeAmbiguousTitle), nameof(Resources.MethodMustNotBeAmbiguousMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [MethodMustExistRule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
+        MethodMustExistRule,
+        MethodMustNotBeAmbiguousRule,
+    ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
         string category, DiagnosticSeverity severity, bool isEnabledByDefault = true, string? descriptionResource = null) =>
-        new DiagnosticDescriptor(id,
+        new (id,
             new LocalizableResourceString(titleResource, Resources.ResourceManager, typeof(Resources)),
             new LocalizableResourceString(messageFormatResource, Resources.ResourceManager, typeof(Resources)),
             category, severity, isEnabledByDefault,
@@ -43,7 +50,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         if (patchDescription == null)
             return;
 
-        CheckMethodMustExist(context, patchDescription);
+        CommonChecks(context, patchDescription);
     }
 
     private static void AnalyzeTypeV2(SymbolAnalysisContext context)
@@ -54,20 +61,151 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         if (patchDescription == null)
             return;
 
-        CheckMethodMustExist(context, patchDescription);
+        CommonChecks(context, patchDescription);
     }
 
-    private static void CheckMethodMustExist(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
+    private static void CommonChecks(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
     {
-        if (patchDescription is not { PatchedTypes: [{ Value: not null }], PatchedMethodNames: [{ Value: not null }] })
+        CheckMethodMustExistAndNotAmbiguous(context, patchDescription);
+    }
+
+    private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
+    {
+        if (patchDescription.MethodNames.Length > 1 || patchDescription.MethodTypes.Length > 1 || 
+            patchDescription.ArgumentTypes.Length > 1 || patchDescription.ArgumentVariations.Length > 1)
+            return;
+        if (patchDescription.TargetTypes is not [{ Value: not null }])
             return;
 
-        var targetType = patchDescription.PatchedTypes[0].Value!;
-        var targetMethodName = patchDescription.PatchedMethodNames[0].Value!;
-        var porentialTargetMembers = targetType.GetMembers(targetMethodName);
-        // TODO: narrow method
-        if (porentialTargetMembers.Count(member => member is IMethodSymbol or IPropertySymbol) == 0)
-            context.ReportDiagnostic(Diagnostic.Create(MethodMustExistRule, patchDescription.PatchedMethodNames[0].Syntax?.GetLocation(), 
-                targetType.ToDisplayString(), targetMethodName));
+        var targetType = patchDescription.TargetTypes[0].Value!;
+        var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
+        var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null }];
+
+        IEnumerable<ISymbol> targetMembers;
+        string memberName;
+        switch (methodType)
+        {
+            case MethodType.Constructor when !isMemberNameSpecified:
+                targetMembers = targetType.InstanceConstructors;
+                memberName = ".ctor";
+                break;
+            case MethodType.StaticConstructor when !isMemberNameSpecified:
+                targetMembers = targetType.StaticConstructors;
+                memberName = ".cctor";
+                break;
+            // TODO: check that Enumerator and Async methods are actually as such
+            case MethodType.Normal or MethodType.Getter or MethodType.Setter or MethodType.Enumerator or MethodType.Async 
+                when isMemberNameSpecified:
+                memberName = patchDescription.MethodNames[0].Value!;
+                targetMembers = targetType.GetMembers(memberName);
+                switch (methodType)
+                {
+                    case MethodType.Getter:
+                        targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.GetMethod is not null);
+                        memberName = $"get_{memberName}";
+                        break;
+                    case MethodType.Setter:
+                        targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.SetMethod is not null);
+                        memberName = $"set_{memberName}";
+                        break;
+                    default:
+                        targetMembers = targetMembers.OfType<IMethodSymbol>();
+                        break;
+                }
+                break;
+            case MethodType.Getter or MethodType.Setter when !isMemberNameSpecified:
+                memberName = "this[]";
+                targetMembers = targetType.GetMembers(memberName);
+                switch (methodType)
+                {
+                    case MethodType.Getter:
+                        targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.GetMethod is not null);
+                        memberName = "get_Item";
+                        break;
+                    case MethodType.Setter:
+                        targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.SetMethod is not null);
+                        memberName = "set_Item";
+                        break;
+                }
+                break;
+            default:
+                return;
+        }
+
+        if (patchDescription.ArgumentTypes.Length == 1)
+        {
+            var argumentTypes = patchDescription.ArgumentTypes[0].Value;
+            var argumentVariations = patchDescription.ArgumentVariations.Length == 0 ?
+                [..argumentTypes.Select(_ => ArgumentType.Normal)] :
+                patchDescription.ArgumentVariations[0].Value;
+
+            if (argumentTypes.Length != argumentVariations.Length)
+                return;
+
+            if (methodType == MethodType.StaticConstructor && argumentTypes.Length > 0)
+                return;
+
+            if (methodType is MethodType.Getter or MethodType.Setter && isMemberNameSpecified && argumentTypes.Length > 0)
+                return;
+
+            targetMembers = targetMembers.Where(member => IsMatch(member, argumentTypes, argumentVariations, context.Compilation));
+        }
+
+        var count = targetMembers.Count();
+        // TODO: support static constructors
+        // Currently disabled due to targetType.StaticConstructors being always empty.
+        if (count == 0 && methodType != MethodType.StaticConstructor)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustExistRule, 
+                patchDescription.AttrubuteSyntaxes.FirstOrDefault()?.GetLocation(),
+                patchDescription.AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation()),
+                memberName, targetType.ToDisplayString()));
+        else if (count > 1)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeAmbiguousRule, 
+                patchDescription.AttrubuteSyntaxes.FirstOrDefault()?.GetLocation(),
+                patchDescription.AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation()),
+                memberName, targetType.ToDisplayString(), count));
+    }
+
+    private static bool IsMatch(ISymbol member, ImmutableArray<ITypeSymbol?> types, ImmutableArray<ArgumentType> variations, 
+        Compilation compilation) =>
+        member switch
+        {
+            IMethodSymbol method => IsMatch(method, types, variations, compilation),
+            IPropertySymbol { GetMethod: not null } property => IsMatch(property.GetMethod, types, variations, compilation),
+            IPropertySymbol { SetMethod: not null } property => IsMatch(property.SetMethod, types, variations, compilation, true),
+            _ => false
+        };
+
+    private static bool IsMatch(IMethodSymbol method, ImmutableArray<ITypeSymbol?> types, ImmutableArray<ArgumentType> variations, 
+        Compilation compilation, bool isSetter = false)
+    {
+        var parameters = method.Parameters;
+        if (isSetter)
+            parameters = parameters[..^1];
+
+        if (parameters.Length != types.Length)
+            return false;
+
+        Debug.Assert(types.Length == variations.Length);
+        for (var i = 0; i < types.Length; i++)
+        {
+            var type = types[i];
+
+            if (type is null)
+                return false;
+
+            if (variations[i] == ArgumentType.Pointer)
+                type = compilation.CreatePointerTypeSymbol(type);
+
+            if (!parameters[i].Type.Equals(type, SymbolEqualityComparer.Default))
+                return false;
+
+            if (variations[i] == ArgumentType.Ref && parameters[i].RefKind != RefKind.Ref)
+                return false;
+            if (variations[i] == ArgumentType.Out && parameters[i].RefKind != RefKind.Out)
+                return false;
+        }
+
+        return true;
     }
 }

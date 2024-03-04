@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HarmonyTools.CodeFixes\HarmonyTools.CodeFixes.csproj" />
     <ProjectReference Include="..\HarmonyTools.Analyzers\HarmonyTools.Analyzers.csproj" />
+    <ProjectReference Include="..\HarmonyTools.Test.PatchBase\HarmonyTools.Test.PatchBase.csproj" />
   </ItemGroup>
 
 </Project>

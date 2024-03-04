@@ -1,11 +1,11 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis;
 
 namespace HarmonyTools.Analyzers;
 
-internal class DetailWithSyntax<T>(T value, CSharpSyntaxNode? syntax)
+internal class DetailWithSyntax<T>(T value, SyntaxNode? syntax)
 {
     public T Value { get; } = value;
-    public CSharpSyntaxNode? Syntax { get; } = syntax;
+    public SyntaxNode? Syntax { get; } = syntax;
 
     public override string? ToString() => Value?.ToString();
 }

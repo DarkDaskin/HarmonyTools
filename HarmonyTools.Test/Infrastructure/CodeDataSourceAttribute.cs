@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -29,29 +28,12 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
             .Where(v => !v.MSBuildPath.Contains("preview"))
             .OrderByDescending(v => v.Version)
             .First();
-        //FixTrailingSlash(latestInstance);
         MSBuildLocator.RegisterInstance(latestInstance);
 
         Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
         foreach (var version in Versions)
             ReferenceAssembliesPerVersion.Add(version, GetReferenceAssemblies(version));
-    }
-
-    private static void FixTrailingSlash(VisualStudioInstance instance)
-    {
-        foreach (var field in instance.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
-        {
-            if (field.Name.Contains("Path"))
-            {
-                var value = (string)field.GetValue(instance)!;
-                if (!value.EndsWith("\\"))
-                {
-                    value += "\\";
-                    field.SetValue(instance, value);
-                }
-            }
-        }
     }
 
     private static ReferenceAssemblies GetReferenceAssemblies(int version)

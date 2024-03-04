@@ -123,4 +123,10 @@
   <data name="MethodMustExistTitle" xml:space="preserve">
     <value>Target method does not exist</value>
   </data>
+  <data name="MethodMustNotBeAmbiguousMessageFormat" xml:space="preserve">
+    <value>Ambiguous match on target method '{0}' in type '{1}': {2} canditates found.</value>
+  </data>
+  <data name="MethodMustNotBeAmbiguousTitle" xml:space="preserve">
+    <value>Ambiguous match on target method</value>
+  </data>
 </root>

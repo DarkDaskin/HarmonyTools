@@ -77,5 +77,23 @@ namespace HarmonyTools.Analyzers {
                 return ResourceManager.GetString("MethodMustExistTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous match on target method &apos;{0}&apos; in type &apos;{1}&apos;: {2} canditates found..
+        /// </summary>
+        internal static string MethodMustNotBeAmbiguousMessageFormat {
+            get {
+                return ResourceManager.GetString("MethodMustNotBeAmbiguousMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous match on target method.
+        /// </summary>
+        internal static string MethodMustNotBeAmbiguousTitle {
+            get {
+                return ResourceManager.GetString("MethodMustNotBeAmbiguousTitle", resourceCulture);
+            }
+        }
     }
 }

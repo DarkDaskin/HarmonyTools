@@ -25,18 +25,55 @@ public class DummyTests
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
     }
 
-    [TestMethod, CodeDataSource("SimplePatch.cs")]
-    public async Task SimplePatch(string code, ReferenceAssemblies referenceAssemblies)
+    [TestMethod, CodeDataSource("ValidSimplePatches.cs")]
+    public async Task WhenValidSimplePatches_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
     {
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
     }
 
-    [TestMethod, CodeDataSource("NonExistingMethod.cs")]
-    public async Task NonExistingMethod(string code, ReferenceAssemblies referenceAssemblies)
+    [TestMethod, CodeDataSource("NonExistingMethods.cs")]
+    public async Task WhenNonExistingMethods_Report(string code, ReferenceAssemblies referenceAssemblies)
     {
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, 
             new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
-                .WithSpan(6, 40, 6, 59)
-                .WithArguments("HarmonyTools.Test.PatchBase.SimpleClass", "NonExistingMethod"));
+                .WithSpan(6, 6, 6, 60)
+                .WithArguments("NonExistingMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(12, 6, 12, 93)
+                .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(18, 6, 19, 61)
+                .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(25, 6, 25, 79)
+                .WithArguments(".ctor", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            // TODO: enable when static constructor detection is fixed
+            //new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+            //    .WithSpan(31, 6, 31, 77)
+            //    .WithArguments(".cctor", "HarmonyTools.Test.PatchBase.NoStaticConstructor"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(37, 6, 37, 77)
+                .WithArguments("get_NonExistingProp", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(43, 6, 43, 92)
+                .WithArguments("set_ReadOnlyProp", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(49, 6, 49, 74)
+                .WithArguments("get_Item", "HarmonyTools.Test.PatchBase.SimpleClass"));
+    }
+
+    [TestMethod, CodeDataSource("AmbiguousMatches.cs")]
+    public async Task WhenAmbiguousMatches_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, 
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
+                .WithSpan(6, 6, 6, 77)
+                .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass", "3"),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
+                .WithSpan(12, 6, 12, 58)
+                .WithArguments("get_Item", "HarmonyTools.Test.PatchBase.SimpleClass", "2"),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
+                .WithSpan(18, 6, 18, 72)
+                .WithArguments(".ctor", "HarmonyTools.Test.PatchBase.MultipleConstructors", "2"));
     }
 }
