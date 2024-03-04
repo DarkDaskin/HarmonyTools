@@ -152,9 +152,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         }
 
         var count = targetMembers.Count();
-        // TODO: support static constructors
-        // Currently disabled due to targetType.StaticConstructors being always empty.
-        if (count == 0 && methodType != MethodType.StaticConstructor)
+        if (count == 0)
             context.ReportDiagnostic(Diagnostic.Create(MethodMustExistRule, 
                 patchDescription.AttrubuteSyntaxes.FirstOrDefault()?.GetLocation(),
                 patchDescription.AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation()),

@@ -47,10 +47,9 @@ public class DummyTests
             new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(25, 6, 25, 79)
                 .WithArguments(".ctor", "HarmonyTools.Test.PatchBase.SimpleClass"),
-            // TODO: enable when static constructor detection is fixed
-            //new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
-            //    .WithSpan(31, 6, 31, 77)
-            //    .WithArguments(".cctor", "HarmonyTools.Test.PatchBase.NoStaticConstructor"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(31, 6, 31, 77)
+                .WithArguments(".cctor", "HarmonyTools.Test.PatchBase.NoStaticConstructor"),
             new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(37, 6, 37, 77)
                 .WithArguments("get_NonExistingProp", "HarmonyTools.Test.PatchBase.SimpleClass"),
