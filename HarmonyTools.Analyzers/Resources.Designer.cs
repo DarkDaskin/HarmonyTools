@@ -61,6 +61,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not enough information to target a method..
+        /// </summary>
+        internal static string MethodMustBeSpecifiedMessageFormat {
+            get {
+                return ResourceManager.GetString("MethodMustBeSpecifiedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough information to target a method.
+        /// </summary>
+        internal static string MethodMustBeSpecifiedTitle {
+            get {
+                return ResourceManager.GetString("MethodMustBeSpecifiedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target method &apos;{0}&apos; does not exist in type &apos;{1}&apos;..
         /// </summary>
         internal static string MethodMustExistMessageFormat {
@@ -93,6 +111,24 @@ namespace HarmonyTools.Analyzers {
         internal static string MethodMustNotBeAmbiguousTitle {
             get {
                 return ResourceManager.GetString("MethodMustNotBeAmbiguousTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Conflicting method specifications found..
+        /// </summary>
+        internal static string MethodMustNotBeOverspecifiedMessageFormat {
+            get {
+                return ResourceManager.GetString("MethodMustNotBeOverspecifiedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Conflicting method specifications found.
+        /// </summary>
+        internal static string MethodMustNotBeOverspecifiedTitle {
+            get {
+                return ResourceManager.GetString("MethodMustNotBeOverspecifiedTitle", resourceCulture);
             }
         }
         

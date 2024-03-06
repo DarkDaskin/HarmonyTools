@@ -19,11 +19,17 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.MethodMustNotBeAmbiguous, nameof(Resources.MethodMustNotBeAmbiguousTitle), nameof(Resources.MethodMustNotBeAmbiguousMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor TypeMustExistRule = 
         CreateRule(DiagnosticIds.TypeMustExist, nameof(Resources.TypeMustExistTitle), nameof(Resources.TypeMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor MethodMustBeSpecifiedRule = 
+        CreateRule(DiagnosticIds.MethodMustBeSpecified, nameof(Resources.MethodMustBeSpecifiedTitle), nameof(Resources.MethodMustBeSpecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor MethodMustNotBeOverspecifiedRule = 
+        CreateRule(DiagnosticIds.MethodMustNotBeOverspecified, nameof(Resources.MethodMustNotBeOverspecifiedTitle), nameof(Resources.MethodMustNotBeOverspecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         MethodMustExistRule,
         MethodMustNotBeAmbiguousRule,
         TypeMustExistRule,
+        MethodMustBeSpecifiedRule,
+        MethodMustNotBeOverspecifiedRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -92,6 +98,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
     private static void CommonChecks(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
     {
         CheckMethodMustExistAndNotAmbiguous(context, patchDescription);
+        CheckMethodMustBeSpecified(context, patchDescription);
+        CheckMethodMustNotBeOverspecified(context, patchDescription);
     }
 
     private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
@@ -116,8 +124,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
     private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription, INamedTypeSymbol targetType)
     {
-        if (patchDescription.MethodNames.Length > 1 || patchDescription.MethodTypes.Length > 1 || 
-            patchDescription.ArgumentTypes.Length > 1 || patchDescription.ArgumentVariations.Length > 1)
+        if (HasConflictingSpecifications(patchDescription))
             return;
 
         var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
@@ -215,6 +222,65 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(TypeMustExistRule,
                 patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
                 targetTypeName));
+    }
+
+    private static void CheckMethodMustBeSpecified(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
+    {
+        if (HasConflictingSpecifications(patchDescription))
+            return;
+
+        var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
+        var isMemberTypeSpecified = patchDescription.TargetTypes is [{ Value: not null }] ||
+                                    patchDescription is HarmonyPatchDescriptionV2 { TargetTypeNames: [{ Value: not null }] };
+        var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null }];
+        if (!isMemberTypeSpecified || methodType is MethodType.Normal && !isMemberNameSpecified)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustBeSpecifiedRule,
+                patchDescription.GetLocation(), patchDescription.GetAdditionalLocations()));
+    }
+
+    private static void CheckMethodMustNotBeOverspecified(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
+    {
+        if (patchDescription is HarmonyPatchDescriptionV2 patchDescriptionV2)
+        {
+            var typeDetails = patchDescriptionV2.TargetTypes.Concat<IWithSyntax>(patchDescriptionV2.TargetTypeNames).ToList();
+            if (typeDetails.Count > 1)
+                context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
+                    typeDetails.GetLocation(), typeDetails.GetAdditionalLocations()));
+        }
+        else if (patchDescription.TargetTypes.Length > 1)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
+                patchDescription.TargetTypes.GetLocation(), patchDescription.TargetTypes.GetAdditionalLocations()));        
+
+        if (patchDescription.MethodNames.Length > 1)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
+                patchDescription.MethodNames.GetLocation(), patchDescription.MethodNames.GetAdditionalLocations()));
+
+        if (patchDescription.MethodTypes.Length > 1)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
+                patchDescription.MethodTypes.GetLocation(), patchDescription.MethodTypes.GetAdditionalLocations()));
+
+        if (patchDescription.ArgumentTypes.Length > 1)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
+                patchDescription.ArgumentTypes.GetLocation(), patchDescription.ArgumentTypes.GetAdditionalLocations()));
+
+        if (patchDescription.ArgumentVariations.Length > 1)
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
+                patchDescription.ArgumentVariations.GetLocation(), patchDescription.ArgumentVariations.GetAdditionalLocations()));
+    }
+
+    private static bool HasConflictingSpecifications(HarmonyPatchDescription patchDescription)
+    {
+        if (patchDescription.TargetTypes.Length > 1 || patchDescription.MethodNames.Length > 1 || patchDescription.MethodTypes.Length > 1 ||
+            patchDescription.ArgumentTypes.Length > 1 || patchDescription.ArgumentVariations.Length > 1)
+            return true;
+
+        if (patchDescription is HarmonyPatchDescriptionV2 { TargetTypeNames.Length: > 1 })
+            return true;
+
+        if (patchDescription is HarmonyPatchDescriptionV2 { TargetTypes: [_], TargetTypeNames: [_] })
+            return true;
+
+        return false;
     }
 
     private static bool IsMatch(ISymbol member, ImmutableArray<ITypeSymbol?> types, ImmutableArray<ArgumentType> variations, 

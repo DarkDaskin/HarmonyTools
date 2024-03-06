@@ -102,4 +102,66 @@ public class DummyTests
                 .WithSpan(5, 6, 5, 76)
                 .WithArguments("HarmonyTools.Test.PatchBase.NonExistingClass"));
     }
+
+    [TestMethod, CodeDataSource("UnspecifiedMethods.cs")]
+    public async Task WhenUnspecifiedMethods_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(6, 6, 6, 18),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(12, 6, 12, 39),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(18, 6, 18, 52),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(24, 6, 24, 71),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(30, 6, 30, 42),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(36, 6, 36, 44));
+    }
+
+    [TestMethod, CodeDataSource("OverspecifiedMethods.cs")]
+    public async Task WhenOverspecifiedMethods_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        var expected = new List<DiagnosticResult>
+        {
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(6, 19, 6, 38)
+                .WithSpan(7, 19, 7, 38),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(13, 40, 13, 72)
+                .WithSpan(14, 19, 14, 55),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(20, 40, 20, 72)
+                .WithSpan(21, 19, 21, 52),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(27, 78, 27, 89)
+                .WithSpan(28, 19, 28, 59),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(34, 78, 34, 112)
+                .WithSpan(36, 19, 36, 53),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(35, 9, 35, 59)
+                .WithSpan(36, 55, 36, 105),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(42, 74, 42, 91)
+                .WithSpan(43, 19, 43, 36)
+                .WithSpan(44, 19, 44, 36),
+        };
+        if (referenceAssemblies.GetHarmonyVersion() == 2)
+            expected.AddRange([
+                new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                    .WithSpan(50, 19, 50, 60)
+                    .WithSpan(51, 19, 51, 60),
+                new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                    .WithSpan(50, 62, 50, 94)
+                    .WithSpan(51, 62, 51, 98),
+                new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                    .WithSpan(57, 19, 57, 60)
+                    .WithSpan(58, 19, 58, 38),
+            ]);
+
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
+    }
 }
