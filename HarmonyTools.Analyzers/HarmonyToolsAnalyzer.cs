@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace HarmonyTools.Analyzers;
 
@@ -36,10 +36,29 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.EnableConcurrentExecution();
 
-        // TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
-        // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-        context.RegisterSymbolAction(AnalyzeTypeV1, SymbolKind.NamedType);
-        context.RegisterSymbolAction(AnalyzeTypeV2, SymbolKind.NamedType);
+        context.RegisterCompilationStartAction(RegisterActionsWithFullMetadata);
+        context.RegisterCompilationAction(RunAnalyzerWithFullMetadata);
+    }
+
+    private static void RegisterActionsWithFullMetadata(CompilationStartAnalysisContext context)
+    {
+        if (context.Compilation.Options.MetadataImportOptions == MetadataImportOptions.All)
+        {
+            context.RegisterSymbolAction(AnalyzeTypeV1, SymbolKind.NamedType);
+            context.RegisterSymbolAction(AnalyzeTypeV2, SymbolKind.NamedType);
+        }
+    }
+
+    private void RunAnalyzerWithFullMetadata(CompilationAnalysisContext context)
+    {
+        if (context.Compilation.Options.MetadataImportOptions == MetadataImportOptions.All)
+            return;
+
+        var compilation = context.Compilation.WithOptions(context.Compilation.Options.WithMetadataImportOptions(MetadataImportOptions.All));
+        var compilationWithAnalyzer = new CompilationWithAnalyzers(compilation, [this], context.Options);
+        var disgnostics = compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(context.CancellationToken).Result;
+        foreach (var disgnostic in disgnostics)
+            context.ReportDiagnostic(disgnostic);
     }
 
     private static void AnalyzeTypeV1(SymbolAnalysisContext context)
