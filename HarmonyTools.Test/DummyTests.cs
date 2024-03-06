@@ -1,4 +1,5 @@
-﻿using HarmonyTools.Test.Infrastructure;
+﻿using System.Collections.Generic;
+using HarmonyTools.Test.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using HarmonyTools.Analyzers;
@@ -34,7 +35,8 @@ public class DummyTests
     [TestMethod, CodeDataSource("NonExistingMethods.cs")]
     public async Task WhenNonExistingMethods_Report(string code, ReferenceAssemblies referenceAssemblies)
     {
-        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, 
+        var expected = new List<DiagnosticResult>
+        {
             new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(6, 6, 6, 60)
                 .WithArguments("NonExistingMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
@@ -58,13 +60,22 @@ public class DummyTests
                 .WithArguments("set_ReadOnlyProp", "HarmonyTools.Test.PatchBase.SimpleClass"),
             new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(49, 6, 49, 74)
-                .WithArguments("get_Item", "HarmonyTools.Test.PatchBase.SimpleClass"));
+                .WithArguments("get_Item", "HarmonyTools.Test.PatchBase.SimpleClass"),
+        };
+        if (referenceAssemblies.GetHarmonyVersion() == 2)
+            expected.Add(new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(55, 6, 55, 99)
+                .WithSpan(56, 6, 56, 44)
+                .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass"));
+
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
 
     [TestMethod, CodeDataSource("AmbiguousMatches.cs")]
     public async Task WhenAmbiguousMatches_Report(string code, ReferenceAssemblies referenceAssemblies)
     {
-        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, 
+        var expected = new List<DiagnosticResult>
+        {
             new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
                 .WithSpan(6, 6, 6, 77)
                 .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass", "3"),
@@ -73,6 +84,13 @@ public class DummyTests
                 .WithArguments("get_Item", "HarmonyTools.Test.PatchBase.SimpleClass", "2"),
             new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
                 .WithSpan(18, 6, 18, 72)
-                .WithArguments(".ctor", "HarmonyTools.Test.PatchBase.MultipleConstructors", "2"));
+                .WithArguments(".ctor", "HarmonyTools.Test.PatchBase.MultipleConstructors", "2"),
+        };
+        if (referenceAssemblies.GetHarmonyVersion() == 2)
+            expected.Add(new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
+                .WithSpan(24, 6, 24, 99)
+                .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass", "3"));
+
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
 }

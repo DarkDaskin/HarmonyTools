@@ -63,9 +63,6 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
     private static int GetVersion(object[] data)
     {
         var assemblies = (ReferenceAssemblies)data[1];
-        var harmonyAssemblyPath = assemblies.Assemblies.Single(s => s.Contains("0Harmony"));
-        var parts = harmonyAssemblyPath.Split(PathIO.DirectorySeparatorChar);
-        var version = Version.Parse(parts[^4]);
-        return version.Major;
+        return assemblies.GetHarmonyVersion();
     }
 }

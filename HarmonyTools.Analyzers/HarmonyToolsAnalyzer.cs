@@ -81,6 +81,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             return;
 
         CommonChecks(context, patchDescription);
+
+        CheckMethodMustExistAndNotAmbiguousV2(context, patchDescription);
     }
 
     private static void CommonChecks(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
@@ -90,13 +92,30 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
     private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
     {
-        if (patchDescription.MethodNames.Length > 1 || patchDescription.MethodTypes.Length > 1 || 
-            patchDescription.ArgumentTypes.Length > 1 || patchDescription.ArgumentVariations.Length > 1)
-            return;
         if (patchDescription.TargetTypes is not [{ Value: not null }])
             return;
 
         var targetType = patchDescription.TargetTypes[0].Value!;
+        CheckMethodMustExistAndNotAmbiguous(context, patchDescription, targetType);
+    }
+
+    private static void CheckMethodMustExistAndNotAmbiguousV2(SymbolAnalysisContext context, HarmonyPatchDescriptionV2 patchDescription)
+    {
+        if (patchDescription.TargetTypeNames is not [{ Value: not null }])
+            return;
+
+        var targetTypeName = patchDescription.TargetTypeNames[0].Value!;
+        var targetType = context.Compilation.GetTypeByMetadataName(targetTypeName);
+        if (targetType is not null)
+            CheckMethodMustExistAndNotAmbiguous(context, patchDescription, targetType);
+    }
+
+    private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription, INamedTypeSymbol targetType)
+    {
+        if (patchDescription.MethodNames.Length > 1 || patchDescription.MethodTypes.Length > 1 || 
+            patchDescription.ArgumentTypes.Length > 1 || patchDescription.ArgumentVariations.Length > 1)
+            return;
+
         var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
         var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null }];
 

@@ -7,7 +7,7 @@ internal class HarmonyPatchDescriptionV2 : HarmonyPatchDescription
 {
     public override int HarmonyVersion => 2;
 
-    public static ImmutableArray<DetailWithSyntax<string?>> TargetTypeNames { get; private set; } = [];
+    public ImmutableArray<DetailWithSyntax<string?>> TargetTypeNames { get; private set; } = [];
 
     public static HarmonyPatchDescriptionV2? Parse(INamedTypeSymbol type, Compilation compilation) => 
         Parse<HarmonyPatchDescriptionV2>(type, compilation, "HarmonyLib");
