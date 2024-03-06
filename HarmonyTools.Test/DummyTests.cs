@@ -93,4 +93,13 @@ public class DummyTests
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
+
+    [TestMethod, CodeDataSource("NonExistingType.cs")]
+    public async Task WhenNonExistingType_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.TypeMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(5, 6, 5, 76)
+                .WithArguments("HarmonyTools.Test.PatchBase.NonExistingClass"));
+    }
 }

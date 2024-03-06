@@ -17,10 +17,13 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.MethodMustExist, nameof(Resources.MethodMustExistTitle), nameof(Resources.MethodMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor MethodMustNotBeAmbiguousRule = 
         CreateRule(DiagnosticIds.MethodMustNotBeAmbiguous, nameof(Resources.MethodMustNotBeAmbiguousTitle), nameof(Resources.MethodMustNotBeAmbiguousMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor TypeMustExistRule = 
+        CreateRule(DiagnosticIds.TypeMustExist, nameof(Resources.TypeMustExistTitle), nameof(Resources.TypeMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         MethodMustExistRule,
         MethodMustNotBeAmbiguousRule,
+        TypeMustExistRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -83,6 +86,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CommonChecks(context, patchDescription);
 
         CheckMethodMustExistAndNotAmbiguousV2(context, patchDescription);
+        CheckTypeMustExistV2(context, patchDescription);
     }
 
     private static void CommonChecks(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
@@ -191,15 +195,26 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         var count = targetMembers.Count();
         if (count == 0)
-            context.ReportDiagnostic(Diagnostic.Create(MethodMustExistRule, 
-                patchDescription.AttrubuteSyntaxes.FirstOrDefault()?.GetLocation(),
-                patchDescription.AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation()),
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustExistRule,
+                patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
                 memberName, targetType.ToDisplayString()));
         else if (count > 1)
-            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeAmbiguousRule, 
-                patchDescription.AttrubuteSyntaxes.FirstOrDefault()?.GetLocation(),
-                patchDescription.AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation()),
+            context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeAmbiguousRule,
+                patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
                 memberName, targetType.ToDisplayString(), count));
+    }
+
+    private static void CheckTypeMustExistV2(SymbolAnalysisContext context, HarmonyPatchDescriptionV2 patchDescription)
+    {
+        if (patchDescription.TargetTypeNames is not [{ Value: not null }])
+            return;
+
+        var targetTypeName = patchDescription.TargetTypeNames[0].Value!;
+        var targetType = context.Compilation.GetTypeByMetadataName(targetTypeName);
+        if (targetType is null)
+            context.ReportDiagnostic(Diagnostic.Create(TypeMustExistRule,
+                patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
+                targetTypeName));
     }
 
     private static bool IsMatch(ISymbol member, ImmutableArray<ITypeSymbol?> types, ImmutableArray<ArgumentType> variations, 

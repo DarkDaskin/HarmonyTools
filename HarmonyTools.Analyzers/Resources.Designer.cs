@@ -95,5 +95,23 @@ namespace HarmonyTools.Analyzers {
                 return ResourceManager.GetString("MethodMustNotBeAmbiguousTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type &apos;{0}&apos; does not exist..
+        /// </summary>
+        internal static string TypeMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("TypeMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type does not exist.
+        /// </summary>
+        internal static string TypeMustExistTitle {
+            get {
+                return ResourceManager.GetString("TypeMustExistTitle", resourceCulture);
+            }
+        }
     }
 }

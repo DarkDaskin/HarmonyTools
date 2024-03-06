@@ -129,4 +129,10 @@
   <data name="MethodMustNotBeAmbiguousTitle" xml:space="preserve">
     <value>Ambiguous match on target method</value>
   </data>
+  <data name="TypeMustExistMessageFormat" xml:space="preserve">
+    <value>Target type '{0}' does not exist.</value>
+  </data>
+  <data name="TypeMustExistTitle" xml:space="preserve">
+    <value>Target type does not exist</value>
+  </data>
 </root>

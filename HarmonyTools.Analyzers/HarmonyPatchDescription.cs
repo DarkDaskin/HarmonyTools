@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -168,4 +169,8 @@ internal abstract class HarmonyPatchDescription
         var argumentSyntax = attributeSyntax?.ArgumentList?.Arguments[constructorParameterIndex];
         return new DetailWithSyntax<ImmutableArray<T?>>(value, argumentSyntax);
     }
+
+    public Location? GetLocation() => AttrubuteSyntaxes.FirstOrDefault()?.GetLocation();
+
+    public IEnumerable<Location> GetAdditionalLocations() => AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation());
 }
