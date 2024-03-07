@@ -62,7 +62,7 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
         where TPatchDescription: HarmonyPatchDescription
     {
         TPatchDescription? patchDescription = null;
-        ImmutableArray<PatchMethodKind> methodKinds = [];
+        ImmutableArray<DetailWithSyntax<PatchMethodKind>> methodKinds = [];
 
         var methodAttributes = method.GetAttributes();
         foreach (var attribute in methodAttributes)
@@ -72,56 +72,57 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
                 patchDescription ??= patchDescriptionConstructor(method);
                 patchDescription.ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
             }
-
+            
             if (attribute.Is(wellKnownTypes.HarmonyPrefix))
-                methodKinds = methodKinds.Add(PatchMethodKind.Prefix);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Prefix, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyPostfix))
-                methodKinds = methodKinds.Add(PatchMethodKind.Postfix);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Postfix, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyTranspiler))
-                methodKinds = methodKinds.Add(PatchMethodKind.Transpiler);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Transpiler, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyFinalizer))
-                methodKinds = methodKinds.Add(PatchMethodKind.Finalizer);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Finalizer, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyReversePatch))
-                methodKinds = methodKinds.Add(PatchMethodKind.ReversePatch);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.ReversePatch, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyPrepare))
-                methodKinds = methodKinds.Add(PatchMethodKind.Prepare);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Prepare, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyCleanup))
-                methodKinds = methodKinds.Add(PatchMethodKind.Cleanup);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Cleanup, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyTargetMethod))
-                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethod);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.TargetMethod, attribute.GetSyntax()));
             if (attribute.Is(wellKnownTypes.HarmonyTargetMethods))
-                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethods);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.TargetMethods, attribute.GetSyntax()));
         }
 
         var isHarmony2 = typeof(TPatchDescription) == typeof(HarmonyPatchDescriptionV2);
+        var methodSyntax = method.GetSyntax(methodKinds.Select(detail => detail.Syntax).FirstOrDefault(syntax => syntax is not null));
         switch (method.Name)
         {
             case nameof(PatchMethodKind.Prefix):
-                methodKinds = methodKinds.Add(PatchMethodKind.Prefix);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Prefix, methodSyntax));
                 break;
             case nameof(PatchMethodKind.Postfix):
-                methodKinds = methodKinds.Add(PatchMethodKind.Postfix);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Postfix, methodSyntax));
                 break;
             case nameof(PatchMethodKind.Transpiler):
-                methodKinds = methodKinds.Add(PatchMethodKind.Transpiler);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Transpiler, methodSyntax));
                 break;
             case nameof(PatchMethodKind.Finalizer) when isHarmony2:
-                methodKinds = methodKinds.Add(PatchMethodKind.Finalizer);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Finalizer, methodSyntax));
                 break;
             case nameof(PatchMethodKind.ReversePatch) when isHarmony2:
-                methodKinds = methodKinds.Add(PatchMethodKind.ReversePatch);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.ReversePatch, methodSyntax));
                 break;
             case nameof(PatchMethodKind.Prepare):
-                methodKinds = methodKinds.Add(PatchMethodKind.Prepare);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Prepare, methodSyntax));
                 break;
             case nameof(PatchMethodKind.Cleanup):
-                methodKinds = methodKinds.Add(PatchMethodKind.Cleanup);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.Cleanup, methodSyntax));
                 break;
             case nameof(PatchMethodKind.TargetMethod):
-                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethod);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.TargetMethod, methodSyntax));
                 break;
             case nameof(PatchMethodKind.TargetMethods):
-                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethods);
+                methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.TargetMethods, methodSyntax));
                 break;
         }
 

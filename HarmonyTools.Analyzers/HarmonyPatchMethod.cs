@@ -3,17 +3,17 @@ using Microsoft.CodeAnalysis;
 
 namespace HarmonyTools.Analyzers;
 
-internal class HarmonyPatchMethod(IMethodSymbol method, ImmutableArray<PatchMethodKind> methodKinds, 
+internal class HarmonyPatchMethod(IMethodSymbol method, ImmutableArray<DetailWithSyntax<PatchMethodKind>> methodKinds, 
     HarmonyPatchDescription? patchDescription)
 {
     public IMethodSymbol Method { get; } = method;
-    public ImmutableArray<PatchMethodKind> MethodKinds { get; } = methodKinds;
+    public ImmutableArray<DetailWithSyntax<PatchMethodKind>> MethodKinds { get; } = methodKinds;
     public HarmonyPatchDescription? PatchDescription { get; } = patchDescription;
 
     public override string ToString() => Method.ToString();
 }
 
-internal class HarmonyPatchMethod<TPatchDescription>(IMethodSymbol method, ImmutableArray<PatchMethodKind> methodKinds, 
+internal class HarmonyPatchMethod<TPatchDescription>(IMethodSymbol method, ImmutableArray<DetailWithSyntax<PatchMethodKind>> methodKinds, 
     TPatchDescription? patchDescription) : HarmonyPatchMethod(method, methodKinds, patchDescription)
     where TPatchDescription : HarmonyPatchDescription
 {

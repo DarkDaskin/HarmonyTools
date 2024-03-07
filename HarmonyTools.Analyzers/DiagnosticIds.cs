@@ -9,4 +9,5 @@ public static class DiagnosticIds
     public const string MethodMustNotBeOverspecified = "HT1005";
     public const string AttributeArgumentsMustBeValid = "HT1006";
     public const string ArgumentTypesAndVariationsMustMatch = "HT1007";
+    public const string HarmonyPatchAttributeMustBeOnType = "HT1008";
 }

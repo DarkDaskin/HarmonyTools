@@ -258,4 +258,12 @@ public class DummyTests
                 .WithSpan(23, 23, 23, 57)
                 .WithSpan(23, 59, 23, 88));
     }
+
+    [TestMethod, CodeDataSource("MissingHarmonyPatchOnType.cs")]
+    public async Task WhenMissingHarmonyPatchOnType_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, DiagnosticSeverity.Warning)
+                .WithSpan(6, 20, 6, 45));
+    }
 }

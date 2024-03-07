@@ -97,6 +97,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Missing HarmonyPatch attribute on type. Specified patches will not be discovered..
+        /// </summary>
+        internal static string HarmonyPatchAttributeMustBeOnTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("HarmonyPatchAttributeMustBeOnTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing HarmonyPatch attribute on type.
+        /// </summary>
+        internal static string HarmonyPatchAttributeMustBeOnTypeTitle {
+            get {
+                return ResourceManager.GetString("HarmonyPatchAttributeMustBeOnTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not enough information to target a method..
         /// </summary>
         internal static string MethodMustBeSpecifiedMessageFormat {

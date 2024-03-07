@@ -30,6 +30,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid, nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor ArgumentTypesAndVariationsMustMatchRule = 
         CreateRule(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, nameof(Resources.ArgumentTypesAndVariationsMustMatchTitle), nameof(Resources.ArgumentTypesAndVariationsMustMatchMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor HarmonyPatchAttributeMustBeOnTypeRule = 
+        CreateRule(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, nameof(Resources.HarmonyPatchAttributeMustBeOnTypeTitle), nameof(Resources.HarmonyPatchAttributeMustBeOnTypeMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         MethodMustExistRule,
@@ -39,6 +41,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         MethodMustNotBeOverspecifiedRule,
         AttributeArgumentsMustBeValidRule,
         ArgumentTypesAndVariationsMustMatchRule,
+        HarmonyPatchAttributeMustBeOnTypeRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -114,6 +117,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
             if (!set.PatchMethods.IsEmpty && !hasPatchMethodDescription && set.TypePatchDescription is not null)
                 PostMergeChecks(set.TypePatchDescription);
+
+            CheckHarmonyPatchAttributeMustBeOnType(set);
         }
 
         protected virtual void PreMergeChecks(TPatchDescription patchDescription)
@@ -328,6 +333,27 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             if (patchDescription.ArgumentVariations.Length > 1)
                 Context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
                     patchDescription.ArgumentVariations.GetLocation(), patchDescription.ArgumentVariations.GetAdditionalLocations()));
+        }
+
+        private void CheckHarmonyPatchAttributeMustBeOnType(HarmonyPatchDescriptionSet<TPatchDescription> set)
+        {
+            if (set.TypePatchDescription is not null)
+                return;
+
+            // Find any patch method having any Harmony attribute. Ignore convention-based methods, because in type not marked with HarmonyPatch
+            // method names do not have special meaning.
+            var patchMethodWithAttributeSyntax = (
+                from patchMethod in set.PatchMethods
+                let methodKindAttributeSyntax = patchMethod.MethodKinds.FirstOrDefault(detail => detail.Syntax is AttributeSyntax)?.Syntax
+                let patchDescriptionAttributeSyntax =
+                    patchMethod.PatchDescription?.AttrubuteSyntaxes.OfType<AttributeSyntax>().FirstOrDefault()
+                let syntax = patchDescriptionAttributeSyntax ?? methodKindAttributeSyntax
+                where syntax is not null
+                select (patchMethod, syntax)).FirstOrDefault();
+            if (patchMethodWithAttributeSyntax.patchMethod is not null)
+                Context.ReportDiagnostic(Diagnostic.Create(HarmonyPatchAttributeMustBeOnTypeRule,
+                    patchMethodWithAttributeSyntax.patchMethod.Method.ContainingType
+                        .GetSyntax(patchMethodWithAttributeSyntax.syntax)?.GetIdentifierLocation()));
         }
 
         protected void ReportInvalidAttributeArgument(IHasSyntax detail) =>

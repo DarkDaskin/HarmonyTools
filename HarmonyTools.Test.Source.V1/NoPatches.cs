@@ -2,6 +2,7 @@
 {
     public class NoPatches
     {
-
+        // Not a Harmony method, just same name.
+        public void Postfix() { }
     }
 }

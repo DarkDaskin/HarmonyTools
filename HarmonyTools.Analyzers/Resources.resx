@@ -129,6 +129,12 @@
   <data name="AttributeArgumentsMustBeValidTitle" xml:space="preserve">
     <value>Invalid attribute argument</value>
   </data>
+  <data name="HarmonyPatchAttributeMustBeOnTypeMessageFormat" xml:space="preserve">
+    <value>Missing HarmonyPatch attribute on type. Specified patches will not be discovered.</value>
+  </data>
+  <data name="HarmonyPatchAttributeMustBeOnTypeTitle" xml:space="preserve">
+    <value>Missing HarmonyPatch attribute on type</value>
+  </data>
   <data name="MethodMustBeSpecifiedMessageFormat" xml:space="preserve">
     <value>Not enough information to target a method.</value>
   </data>
