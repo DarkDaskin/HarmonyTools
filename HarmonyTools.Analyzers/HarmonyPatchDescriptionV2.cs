@@ -3,14 +3,14 @@ using Microsoft.CodeAnalysis;
 
 namespace HarmonyTools.Analyzers;
 
-internal class HarmonyPatchDescriptionV2 : HarmonyPatchDescription
+internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescription(symbol)
 {
     public override int HarmonyVersion => 2;
 
     public ImmutableArray<DetailWithSyntax<string?>> TargetTypeNames { get; private set; } = [];
-
-    public static HarmonyPatchDescriptionV2? Parse(INamedTypeSymbol type, Compilation compilation) => 
-        Parse<HarmonyPatchDescriptionV2>(type, compilation, "HarmonyLib");
+    
+    public static HarmonyPatchDescriptionSet<HarmonyPatchDescriptionV2> Parse(INamedTypeSymbol type, Compilation compilation) =>
+        Parse(type, compilation, "HarmonyLib", symbol => new HarmonyPatchDescriptionV2(symbol));
 
     protected override void ProcessHarmonyPatchAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {
@@ -21,5 +21,13 @@ internal class HarmonyPatchDescriptionV2 : HarmonyPatchDescription
             TargetTypeNames = TargetTypeNames.Add(GetDetailWithSyntax<string?>(attribute, 0));
             MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 1));
         }
+    }
+
+    public override void Merge(HarmonyPatchDescription other)
+    {
+        base.Merge(other);
+
+        var otherV2 = (HarmonyPatchDescriptionV2)other;
+        TargetTypeNames = TargetTypeNames.AddRange(otherV2.TargetTypeNames);
     }
 }

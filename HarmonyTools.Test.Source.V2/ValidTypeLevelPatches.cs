@@ -1,230 +1,247 @@
 ﻿using System;
-using Harmony;
+using HarmonyLib;
 using HarmonyTools.Test.PatchBase;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-namespace HarmonyTools.Test.Source.V1
+namespace HarmonyTools.Test.Source.V2
 {
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
-    internal class SimpleMethodPatchCompound1
+    internal class TypeLevelSimpleMethodPatchCompound1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod), MethodType.Normal)]
-    internal class SimpleMethodPatchCompound2
+    internal class TypeLevelSimpleMethodPatchCompound2
+    {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.SimpleMethod))]
+    internal class TypeLevelSimpleMethodPatchCompound3
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.SimpleMethod))]
-    internal class SimpleMethodPatchSeparate1
+    internal class TypeLevelSimpleMethodPatchSeparate1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.SimpleMethod)), HarmonyPatch(MethodType.Normal)]
-    internal class SimpleMethodPatchSeparate2
+    internal class TypeLevelSimpleMethodPatchSeparate2
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch, HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.SimpleMethod)), HarmonyPatch(MethodType.Normal)]
-    internal class SimpleMethodPatchSeparate3
+    internal class TypeLevelSimpleMethodPatchSeparate3
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod), typeof(int), typeof(int))]
-    internal class OverloadedMethodPatchCompound1
+    internal class TypeLevelOverloadedMethodPatchCompound1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod), new[] { typeof(int), typeof(int) },
         new[] { ArgumentType.Normal, ArgumentType.Normal })]
-    internal class OverloadedMethodPatchCompound2
+    internal class TypeLevelOverloadedMethodPatchCompound2
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))] 
     [HarmonyPatch(new[] { typeof(int), typeof(int) })]
-    internal class OverloadedMethodSeparate1
+    internal class TypeLevelOverloadedMethodSeparate1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
     [HarmonyPatch(new[] { typeof(int), typeof(int) }, new[] { ArgumentType.Normal, ArgumentType.Normal })]
-    internal class OverloadedMethodSeparate2
+    internal class TypeLevelOverloadedMethodSeparate2
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), new[] { typeof(int), typeof(int) }), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
-    internal class OverloadedMethodSeparate3
+    internal class TypeLevelOverloadedMethodSeparate3
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass))]
     [HarmonyPatch(nameof(SimpleClass.OverloadedMethod), typeof(int), typeof(int))]
-    internal class OverloadedMethodSeparate4
+    internal class TypeLevelOverloadedMethodSeparate4
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass))]
     [HarmonyPatch(nameof(SimpleClass.OverloadedMethod), new[] { typeof(int), typeof(int) }, new[] { ArgumentType.Normal, ArgumentType.Normal })]
-    internal class OverloadedMethodSeparate5
+    internal class TypeLevelOverloadedMethodSeparate5
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod), new[] { typeof(int) }, new[] { ArgumentType.Out })]
-    internal class OutMethodCompound
+    internal class TypeLevelOutMethodCompound
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
     [HarmonyPatch(new[] { typeof(int) }, new[] { ArgumentType.Out })]
-    internal class OutMethodSeparate
+    internal class TypeLevelOutMethodSeparate
     {
         public static void Postfix() { }
     }
 
 
     [HarmonyPatch(typeof(SimpleClass), MethodType.Constructor)]
-    internal class ConstructorCompound1
+    internal class TypeLevelConstructorCompound1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), MethodType.Constructor, new Type[0])]
-    internal class ConstructorCompound2
+    internal class TypeLevelConstructorCompound2
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), MethodType.Constructor, new Type[0], new ArgumentType[0])]
-    internal class ConstructorCompound3
+    internal class TypeLevelConstructorCompound3
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor)]
-    internal class ConstructorSeparate1
+    internal class TypeLevelConstructorSeparate1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor), HarmonyPatch(new Type[0])]
-    internal class ConstructorSeparate2
+    internal class TypeLevelConstructorSeparate2
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor), HarmonyPatch(new Type[0], new ArgumentType[0])]
-    internal class ConstructorSeparate3
+    internal class TypeLevelConstructorSeparate3
     {
         public static void Postfix() { }
     }
 
-    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor,new Type[0])]
-    internal class ConstructorSeparate4
+    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor, new Type[0])]
+    internal class TypeLevelConstructorSeparate4
     {
         public static void Postfix() { }
     }
 
-    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor,new Type[0], new ArgumentType[0])]
-    internal class ConstructorSeparate5
+    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Constructor, new Type[0], new ArgumentType[0])]
+    internal class TypeLevelConstructorSeparate5
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), MethodType.StaticConstructor)]
-    internal class StaticConstructorCompound
+    internal class TypeLevelStaticConstructorCompound
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.StaticConstructor)]
-    internal class StaticConstructorSeparate
+    internal class TypeLevelStaticConstructorSeparate
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.ReadOnlyProp), MethodType.Getter)]
-    internal class PropertyGetterCompound
+    internal class TypeLevelPropertyGetterCompound
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.ReadOnlyProp)), HarmonyPatch(MethodType.Getter)]
-    internal class PropertyGetterSeparate1
+    internal class TypeLevelPropertyGetterSeparate1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.ReadOnlyProp), MethodType.Getter)]
-    internal class PropertyGetterSeparate2
+    internal class TypeLevelPropertyGetterSeparate2
     {
         public static void Postfix() { }
     }
-
-    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.ReadOnlyProp), PropertyMethod.Getter)]
-    internal class PropertyGetterObsolete
-    {
-        public static void Postfix() { }
-    }
-
+    
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.ReadWriteProp), MethodType.Setter)]
-    internal class PropertySetterCompound
+    internal class TypeLevelPropertySetterCompound
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.ReadWriteProp)), HarmonyPatch(MethodType.Setter)]
-    internal class PropertySetterSeparate1
+    internal class TypeLevelPropertySetterSeparate1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.ReadWriteProp), MethodType.Setter)]
-    internal class PropertySetterSeparate2
+    internal class TypeLevelPropertySetterSeparate2
     {
         public static void Postfix() { }
     }
-
-    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.ReadWriteProp), PropertyMethod.Setter)]
-    internal class PropertySetterObsolete
-    {
-        public static void Postfix() { }
-    }
-
+    
     [HarmonyPatch(typeof(SimpleClass), MethodType.Getter, typeof(int))]
-    internal class IndexerCompound1
+    internal class TypeLevelIndexerCompound1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass), MethodType.Getter, new[] { typeof(double) }, new[] { ArgumentType.Normal })]
-    internal class IndexerCompound2
+    internal class TypeLevelIndexerCompound2
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Getter), HarmonyPatch(new[] { typeof(int) })]
-    internal class IndexerSeparate1
+    internal class TypeLevelIndexerSeparate1
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(MethodType.Getter)]
     [HarmonyPatch(new[] { typeof(int) }, new[] { ArgumentType.Normal })]
-    internal class IndexerSeparate2
+    internal class TypeLevelIndexerSeparate2
+    {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.EnumeratorMethod), MethodType.Enumerator)]
+    internal class TypeLevelEnumeratorCompound
+    {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.EnumeratorMethod)), HarmonyPatch(MethodType.Enumerator)]
+    internal class TypeLevelEnumeratorSeparate
+    {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.AsyncMethod), MethodType.Async)]
+    internal class TypeLevelAsyncCompound
+    {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.AsyncMethod)), HarmonyPatch(MethodType.Async)]
+    internal class TypeLevelAsyncSeparate
     {
         public static void Postfix() { }
     }

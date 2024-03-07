@@ -38,4 +38,18 @@ namespace HarmonyTools.Test.Source.V2
     {
         public static void Postfix() { }
     }
+
+    [HarmonyPatch]
+    internal class UnspecifiedMethod7
+    {
+        [HarmonyPatch(typeof(SimpleClass))]
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(nameof(SimpleClass.ReadOnlyProp))]
+    internal class UnspecifiedMethod8
+    {
+        [HarmonyPatch(MethodType.Getter)]
+        public static void Postfix() { }
+    }
 }

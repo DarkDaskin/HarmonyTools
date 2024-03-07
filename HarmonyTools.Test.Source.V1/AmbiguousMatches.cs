@@ -4,7 +4,7 @@ using HarmonyTools.Test.PatchBase;
 namespace HarmonyTools.Test.Source.V1
 {
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod))]
-    internal class AmbiguousMethod
+    internal class AmbiguousMethod1
     {
         public static void Postfix() { }
     }
@@ -18,6 +18,13 @@ namespace HarmonyTools.Test.Source.V1
     [HarmonyPatch(typeof(MultipleConstructors), MethodType.Constructor)]
     internal class AmbiguousConstructor
     {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch]
+    internal class AmbiguousMethod2
+    {
+        [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod))]
         public static void Postfix() { }
     }
 }

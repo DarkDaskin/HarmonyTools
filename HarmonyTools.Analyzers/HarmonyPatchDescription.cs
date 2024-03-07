@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using HarmonyTools.Analyzers.HarmonyEnums;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HarmonyTools.Analyzers;
 
-internal abstract class HarmonyPatchDescription
+internal abstract class HarmonyPatchDescription(ISymbol symbol)
 {
     public abstract int HarmonyVersion { get; }
 
+    public ISymbol Symbol { get; } = symbol;
     public ImmutableArray<SyntaxNode> AttrubuteSyntaxes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<INamedTypeSymbol?>> TargetTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<string?>> MethodNames { get; protected set; } = [];
@@ -17,25 +20,112 @@ internal abstract class HarmonyPatchDescription
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ITypeSymbol?>>> ArgumentTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ArgumentType>>> ArgumentVariations { get; protected set; } = [];
 
-    protected static TPatchDescription? Parse<TPatchDescription>(INamedTypeSymbol type, Compilation compilation, string harmonyNamespace)
-        where TPatchDescription : HarmonyPatchDescription,  new()
+    protected static HarmonyPatchDescriptionSet<TPatchDescription> Parse<TPatchDescription>(INamedTypeSymbol type, 
+        Compilation compilation, string harmonyNamespace, Func<ISymbol, TPatchDescription> patchDescriptionConstructor)
+        where TPatchDescription : HarmonyPatchDescription
     {
         var wellKnownTypes = new WellKnownTypes(compilation, harmonyNamespace);
 
-        TPatchDescription? pd = null;
+        if (wellKnownTypes.HarmonyPatch is null)
+            return HarmonyPatchDescriptionSet<TPatchDescription>.Empty;
 
-        var attributes = type.GetAttributes();
-        foreach (var attribute in attributes)
+        var typePatchDescription = GetTypePatchDescription(type, wellKnownTypes, patchDescriptionConstructor);
+
+        var patchMethods = ImmutableArray.CreateBuilder<HarmonyPatchMethod<TPatchDescription>>();
+        var methods = type.GetMembers().OfType<IMethodSymbol>().Where(method => method.MethodKind == MethodKind.Ordinary);
+        foreach (var method in methods) 
+            patchMethods.Add(GetPatchMethod(method, wellKnownTypes, patchDescriptionConstructor));
+
+        return new HarmonyPatchDescriptionSet<TPatchDescription>(typePatchDescription, patchMethods.DrainToImmutable());
+    }
+    private static TPatchDescription? GetTypePatchDescription<TPatchDescription>(INamedTypeSymbol type, WellKnownTypes wellKnownTypes,
+        Func<ISymbol, TPatchDescription> patchDescriptionConstructor) 
+        where TPatchDescription: HarmonyPatchDescription
+    {
+        TPatchDescription? patchDescription = null;
+
+        var typeAttributes = type.GetAttributes();
+        foreach (var attribute in typeAttributes)
         {
-            if (!(attribute.AttributeClass?.Equals(wellKnownTypes.HarmonyPatch, SymbolEqualityComparer.Default) ?? false))
+            if (!attribute.Is(wellKnownTypes.HarmonyPatch))
                 continue;
 
-            pd ??= new TPatchDescription();
-
-            pd.ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
+            patchDescription ??= patchDescriptionConstructor(type);
+            patchDescription.ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
         }
 
-        return pd;
+        return patchDescription;
+    }
+
+    private static HarmonyPatchMethod<TPatchDescription> GetPatchMethod<TPatchDescription>(IMethodSymbol method, 
+        WellKnownTypes wellKnownTypes, Func<ISymbol, TPatchDescription> patchDescriptionConstructor) 
+        where TPatchDescription: HarmonyPatchDescription
+    {
+        TPatchDescription? patchDescription = null;
+        ImmutableArray<PatchMethodKind> methodKinds = [];
+
+        var methodAttributes = method.GetAttributes();
+        foreach (var attribute in methodAttributes)
+        {
+            if (attribute.Is(wellKnownTypes.HarmonyPatch))
+            {
+                patchDescription ??= patchDescriptionConstructor(method);
+                patchDescription.ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
+            }
+
+            if (attribute.Is(wellKnownTypes.HarmonyPrefix))
+                methodKinds = methodKinds.Add(PatchMethodKind.Prefix);
+            if (attribute.Is(wellKnownTypes.HarmonyPostfix))
+                methodKinds = methodKinds.Add(PatchMethodKind.Postfix);
+            if (attribute.Is(wellKnownTypes.HarmonyTranspiler))
+                methodKinds = methodKinds.Add(PatchMethodKind.Transpiler);
+            if (attribute.Is(wellKnownTypes.HarmonyFinalizer))
+                methodKinds = methodKinds.Add(PatchMethodKind.Finalizer);
+            if (attribute.Is(wellKnownTypes.HarmonyReversePatch))
+                methodKinds = methodKinds.Add(PatchMethodKind.ReversePatch);
+            if (attribute.Is(wellKnownTypes.HarmonyPrepare))
+                methodKinds = methodKinds.Add(PatchMethodKind.Prepare);
+            if (attribute.Is(wellKnownTypes.HarmonyCleanup))
+                methodKinds = methodKinds.Add(PatchMethodKind.Cleanup);
+            if (attribute.Is(wellKnownTypes.HarmonyTargetMethod))
+                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethod);
+            if (attribute.Is(wellKnownTypes.HarmonyTargetMethods))
+                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethods);
+        }
+
+        var isHarmony2 = typeof(TPatchDescription) == typeof(HarmonyPatchDescriptionV2);
+        switch (method.Name)
+        {
+            case nameof(PatchMethodKind.Prefix):
+                methodKinds = methodKinds.Add(PatchMethodKind.Prefix);
+                break;
+            case nameof(PatchMethodKind.Postfix):
+                methodKinds = methodKinds.Add(PatchMethodKind.Postfix);
+                break;
+            case nameof(PatchMethodKind.Transpiler):
+                methodKinds = methodKinds.Add(PatchMethodKind.Transpiler);
+                break;
+            case nameof(PatchMethodKind.Finalizer) when isHarmony2:
+                methodKinds = methodKinds.Add(PatchMethodKind.Finalizer);
+                break;
+            case nameof(PatchMethodKind.ReversePatch) when isHarmony2:
+                methodKinds = methodKinds.Add(PatchMethodKind.ReversePatch);
+                break;
+            case nameof(PatchMethodKind.Prepare):
+                methodKinds = methodKinds.Add(PatchMethodKind.Prepare);
+                break;
+            case nameof(PatchMethodKind.Cleanup):
+                methodKinds = methodKinds.Add(PatchMethodKind.Cleanup);
+                break;
+            case nameof(PatchMethodKind.TargetMethod):
+                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethod);
+                break;
+            case nameof(PatchMethodKind.TargetMethods):
+                methodKinds = methodKinds.Add(PatchMethodKind.TargetMethods);
+                break;
+        }
+
+        return new HarmonyPatchMethod<TPatchDescription>(method, methodKinds, patchDescription);
     }
 
     protected virtual void ProcessHarmonyPatchAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
@@ -172,4 +262,17 @@ internal abstract class HarmonyPatchDescription
     public Location? GetLocation() => AttrubuteSyntaxes.FirstOrDefault()?.GetLocation();
 
     public IEnumerable<Location> GetAdditionalLocations() => AttrubuteSyntaxes.Skip(1).Select(syntax => syntax.GetLocation());
+
+    public virtual void Merge(HarmonyPatchDescription other)
+    {
+        if (other.GetType() != GetType())
+            // ReSharper disable once LocalizableElement
+            throw new ArgumentException("Other type does not correspond to this type.", nameof(other));
+
+        TargetTypes = TargetTypes.AddRange(other.TargetTypes);
+        MethodNames = MethodNames.AddRange(other.MethodNames);
+        MethodTypes = MethodTypes.AddRange(other.MethodTypes);
+        ArgumentTypes = ArgumentTypes.AddRange(other.ArgumentTypes);
+        ArgumentVariations = ArgumentVariations.AddRange(other.ArgumentVariations);
+    }
 }

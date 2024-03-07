@@ -21,8 +21,15 @@ namespace HarmonyTools.Test.Source.V2
         public static void Postfix() { }
     }
 
-    [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.OverloadedMethod))]
+    [HarmonyPatch]
     internal class AmbiguousMethod2
+    {
+        [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod))]
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.OverloadedMethod))]
+    internal class AmbiguousMethod3
     {
         public static void Postfix() { }
     }

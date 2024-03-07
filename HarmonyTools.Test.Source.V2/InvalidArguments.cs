@@ -28,4 +28,13 @@ namespace HarmonyTools.Test.Source.V2
     {
         public static void Postfix() { }
     }
+
+
+
+    [HarmonyPatch]
+    internal class InvalidArguments5
+    {
+        [HarmonyPatch((Type)null, (string)null)]
+        public static void Postfix() { }
+    }
 }

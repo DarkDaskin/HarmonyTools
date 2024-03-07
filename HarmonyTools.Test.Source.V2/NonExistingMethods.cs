@@ -4,7 +4,7 @@ using HarmonyTools.Test.PatchBase;
 namespace HarmonyTools.Test.Source.V2
 {
     [HarmonyPatch(typeof(SimpleClass), "NonExistingMethod")]
-    internal class NonExistingMethod
+    internal class NonExistingMethod1
     {
         public static void Postfix() { }
     }
@@ -49,6 +49,13 @@ namespace HarmonyTools.Test.Source.V2
     [HarmonyPatch(typeof(SimpleClass), MethodType.Getter, typeof(string))]
     internal class NonExistingIndexer
     {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass))]
+    internal class NonExistingMethod2
+    {
+        [HarmonyPatch("NonExistingMethod")]
         public static void Postfix() { }
     }
 

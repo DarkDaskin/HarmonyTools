@@ -26,8 +26,20 @@ public class DummyTests
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
     }
 
-    [TestMethod, CodeDataSource("ValidSimplePatches.cs")]
-    public async Task WhenValidSimplePatches_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
+    [TestMethod, CodeDataSource("ValidTypeLevelPatches.cs")]
+    public async Task WhenValidTypeLevelPatches_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
+    }
+
+    [TestMethod, CodeDataSource("ValidMethodLevelPatches.cs")]
+    public async Task WhenValidMethodLevelPatches_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
+    }
+
+    [TestMethod, CodeDataSource("ValidMixedLevelPatches.cs")]
+    public async Task WhenValidMixedLevelPatches_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
     {
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
     }
@@ -61,11 +73,14 @@ public class DummyTests
             new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(49, 6, 49, 74)
                 .WithArguments("get_Item", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(58, 10, 58, 43)
+                .WithArguments("NonExistingMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
         };
         if (referenceAssemblies.GetHarmonyVersion() == 2)
             expected.Add(new DiagnosticResult(DiagnosticIds.MethodMustExist, DiagnosticSeverity.Warning)
-                .WithSpan(55, 6, 55, 99)
-                .WithSpan(56, 6, 56, 44)
+                .WithSpan(62, 6, 62, 99)
+                .WithSpan(63, 6, 63, 44)
                 .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass"));
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
@@ -85,21 +100,27 @@ public class DummyTests
             new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
                 .WithSpan(18, 6, 18, 72)
                 .WithArguments(".ctor", "HarmonyTools.Test.PatchBase.MultipleConstructors", "2"),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
+                .WithSpan(27, 10, 27, 81)
+                .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass", "3"),
         };
         if (referenceAssemblies.GetHarmonyVersion() == 2)
             expected.Add(new DiagnosticResult(DiagnosticIds.MethodMustNotBeAmbiguous, DiagnosticSeverity.Warning)
-                .WithSpan(24, 6, 24, 99)
+                .WithSpan(31, 6, 31, 99)
                 .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass", "3"));
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
 
-    [TestMethod, CodeDataSource("NonExistingType.cs")]
-    public async Task WhenNonExistingType_Report(string code, ReferenceAssemblies referenceAssemblies)
+    [TestMethod, CodeDataSource("NonExistingTypes.cs")]
+    public async Task WhenNonExistingTypes_Report(string code, ReferenceAssemblies referenceAssemblies)
     {
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
             new DiagnosticResult(DiagnosticIds.TypeMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(5, 6, 5, 76)
+                .WithArguments("HarmonyTools.Test.PatchBase.NonExistingClass"),
+            new DiagnosticResult(DiagnosticIds.TypeMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(14, 10, 14, 80)
                 .WithArguments("HarmonyTools.Test.PatchBase.NonExistingClass"));
     }
 
@@ -118,7 +139,11 @@ public class DummyTests
             new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
                 .WithSpan(30, 6, 30, 42),
             new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
-                .WithSpan(36, 6, 36, 44));
+                .WithSpan(36, 6, 36, 44),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(45, 10, 45, 43),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(52, 10, 52, 41));
     }
 
     [TestMethod, CodeDataSource("OverspecifiedMethods.cs")]
@@ -148,18 +173,24 @@ public class DummyTests
                 .WithSpan(42, 74, 42, 91)
                 .WithSpan(43, 19, 43, 36)
                 .WithSpan(44, 19, 44, 36),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(53, 44, 53, 76)
+                .WithSpan(53, 92, 53, 128),
+            new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                .WithSpan(57, 40, 57, 72)
+                .WithSpan(60, 23, 60, 59),
         };
         if (referenceAssemblies.GetHarmonyVersion() == 2)
             expected.AddRange([
                 new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                    .WithSpan(50, 19, 50, 60)
-                    .WithSpan(51, 19, 51, 60),
+                    .WithSpan(64, 19, 64, 60)
+                    .WithSpan(65, 19, 65, 60),
                 new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                    .WithSpan(50, 62, 50, 94)
-                    .WithSpan(51, 62, 51, 98),
+                    .WithSpan(64, 62, 64, 94)
+                    .WithSpan(65, 62, 65, 98),
                 new DiagnosticResult(DiagnosticIds.MethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                    .WithSpan(57, 19, 57, 60)
-                    .WithSpan(58, 19, 58, 38),
+                    .WithSpan(71, 19, 71, 60)
+                    .WithSpan(72, 19, 72, 38),
             ]);
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
@@ -203,6 +234,12 @@ public class DummyTests
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
                     .WithSpan(26, 33, 26, 45),
             ]);
+        expected.AddRange([
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(37, 23, 37, 33),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(37, 35, 37, 47),
+        ]);
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
@@ -216,6 +253,9 @@ public class DummyTests
                 .WithSpan(7, 42, 7, 92),
             new DiagnosticResult(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, DiagnosticSeverity.Warning)
                 .WithSpan(14, 19, 14, 53)
-                .WithSpan(14, 55, 14, 84));
+                .WithSpan(14, 55, 14, 84),
+            new DiagnosticResult(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, DiagnosticSeverity.Warning)
+                .WithSpan(23, 23, 23, 57)
+                .WithSpan(23, 59, 23, 88));
     }
 }

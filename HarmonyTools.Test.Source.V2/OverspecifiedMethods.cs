@@ -47,16 +47,30 @@ namespace HarmonyTools.Test.Source.V2
         public static void Postfix() { }
     }
 
+    [HarmonyPatch]
+    internal class OverspecifiedMethod7
+    {
+        [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod)), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
+    internal class OverspecifiedMethod8
+    {
+        [HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
+        public static void Postfix() { }
+    }
+
     [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.SimpleMethod))]
     [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.OverloadedMethod))]
-    internal class OverspecifiedMethod7
+    internal class OverspecifiedMethod9
     {
         public static void Postfix() { }
     }
 
     [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.SimpleMethod))]
     [HarmonyPatch(typeof(SimpleClass))]
-    internal class OverspecifiedMethod8
+    internal class OverspecifiedMethod10
     {
         public static void Postfix() { }
     }
