@@ -206,4 +206,16 @@ public class DummyTests
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
+
+    [TestMethod, CodeDataSource("ArgumentTypesAndVariationsMismatch.cs")]
+    public async Task WhenArgumentTypesAndVariationsMismatch_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, DiagnosticSeverity.Warning)
+                .WithSpan(7, 19, 7, 40)
+                .WithSpan(7, 42, 7, 92),
+            new DiagnosticResult(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, DiagnosticSeverity.Warning)
+                .WithSpan(14, 19, 14, 53)
+                .WithSpan(14, 55, 14, 84));
+    }
 }

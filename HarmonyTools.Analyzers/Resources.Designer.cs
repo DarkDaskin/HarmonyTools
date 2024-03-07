@@ -61,6 +61,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Argument types and argument variations have differing number of items..
+        /// </summary>
+        internal static string ArgumentTypesAndVariationsMustMatchMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentTypesAndVariationsMustMatchMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Argument types and argument variations mismatch.
+        /// </summary>
+        internal static string ArgumentTypesAndVariationsMustMatchTitle {
+            get {
+                return ResourceManager.GetString("ArgumentTypesAndVariationsMustMatchTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid attribute argument..
         /// </summary>
         internal static string AttributeArgumentsMustBeValidMessageFormat {

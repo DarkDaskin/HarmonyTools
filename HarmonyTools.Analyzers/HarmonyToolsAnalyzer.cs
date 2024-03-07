@@ -27,6 +27,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.MethodMustNotBeOverspecified, nameof(Resources.MethodMustNotBeOverspecifiedTitle), nameof(Resources.MethodMustNotBeOverspecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor AttributeArgumentsMustBeValidRule = 
         CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid, nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor ArgumentTypesAndVariationsMustMatchRule = 
+        CreateRule(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, nameof(Resources.ArgumentTypesAndVariationsMustMatchTitle), nameof(Resources.ArgumentTypesAndVariationsMustMatchMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         MethodMustExistRule,
@@ -35,6 +37,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         MethodMustBeSpecifiedRule,
         MethodMustNotBeOverspecifiedRule,
         AttributeArgumentsMustBeValidRule,
+        ArgumentTypesAndVariationsMustMatchRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -107,6 +110,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CheckMethodMustBeSpecified(context, patchDescription);
         CheckMethodMustNotBeOverspecified(context, patchDescription);
         CheckAttributeArgumentsMustBeValid(context, patchDescription);
+        CheckArgumentTypesAndVariationsMustMatch(context, patchDescription);
     }
 
     private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
@@ -308,6 +312,30 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             for (var i = 0; i < detail.Value.Length; i++)
                 if (!IsValidEnumValue(detail.Value[i]))
                     ReportInvalidAttributeArgument(context, detail, i);
+    }
+
+    private static void CheckArgumentTypesAndVariationsMustMatch(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
+    {
+        // Match argument variations with argument types from the same attribute.
+        var argumentTypesAndVariationsByAttribute =
+            from variation in patchDescription.ArgumentVariations
+            let attributeSyntax = GetAttributeSyntax(variation)
+            where attributeSyntax != null
+            let type = patchDescription.ArgumentTypes.Single(type => GetAttributeSyntax(type) == attributeSyntax)
+            where !type.Value.IsDefault && !variation.Value.IsDefault
+            select (type, variation);
+        foreach (var (type, variation) in argumentTypesAndVariationsByAttribute)
+            if (type.Value.Length != variation.Value.Length)
+                context.ReportDiagnostic(Diagnostic.Create(ArgumentTypesAndVariationsMustMatchRule, 
+                    type.Syntax!.GetLocation(), additionalLocations: [variation.Syntax!.GetLocation()]));
+        
+
+        static AttributeSyntax? GetAttributeSyntax(IHasSyntax hasSyntax)
+        {
+            var attributeArgumentSyntax = hasSyntax.Syntax as AttributeArgumentSyntax;
+            var attributeArgumentListSyntax = attributeArgumentSyntax?.Parent as AttributeArgumentListSyntax;
+            return attributeArgumentListSyntax?.Parent as AttributeSyntax;
+        }
     }
 
     private static void CheckAttributeArgumentsMustBeValidV2(SymbolAnalysisContext context, HarmonyPatchDescriptionV2 patchDescription)

@@ -8,4 +8,5 @@ public static class DiagnosticIds
     public const string MethodMustBeSpecified = "HT1004";
     public const string MethodMustNotBeOverspecified = "HT1005";
     public const string AttributeArgumentsMustBeValid = "HT1006";
+    public const string ArgumentTypesAndVariationsMustMatch = "HT1007";
 }
