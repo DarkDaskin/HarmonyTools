@@ -24,7 +24,7 @@ internal class HarmonyPatchDescriptionV1 : HarmonyPatchDescription
         {
             PropertyMethod.Getter => MethodType.Getter,
             PropertyMethod.Setter => MethodType.Setter,
-            _ => MethodType.Normal
+            _ => (MethodType)int.MaxValue
         };
     }
 }

@@ -162,9 +162,8 @@ internal abstract class HarmonyPatchDescription
 
     protected static DetailWithSyntax<ImmutableArray<T?>> GetDetailWithSyntaxForArray<T>(AttributeData attribute, int constructorParameterIndex)
     {
-        var value = attribute.ConstructorArguments[constructorParameterIndex].Values
-           .Select(constant => (T?) constant.Value)
-           .ToImmutableArray();
+        var values = attribute.ConstructorArguments[constructorParameterIndex].Values;
+        var value = values.IsDefault ? default : values.Select(constant => (T?)constant.Value).ToImmutableArray();
         var attributeSyntax = (AttributeSyntax?)attribute.ApplicationSyntaxReference?.GetSyntax();
         var argumentSyntax = attributeSyntax?.ArgumentList?.Arguments[constructorParameterIndex];
         return new DetailWithSyntax<ImmutableArray<T?>>(value, argumentSyntax);

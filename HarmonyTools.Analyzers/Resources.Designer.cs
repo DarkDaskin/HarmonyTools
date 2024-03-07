@@ -61,6 +61,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid attribute argument..
+        /// </summary>
+        internal static string AttributeArgumentsMustBeValidMessageFormat {
+            get {
+                return ResourceManager.GetString("AttributeArgumentsMustBeValidMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid attribute argument.
+        /// </summary>
+        internal static string AttributeArgumentsMustBeValidTitle {
+            get {
+                return ResourceManager.GetString("AttributeArgumentsMustBeValidTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not enough information to target a method..
         /// </summary>
         internal static string MethodMustBeSpecifiedMessageFormat {

@@ -164,4 +164,46 @@ public class DummyTests
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
+
+    [TestMethod, CodeDataSource("InvalidArguments.cs")]
+    public async Task WhenInvalidArguments_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        var expected = new List<DiagnosticResult>
+        {
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(7, 19, 7, 29),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(7, 31, 7, 43),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(7, 45, 7, 57),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(7, 59, 7, 79),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(14, 32, 14, 36),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(14, 61, 14, 78),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(20, 19, 20, 29),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(20, 45, 20, 57),
+        };
+        if (referenceAssemblies.GetHarmonyVersion() == 1)
+            expected.AddRange([
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(20, 59, 20, 72),
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(27, 53, 27, 72),
+            ]);
+        if (referenceAssemblies.GetHarmonyVersion() == 2)
+            expected.AddRange([
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(20, 59, 20, 74),
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(26, 19, 26, 31),
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(26, 33, 26, 45),
+            ]);
+
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
+    }
 }

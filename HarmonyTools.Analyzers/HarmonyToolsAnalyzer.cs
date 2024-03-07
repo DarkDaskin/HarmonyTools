@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace HarmonyTools.Analyzers;
@@ -23,6 +25,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.MethodMustBeSpecified, nameof(Resources.MethodMustBeSpecifiedTitle), nameof(Resources.MethodMustBeSpecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor MethodMustNotBeOverspecifiedRule = 
         CreateRule(DiagnosticIds.MethodMustNotBeOverspecified, nameof(Resources.MethodMustNotBeOverspecifiedTitle), nameof(Resources.MethodMustNotBeOverspecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor AttributeArgumentsMustBeValidRule = 
+        CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid, nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         MethodMustExistRule,
@@ -30,6 +34,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         TypeMustExistRule,
         MethodMustBeSpecifiedRule,
         MethodMustNotBeOverspecifiedRule,
+        AttributeArgumentsMustBeValidRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -93,6 +98,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         CheckMethodMustExistAndNotAmbiguousV2(context, patchDescription);
         CheckTypeMustExistV2(context, patchDescription);
+        CheckAttributeArgumentsMustBeValidV2(context, patchDescription);
     }
 
     private static void CommonChecks(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
@@ -100,6 +106,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CheckMethodMustExistAndNotAmbiguous(context, patchDescription);
         CheckMethodMustBeSpecified(context, patchDescription);
         CheckMethodMustNotBeOverspecified(context, patchDescription);
+        CheckAttributeArgumentsMustBeValid(context, patchDescription);
     }
 
     private static void CheckMethodMustExistAndNotAmbiguous(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
@@ -191,6 +198,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             if (argumentTypes.Length != argumentVariations.Length)
                 return;
 
+            if (argumentTypes.Any(type => type is null) || argumentVariations.Any(variation => !IsValidEnumValue(variation)))
+                return;
+
             if (methodType == MethodType.StaticConstructor && argumentTypes.Length > 0)
                 return;
 
@@ -230,9 +240,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             return;
 
         var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
-        var isMemberTypeSpecified = patchDescription.TargetTypes is [{ Value: not null }] ||
-                                    patchDescription is HarmonyPatchDescriptionV2 { TargetTypeNames: [{ Value: not null }] };
-        var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null }];
+        var isMemberTypeSpecified = patchDescription.TargetTypes is [_] ||
+                                    patchDescription is HarmonyPatchDescriptionV2 { TargetTypeNames: [_] };
+        var isMemberNameSpecified = patchDescription.MethodNames is [_];
         if (!isMemberTypeSpecified || methodType is MethodType.Normal && !isMemberNameSpecified)
             context.ReportDiagnostic(Diagnostic.Create(MethodMustBeSpecifiedRule,
                 patchDescription.GetLocation(), patchDescription.GetAdditionalLocations()));
@@ -242,8 +252,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
     {
         if (patchDescription is HarmonyPatchDescriptionV2 patchDescriptionV2)
         {
-            var typeDetails = patchDescriptionV2.TargetTypes.Concat<IWithSyntax>(patchDescriptionV2.TargetTypeNames).ToList();
-            if (typeDetails.Count > 1)
+            var typeDetails = patchDescriptionV2.TargetTypes.Concat<IHasSyntax>(patchDescriptionV2.TargetTypeNames).ToArray();
+            if (typeDetails.Length > 1)
                 context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
                     typeDetails.GetLocation(), typeDetails.GetAdditionalLocations()));
         }
@@ -266,6 +276,55 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         if (patchDescription.ArgumentVariations.Length > 1)
             context.ReportDiagnostic(Diagnostic.Create(MethodMustNotBeOverspecifiedRule,
                 patchDescription.ArgumentVariations.GetLocation(), patchDescription.ArgumentVariations.GetAdditionalLocations()));
+    }
+
+    private static void CheckAttributeArgumentsMustBeValid(SymbolAnalysisContext context, HarmonyPatchDescription patchDescription)
+    {
+        foreach (var detail in patchDescription.TargetTypes.Where(type => type.Value is null))
+            ReportInvalidAttributeArgument(context, detail);
+
+        foreach (var detail in patchDescription.MethodNames.Where(type => type.Value is null))
+            ReportInvalidAttributeArgument(context, detail);
+
+        foreach (var detail in patchDescription.MethodTypes.Where(type => !IsValidEnumValue(type.Value)))
+            ReportInvalidAttributeArgument(context, detail);
+
+        if (patchDescription.HarmonyVersion == 1)
+            foreach (var detail in patchDescription.MethodTypes.Where(type => type.Value is >= MethodType.Enumerator and <= MethodType.Async))
+                ReportInvalidAttributeArgument(context, detail);
+
+        foreach (var detail in patchDescription.ArgumentTypes.Where(type => type.Value.IsDefault))
+            ReportInvalidAttributeArgument(context, detail);
+
+        foreach (var detail in patchDescription.ArgumentTypes.Where(type => !type.Value.IsDefault))
+            for (var i = 0; i < detail.Value.Length; i++)
+                if (detail.Value[i] is null)
+                    ReportInvalidAttributeArgument(context, detail, i);
+
+        foreach (var detail in patchDescription.ArgumentVariations.Where(type => type.Value.IsDefault))
+            ReportInvalidAttributeArgument(context, detail);
+
+        foreach (var detail in patchDescription.ArgumentVariations.Where(type => !type.Value.IsDefault))
+            for (var i = 0; i < detail.Value.Length; i++)
+                if (!IsValidEnumValue(detail.Value[i]))
+                    ReportInvalidAttributeArgument(context, detail, i);
+    }
+
+    private static void CheckAttributeArgumentsMustBeValidV2(SymbolAnalysisContext context, HarmonyPatchDescriptionV2 patchDescription)
+    {
+        foreach (var detail in patchDescription.TargetTypeNames.Where(type => type.Value is null))
+            ReportInvalidAttributeArgument(context, detail);
+    }
+
+    private static void ReportInvalidAttributeArgument(SymbolAnalysisContext context, IHasSyntax detail) =>
+        context.ReportDiagnostic(Diagnostic.Create(AttributeArgumentsMustBeValidRule, detail.Syntax?.GetLocation()));
+
+    private static void ReportInvalidAttributeArgument<T>(SymbolAnalysisContext context, DetailWithSyntax<ImmutableArray<T>> detail, int arrayIndex)
+    {
+        var attributeArgumentSyntax = detail.Syntax as AttributeArgumentSyntax;
+        var arrayCreationExpressionSyntax = attributeArgumentSyntax?.Expression as ArrayCreationExpressionSyntax;
+        var itemExpressionSyntax = arrayCreationExpressionSyntax?.Initializer?.Expressions.ElementAtOrDefault(arrayIndex);
+        context.ReportDiagnostic(Diagnostic.Create(AttributeArgumentsMustBeValidRule, (itemExpressionSyntax ?? detail.Syntax)?.GetLocation()));
     }
 
     private static bool HasConflictingSpecifications(HarmonyPatchDescription patchDescription)
@@ -325,4 +384,6 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         return true;
     }
+
+    private static bool IsValidEnumValue<TEnum>(TEnum value) where TEnum : struct => Enum.IsDefined(typeof(TEnum), value);
 }
