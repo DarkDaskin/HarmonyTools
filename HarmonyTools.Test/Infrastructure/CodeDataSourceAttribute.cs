@@ -20,7 +20,7 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
     private static readonly string BasePath = @"..\..\..\..\HarmonyTools.Test.Source";
     private static readonly Dictionary<int, ReferenceAssemblies> ReferenceAssembliesPerVersion = new();
 
-    public string Path { get; } = path ?? throw new ArgumentNullException(nameof(path));
+    public string Path { get; } = path;
 
     static CodeDataSourceAttribute()
     {
@@ -58,7 +58,7 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
         }
     }
 
-    public string GetDisplayName(MethodInfo methodInfo, object[] data) => $"{methodInfo.Name} ({Path}, v{GetVersion(data)})";
+    public string GetDisplayName(MethodInfo methodInfo, object?[]? data) => $"{methodInfo.Name} ({Path}, v{GetVersion(data!)})";
 
     private static int GetVersion(object[] data)
     {

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using HarmonyTools.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
-using VerifyCS = HarmonyTools.Test.CSharpCodeFixVerifier<
+using VerifyCS = HarmonyTools.Test.Verifiers.CSharpCodeFixVerifier<
     HarmonyTools.Analyzers.HarmonyToolsAnalyzer,
     HarmonyTools.HarmonyToolsCodeFixProvider>;
 
