@@ -21,6 +21,8 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
     private static readonly Dictionary<int, ReferenceAssemblies> ReferenceAssembliesPerVersion = new();
 
     public string Path { get; } = path;
+    public string? FixedPath { get; set; }
+    public bool ProvideVersion { get; set; }
 
     static CodeDataSourceAttribute()
     {
@@ -52,17 +54,30 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
     {
         foreach (var version in Versions)
         {
-            var fullPath = PathIO.Combine($"{BasePath}.V{version}", Path);
-            if (File.Exists(fullPath))
-                yield return [File.ReadAllText(fullPath), ReferenceAssembliesPerVersion[version]];
+            var fullPath = GetFullPath(Path, version);
+            var fullFixedPath = FixedPath is null ? null : GetFullPath(FixedPath, version);
+            if (File.Exists(fullPath) && (fullFixedPath is null || File.Exists(fullFixedPath)))
+            {
+                List<object> data = [File.ReadAllText(fullPath), ReferenceAssembliesPerVersion[version]];
+                if (fullFixedPath is not null)
+                    data.Add(File.ReadAllText(fullFixedPath));
+                if (ProvideVersion)
+                    data.Add(version);
+                yield return data.ToArray();
+            }
         }
     }
+
+    private string GetFullPath(string path, int version) => PathIO.Combine($"{BasePath}.V{version}", path);
 
     public string GetDisplayName(MethodInfo methodInfo, object?[]? data) => $"{methodInfo.Name} ({Path}, v{GetVersion(data!)})";
 
     private static int GetVersion(object[] data)
     {
         var assemblies = (ReferenceAssemblies)data[1];
-        return assemblies.GetHarmonyVersion();
+        var harmonyAssemblyPath = assemblies.Assemblies.Single(s => s.Contains("0Harmony"));
+        var parts = harmonyAssemblyPath.Split(PathIO.DirectorySeparatorChar);
+        var version = Version.Parse(parts[^4]);
+        return version.Major;
     }
 }

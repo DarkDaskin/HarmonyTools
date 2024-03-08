@@ -15,6 +15,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 {
     private const string TargetCategory = "Target";
 
+    public const string HarmonyNamespaceKey = "HarmonyNamespace";
+
 #pragma warning disable RS2008
     private static readonly DiagnosticDescriptor MethodMustExistRule = 
         CreateRule(DiagnosticIds.MethodMustExist, nameof(Resources.MethodMustExistTitle), nameof(Resources.MethodMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
@@ -91,6 +93,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         where TPatchDescription : HarmonyPatchDescription
     {
         protected readonly SymbolAnalysisContext Context = context;
+
+        protected abstract string HarmonyNamespace { get; }
 
         public abstract void Verify();
 
@@ -351,9 +355,12 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 where syntax is not null
                 select (patchMethod, syntax)).FirstOrDefault();
             if (patchMethodWithAttributeSyntax.patchMethod is not null)
+            {
+                var properties = ImmutableDictionary.Create<string, string?>().Add(HarmonyNamespaceKey, HarmonyNamespace);
                 Context.ReportDiagnostic(Diagnostic.Create(HarmonyPatchAttributeMustBeOnTypeRule,
                     patchMethodWithAttributeSyntax.patchMethod.Method.ContainingType
-                        .GetSyntax(patchMethodWithAttributeSyntax.syntax)?.GetIdentifierLocation()));
+                        .GetSyntax(patchMethodWithAttributeSyntax.syntax)?.GetIdentifierLocation(), properties));
+            }
         }
 
         protected void ReportInvalidAttributeArgument(IHasSyntax detail) =>
@@ -430,11 +437,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
     private class VerifierV1(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV1>(context)
     {
+        protected override string HarmonyNamespace => HarmonyPatchDescriptionV1.HarmonyNamespace;
+
         public override void Verify() => VerifyCore(HarmonyPatchDescriptionV1.Parse((INamedTypeSymbol)Context.Symbol, Context.Compilation));
     }
 
     private class VerifierV2(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV2>(context)
     {
+        protected override string HarmonyNamespace => HarmonyPatchDescriptionV2.HarmonyNamespace;
+
         public override void Verify() => VerifyCore(HarmonyPatchDescriptionV2.Parse((INamedTypeSymbol)Context.Symbol, Context.Compilation));
 
         protected override void PreMergeChecks(HarmonyPatchDescriptionV2 patchDescription)

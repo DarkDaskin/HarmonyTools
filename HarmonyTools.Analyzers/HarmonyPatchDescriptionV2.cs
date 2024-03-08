@@ -5,12 +5,14 @@ namespace HarmonyTools.Analyzers;
 
 internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescription(symbol)
 {
+    public const string HarmonyNamespace = "HarmonyLib";
+
     public override int HarmonyVersion => 2;
 
     public ImmutableArray<DetailWithSyntax<string?>> TargetTypeNames { get; private set; } = [];
     
     public static HarmonyPatchDescriptionSet<HarmonyPatchDescriptionV2> Parse(INamedTypeSymbol type, Compilation compilation) =>
-        Parse(type, compilation, "HarmonyLib", symbol => new HarmonyPatchDescriptionV2(symbol));
+        Parse(type, compilation, HarmonyNamespace, symbol => new HarmonyPatchDescriptionV2(symbol));
 
     protected override void ProcessHarmonyPatchAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {

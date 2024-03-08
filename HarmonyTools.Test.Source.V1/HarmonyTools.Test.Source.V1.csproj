@@ -4,6 +4,12 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
+  <!-- Have to remove fixed source from compilation because of duplicate type names. -->
+  <ItemGroup>
+    <Compile Remove="**\*_Fixed*.cs" />
+    <Content Include="**\*_Fixed*.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="1.2.0.1" />
   </ItemGroup>

@@ -5,10 +5,12 @@ namespace HarmonyTools.Analyzers;
 
 internal class HarmonyPatchDescriptionV1(ISymbol symbol) : HarmonyPatchDescription(symbol)
 {
+    public const string HarmonyNamespace = "Harmony";
+
     public override int HarmonyVersion => 1;
 
     public static HarmonyPatchDescriptionSet<HarmonyPatchDescriptionV1> Parse(INamedTypeSymbol type, Compilation compilation) =>
-        Parse(type, compilation, "Harmony", symbol => new HarmonyPatchDescriptionV1(symbol));
+        Parse(type, compilation, HarmonyNamespace, symbol => new HarmonyPatchDescriptionV1(symbol));
 
     protected override void ProcessHarmonyPatchAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {
