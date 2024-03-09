@@ -12,6 +12,19 @@ internal class DetailWithSyntax<T>(T value, SyntaxNode? syntax) : IHasSyntax
     public override string? ToString() => Value?.ToString();
 }
 
+internal static class DetailWithSyntaxExtensions
+{
+    public static bool Contains<T>(this IEnumerable<DetailWithSyntax<T>> details, T value) =>
+        details.Any(detail => Equals(detail.Value, value));
+}
+
+internal class SyntaxWrapper(SyntaxNode? syntax) : IHasSyntax
+{
+    public SyntaxNode? Syntax { get; } = syntax;
+
+    public SyntaxWrapper(AttributeData attribute) : this(attribute.GetSyntax()) { }
+}
+
 internal interface IHasSyntax
 {
     SyntaxNode? Syntax { get; }

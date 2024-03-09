@@ -52,4 +52,10 @@ namespace HarmonyTools.Test.Source.V1
         [HarmonyPatch(MethodType.Getter)]
         public static void Postfix() { }
     }
+
+    [HarmonyPatchAll]
+    internal class UnspecifiedMethod9
+    {
+        public static void Postfix() { }
+    }
 }

@@ -115,6 +115,42 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bulk patching can&apos;t be combined with individual target method annotations..
+        /// </summary>
+        internal static string DontUseIndividualAnnotationsWithBulkPatchingMessageFormat {
+            get {
+                return ResourceManager.GetString("DontUseIndividualAnnotationsWithBulkPatchingMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bulk patching can&apos;t be combined with individual target method annotations.
+        /// </summary>
+        internal static string DontUseIndividualAnnotationsWithBulkPatchingTitle {
+            get {
+                return ResourceManager.GetString("DontUseIndividualAnnotationsWithBulkPatchingTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only single method of bulk patching is allowed..
+        /// </summary>
+        internal static string DontUseMultipleBulkPatchingMethodsMessageFormat {
+            get {
+                return ResourceManager.GetString("DontUseMultipleBulkPatchingMethodsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only single method of bulk patching is allowed.
+        /// </summary>
+        internal static string DontUseMultipleBulkPatchingMethodsTitle {
+            get {
+                return ResourceManager.GetString("DontUseMultipleBulkPatchingMethodsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Missing HarmonyPatch attribute on type. Specified patches will not be discovered..
         /// </summary>
         internal static string HarmonyPatchAttributeMustBeOnTypeMessageFormat {

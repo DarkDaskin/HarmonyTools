@@ -18,27 +18,55 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
     private const string TargetCategory = "Target";
 #pragma warning disable RS2008
     private static readonly DiagnosticDescriptor MethodMustExistRule = 
-        CreateRule(DiagnosticIds.MethodMustExist, nameof(Resources.MethodMustExistTitle), nameof(Resources.MethodMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.MethodMustExist, 
+            nameof(Resources.MethodMustExistTitle), nameof(Resources.MethodMustExistMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor MethodMustNotBeAmbiguousRule = 
-        CreateRule(DiagnosticIds.MethodMustNotBeAmbiguous, nameof(Resources.MethodMustNotBeAmbiguousTitle), nameof(Resources.MethodMustNotBeAmbiguousMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.MethodMustNotBeAmbiguous,
+            nameof(Resources.MethodMustNotBeAmbiguousTitle), nameof(Resources.MethodMustNotBeAmbiguousMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor TypeMustExistRule = 
-        CreateRule(DiagnosticIds.TypeMustExist, nameof(Resources.TypeMustExistTitle), nameof(Resources.TypeMustExistMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.TypeMustExist, 
+            nameof(Resources.TypeMustExistTitle), nameof(Resources.TypeMustExistMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor MethodMustBeSpecifiedRule = 
-        CreateRule(DiagnosticIds.MethodMustBeSpecified, nameof(Resources.MethodMustBeSpecifiedTitle), nameof(Resources.MethodMustBeSpecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.MethodMustBeSpecified, 
+            nameof(Resources.MethodMustBeSpecifiedTitle), nameof(Resources.MethodMustBeSpecifiedMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor MethodMustNotBeOverspecifiedRule = 
-        CreateRule(DiagnosticIds.MethodMustNotBeOverspecified, nameof(Resources.MethodMustNotBeOverspecifiedTitle), nameof(Resources.MethodMustNotBeOverspecifiedMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.MethodMustNotBeOverspecified, 
+            nameof(Resources.MethodMustNotBeOverspecifiedTitle), nameof(Resources.MethodMustNotBeOverspecifiedMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor AttributeArgumentsMustBeValidRule = 
-        CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid, nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid, 
+            nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor ArgumentTypesAndVariationsMustMatchRule = 
-        CreateRule(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, nameof(Resources.ArgumentTypesAndVariationsMustMatchTitle), nameof(Resources.ArgumentTypesAndVariationsMustMatchMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, 
+            nameof(Resources.ArgumentTypesAndVariationsMustMatchTitle), nameof(Resources.ArgumentTypesAndVariationsMustMatchMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor HarmonyPatchAttributeMustBeOnTypeRule = 
-        CreateRule(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, nameof(Resources.HarmonyPatchAttributeMustBeOnTypeTitle), nameof(Resources.HarmonyPatchAttributeMustBeOnTypeMessageFormat), TargetCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, 
+            nameof(Resources.HarmonyPatchAttributeMustBeOnTypeTitle), nameof(Resources.HarmonyPatchAttributeMustBeOnTypeMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DontUseIndividualAnnotationsWithBulkPatchingRule = 
+        CreateRule(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, 
+            nameof(Resources.DontUseIndividualAnnotationsWithBulkPatchingTitle), nameof(Resources.DontUseIndividualAnnotationsWithBulkPatchingMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DontUseMultipleBulkPatchingMethodsRule = 
+        CreateRule(DiagnosticIds.DontUseMultipleBulkPatchingMethods, 
+            nameof(Resources.DontUseMultipleBulkPatchingMethodsTitle), nameof(Resources.DontUseMultipleBulkPatchingMethodsMessageFormat), 
+            TargetCategory, DiagnosticSeverity.Warning);
 
     private const string PatchMethodCategory = "PatchMethod";
     private static readonly DiagnosticDescriptor PatchMethodMustHaveSingleKindRule = 
-        CreateRule(DiagnosticIds.PatchMethodMustHaveSingleKind, nameof(Resources.PatchMethodMustHaveSingleKindTitle), nameof(Resources.PatchMethodMustHaveSingleKindMessageFormat), PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor DontDefineMultipleAuxiliaryPatchMethodsRule = 
-        CreateRule(DiagnosticIds.DontDefineMultipleAuxiliaryPatchMethods, nameof(Resources.DontDefineMultipleAuxiliaryPatchMethodsTitle), nameof(Resources.DontDefineMultipleAuxiliaryPatchMethodsMessageFormat), PatchMethodCategory, DiagnosticSeverity.Warning);
+        CreateRule(DiagnosticIds.PatchMethodMustHaveSingleKind, 
+            nameof(Resources.PatchMethodMustHaveSingleKindTitle), nameof(Resources.PatchMethodMustHaveSingleKindMessageFormat), 
+            PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DontDefineMultipleAuxiliaryPatchMethodsRule =
+        CreateRule(DiagnosticIds.DontDefineMultipleAuxiliaryPatchMethods,
+            nameof(Resources.DontDefineMultipleAuxiliaryPatchMethodsTitle), nameof(Resources.DontDefineMultipleAuxiliaryPatchMethodsMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         MethodMustExistRule,
@@ -49,6 +77,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         AttributeArgumentsMustBeValidRule,
         ArgumentTypesAndVariationsMustMatchRule,
         HarmonyPatchAttributeMustBeOnTypeRule,
+        DontUseIndividualAnnotationsWithBulkPatchingRule,
+        DontUseMultipleBulkPatchingMethodsRule,
+
         PatchMethodMustHaveSingleKindRule,
         DontDefineMultipleAuxiliaryPatchMethodsRule,
     ];
@@ -79,7 +110,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             context.RegisterSymbolAction(symbolContext => new VerifierV1(symbolContext).Verify(), SymbolKind.NamedType);
         if (WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony2Namespace))
             context.RegisterSymbolAction(symbolContext => new VerifierV2(symbolContext).Verify(), SymbolKind.NamedType);
-        }
+    }
 
     private void RunAnalyzerWithFullMetadata(CompilationAnalysisContext context)
     {
@@ -96,16 +127,14 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         foreach (var disgnostic in disgnostics)
             context.ReportDiagnostic(disgnostic);
     }
+    
 
-
-
-    private abstract class Verifier<TPatchDescription>(SymbolAnalysisContext context)
+    private abstract class Verifier<TPatchDescription>(SymbolAnalysisContext context, string harmonyNamespace)
         where TPatchDescription : HarmonyPatchDescription
     {
         protected readonly SymbolAnalysisContext Context = context;
-
-        protected abstract string HarmonyNamespace { get; }
-
+        protected readonly WellKnownTypes WellKnownTypes = new(context.Compilation, harmonyNamespace);
+        
         public abstract void Verify();
 
         protected void VerifyCore(HarmonyPatchDescriptionSet<TPatchDescription> set)
@@ -126,12 +155,12 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 if (set.TypePatchDescription is not null)
                     patchMethod.PatchDescription.Merge(set.TypePatchDescription);
 
-                PostMergeChecks(patchMethod.PatchDescription);
+                PostMergeChecks(patchMethod.PatchDescription, set);
             }
 
             if (set.TypePatchDescription is not null && set.PatchMethods.Any(
                     patchMethod => patchMethod.PatchDescription is null && patchMethod.MethodKinds.Any(kind => kind.Value.IsPrimary())))
-                PostMergeChecks(set.TypePatchDescription);
+                PostMergeChecks(set.TypePatchDescription, set);
 
             PatchDescriptionSetChecks(set);
         }
@@ -142,10 +171,10 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckArgumentTypesAndVariationsMustMatch(patchDescription);
         }
 
-        protected virtual void PostMergeChecks(TPatchDescription patchDescription)
+        protected virtual void PostMergeChecks(TPatchDescription patchDescription, HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
             CheckMethodMustExistAndNotAmbiguous(patchDescription);
-            CheckMethodMustBeSpecified(patchDescription);
+            CheckMethodMustBeSpecified(patchDescription, set);
             CheckMethodMustNotBeOverspecified(patchDescription);
         }
 
@@ -158,6 +187,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         {
             CheckHarmonyPatchAttributeMustBeOnType(set);
             CheckDontDefineMultipleAuxiliaryPatchMethods(set);
+            CheckBulkPatching(set);
         }
 
         private void CheckAttributeArgumentsMustBeValid(HarmonyPatchDescription patchDescription)
@@ -317,18 +347,26 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     memberName, targetType.ToDisplayString(), count));
         }
 
-        private void CheckMethodMustBeSpecified(HarmonyPatchDescription patchDescription)
+        private void CheckMethodMustBeSpecified(HarmonyPatchDescription patchDescription, HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
             if (HasConflictingSpecifications(patchDescription))
+                return;
+
+            if (GetBulkPatchMethods(set).Any())
                 return;
 
             var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
             var isMemberTypeSpecified = patchDescription.TargetTypes is [_] ||
                                         patchDescription is HarmonyPatchDescriptionV2 { TargetTypeNames: [_] };
             var isMemberNameSpecified = patchDescription.MethodNames is [_];
-            if (!isMemberTypeSpecified || methodType is MethodType.Normal && !isMemberNameSpecified)
+            var isPatchAll = set.TypePatchDescription?.IsPatchAll?.Value ?? false;
+            if (!isMemberTypeSpecified || methodType is MethodType.Normal && !isMemberNameSpecified && !isPatchAll)
+            {
+                var predicate = (AttributeData attribute) =>
+                    attribute.Is(WellKnownTypes.HarmonyPatch) || isPatchAll && attribute.Is(WellKnownTypes.HarmonyPatchAll);
                 Context.ReportDiagnostic(Diagnostic.Create(MethodMustBeSpecifiedRule,
-                    patchDescription.GetLocation(), patchDescription.GetAdditionalLocations()));
+                    patchDescription.GetLocation(predicate), patchDescription.GetAdditionalLocations(predicate)));
+            }
         }
 
         private void CheckMethodMustNotBeOverspecified(HarmonyPatchDescription patchDescription)
@@ -372,16 +410,64 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 from patchMethod in set.PatchMethods
                 let methodKindAttributeSyntax = patchMethod.MethodKinds.FirstOrDefault(detail => detail.Syntax is AttributeSyntax)?.Syntax
                 let patchDescriptionAttributeSyntax =
-                    patchMethod.PatchDescription?.AttrubuteSyntaxes.OfType<AttributeSyntax>().FirstOrDefault()
+                    patchMethod.PatchDescription?.Attrubutes.FirstOrDefault().GetSyntax()
                 let syntax = patchDescriptionAttributeSyntax ?? methodKindAttributeSyntax
                 where syntax is not null
                 select (patchMethod, syntax)).FirstOrDefault();
             if (patchMethodWithAttributeSyntax.patchMethod is not null)
             {
-                var properties = ImmutableDictionary.Create<string, string?>().Add(HarmonyNamespaceKey, HarmonyNamespace);
+                var properties = ImmutableDictionary.Create<string, string?>().Add(HarmonyNamespaceKey, harmonyNamespace);
                 Context.ReportDiagnostic(Diagnostic.Create(HarmonyPatchAttributeMustBeOnTypeRule,
                     patchMethodWithAttributeSyntax.patchMethod.Method.ContainingType
                         .GetSyntax(patchMethodWithAttributeSyntax.syntax)?.GetIdentifierLocation(), properties));
+            }
+        }
+
+        private void CheckBulkPatching(HarmonyPatchDescriptionSet<TPatchDescription> set)
+        {
+            if (set.TypePatchDescription is null)
+                return;
+
+            var bulkPatchMethods = GetBulkPatchMethods(set).ToArray();
+            var hasBulkPatchMethods = bulkPatchMethods.Any();
+            var isPatchAll = set.TypePatchDescription.IsPatchAll?.Value ?? false;
+            if (!isPatchAll && !hasBulkPatchMethods)
+                return;
+
+            var conflictingSyntaxes = bulkPatchMethods.SelectMany(patchMethod => patchMethod.MethodKinds)
+                .Concat<IHasSyntax>(isPatchAll ? [set.TypePatchDescription.IsPatchAll!] : []).ToArray();
+
+            if (conflictingSyntaxes.Length > 1)
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(DontUseMultipleBulkPatchingMethodsRule,
+                    conflictingSyntaxes.GetLocation(), conflictingSyntaxes.GetAdditionalLocations()));
+            }
+
+            var conflictingPatchDescriptions = set.PatchMethods.Select(patchMethod => patchMethod.PatchDescription).Concat([set.TypePatchDescription])
+                .Where(patchDescription => IsConflictingPatchDescription(patchDescription, hasBulkPatchMethods)).ToArray();
+            if (conflictingPatchDescriptions is [])
+                return;
+
+            conflictingSyntaxes =
+            [
+                .. conflictingSyntaxes,
+                .. conflictingPatchDescriptions.SelectMany(
+                    patchDescription => patchDescription?.Attrubutes.Where(attribute => attribute.Is(WellKnownTypes.HarmonyPatch)).Select(attribute => new SyntaxWrapper(attribute)) ?? []),
+            ];
+
+            Context.ReportDiagnostic(Diagnostic.Create(DontUseIndividualAnnotationsWithBulkPatchingRule,
+                conflictingSyntaxes.GetLocation(), conflictingSyntaxes.GetAdditionalLocations()));
+
+
+            static bool IsConflictingPatchDescription(TPatchDescription? patchDescription, bool hasBulkPatchingMethods)
+            {
+                if (patchDescription is null) 
+                    return false;
+
+                if (patchDescription.MethodNames.Concat<IHasSyntax>(patchDescription.MethodTypes).Concat(patchDescription.ArgumentTypes).Any())
+                    return true;
+
+                return hasBulkPatchingMethods && patchDescription.TargetTypes.Any();
             }
         }
 
@@ -399,7 +485,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             foreach (var kind in Enum.GetValues(typeof(PatchMethodKind)).Cast<PatchMethodKind>().Where(kind => kind.IsAuxiliary()))
             {
                 var patchMethods = set.PatchMethods
-                    .Where(patchMethod => patchMethod.MethodKinds.Any(detail => detail.Value == kind)).ToArray();
+                    .Where(patchMethod => patchMethod.MethodKinds.Contains(kind)).ToArray();
                 if (patchMethods.Length > 1)
                     Context.ReportDiagnostic(Diagnostic.Create(DontDefineMultipleAuxiliaryPatchMethodsRule,
                         patchMethods.GetLocation(), patchMethods.GetAdditionalLocations()));
@@ -476,20 +562,21 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         }
 
         private static bool IsValidEnumValue<TEnum>(TEnum value) where TEnum : struct => Enum.IsDefined(typeof(TEnum), value);
+
+        private static IEnumerable<HarmonyPatchMethod<TPatchDescription>> GetBulkPatchMethods(
+            HarmonyPatchDescriptionSet<TPatchDescription> set) =>
+            set.PatchMethods.Where(patchMethod => patchMethod.MethodKinds.Any(
+                detail => detail.Value is PatchMethodKind.TargetMethod or PatchMethodKind.TargetMethods));
     }
 
-    private class VerifierV1(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV1>(context)
+    private sealed class VerifierV1(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV1>(context, WellKnownTypes.Harmony1Namespace)
     {
-        protected override string HarmonyNamespace => HarmonyPatchDescriptionV1.HarmonyNamespace;
-
-        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV1.Parse((INamedTypeSymbol)Context.Symbol, Context.Compilation));
+        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV1.Parse((INamedTypeSymbol)Context.Symbol, WellKnownTypes));
     }
 
-    private class VerifierV2(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV2>(context)
+    private sealed class VerifierV2(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV2>(context, WellKnownTypes.Harmony2Namespace)
     {
-        protected override string HarmonyNamespace => HarmonyPatchDescriptionV2.HarmonyNamespace;
-
-        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV2.Parse((INamedTypeSymbol)Context.Symbol, Context.Compilation));
+        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV2.Parse((INamedTypeSymbol)Context.Symbol, WellKnownTypes));
 
         protected override void PreMergeChecks(HarmonyPatchDescriptionV2 patchDescription)
         {
@@ -498,9 +585,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckAttributeArgumentsMustBeValidV2(patchDescription);
         }
 
-        protected override void PostMergeChecks(HarmonyPatchDescriptionV2 patchDescription)
+        protected override void PostMergeChecks(HarmonyPatchDescriptionV2 patchDescription, HarmonyPatchDescriptionSet<HarmonyPatchDescriptionV2> set)
         {
-            base.PostMergeChecks(patchDescription);
+            base.PostMergeChecks(patchDescription, set);
 
             CheckMethodMustExistAndNotAmbiguousV2(patchDescription);
             CheckTypeMustExistV2(patchDescription);

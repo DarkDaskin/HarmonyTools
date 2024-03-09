@@ -135,6 +135,18 @@
   <data name="DontDefineMultipleAuxiliaryPatchMethodsTitle" xml:space="preserve">
     <value>Multiple auxiliary patch methods of the same kind are defined</value>
   </data>
+  <data name="DontUseIndividualAnnotationsWithBulkPatchingMessageFormat" xml:space="preserve">
+    <value>Bulk patching can't be combined with individual target method annotations.</value>
+  </data>
+  <data name="DontUseIndividualAnnotationsWithBulkPatchingTitle" xml:space="preserve">
+    <value>Bulk patching can't be combined with individual target method annotations</value>
+  </data>
+  <data name="DontUseMultipleBulkPatchingMethodsMessageFormat" xml:space="preserve">
+    <value>Only single method of bulk patching is allowed.</value>
+  </data>
+  <data name="DontUseMultipleBulkPatchingMethodsTitle" xml:space="preserve">
+    <value>Only single method of bulk patching is allowed</value>
+  </data>
   <data name="HarmonyPatchAttributeMustBeOnTypeMessageFormat" xml:space="preserve">
     <value>Missing HarmonyPatch attribute on type. Specified patches will not be discovered.</value>
   </data>

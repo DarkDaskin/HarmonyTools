@@ -44,6 +44,12 @@ public class TargetTests
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
     }
 
+    [TestMethod, CodeDataSource("ValidBulkPatches.cs")]
+    public async Task WhenValidBulkPatches_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
+    }
+
     [TestMethod, CodeDataSource("NonExistingMethods.cs", ProvideVersion = true)]
     public async Task WhenNonExistingMethods_Report(string code, ReferenceAssemblies referenceAssemblies, int version)
     {
@@ -143,7 +149,9 @@ public class TargetTests
             new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
                 .WithSpan(45, 10, 45, 43),
             new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
-                .WithSpan(52, 10, 52, 41));
+                .WithSpan(52, 10, 52, 41),
+            new DiagnosticResult(DiagnosticIds.MethodMustBeSpecified, DiagnosticSeverity.Warning)
+                .WithSpan(56, 6, 56, 21));
     }
 
     [TestMethod, CodeDataSource("OverspecifiedMethods.cs", ProvideVersion = true)]
@@ -266,5 +274,45 @@ public class TargetTests
             new DiagnosticResult(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, DiagnosticSeverity.Warning)
                 .WithSpan(6, 20, 6, 45),
             fixedCode);
+    }
+
+    [TestMethod, CodeDataSource("IndividualAnnotationsWithBulkPatching.cs")]
+    public async Task WhenIndividualAnnotationsWithBulkPatching_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(8, 6, 8, 73)
+                .WithSpan(8, 75, 8, 90),
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(14, 6, 14, 21)
+                .WithSpan(17, 10, 17, 77),
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(21, 6, 21, 63)
+                .WithSpan(21, 65, 21, 80),
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(27, 6, 27, 81)
+                .WithSpan(27, 83, 27, 98),
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(33, 6, 33, 39)
+                .WithSpan(36, 34, 36, 46),
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(41, 6, 41, 39)
+                .WithSpan(44, 47, 44, 60),
+            new DiagnosticResult(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, DiagnosticSeverity.Warning)
+                .WithSpan(49, 6, 49, 39)
+                .WithSpan(49, 41, 49, 87)
+                .WithSpan(52, 10, 52, 29));
+    }
+
+    [TestMethod, CodeDataSource("MultipleBulkPatchingMethods.cs")]
+    public async Task WhenMultipleBulkPatchingMethods_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.DontUseMultipleBulkPatchingMethods, DiagnosticSeverity.Warning)
+                .WithSpan(7, 6, 7, 21)
+                .WithSpan(10, 34, 10, 46),
+            new DiagnosticResult(DiagnosticIds.DontUseMultipleBulkPatchingMethods, DiagnosticSeverity.Warning)
+                .WithSpan(16, 34, 16, 46)
+                .WithSpan(18, 47, 18, 60));
     }
 }
