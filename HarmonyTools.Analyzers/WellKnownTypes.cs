@@ -10,6 +10,7 @@ internal class WellKnownTypes
     public readonly ITypeSymbol String;
     public readonly ITypeSymbol Type;
     public readonly ITypeSymbol ArrayOfType;
+    public readonly ITypeSymbol? HarmonyAttribute;
     public readonly ITypeSymbol? HarmonyPatch;
     public readonly ITypeSymbol? HarmonyPatchAll;
     public readonly ITypeSymbol? HarmonyPatchCategory;
@@ -32,6 +33,7 @@ internal class WellKnownTypes
         String = compilation.GetSpecialType(SpecialType.System_String);
         Type = compilation.GetTypeByMetadataName("System.Type")!;
         ArrayOfType = compilation.CreateArrayTypeSymbol(Type);
+        HarmonyAttribute = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyAttribute");
         HarmonyPatch = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatch");
         HarmonyPatchAll = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchAll");
         HarmonyPatchCategory = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchCategory");

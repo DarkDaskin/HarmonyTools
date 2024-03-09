@@ -57,6 +57,10 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.DontUseMultipleBulkPatchingMethods, 
             nameof(Resources.DontUseMultipleBulkPatchingMethodsTitle), nameof(Resources.DontUseMultipleBulkPatchingMethodsMessageFormat), 
             TargetMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsRule = 
+        CreateRule(DiagnosticIds.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods, 
+            nameof(Resources.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsTitle), nameof(Resources.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsMessageFormat), 
+            TargetMethodCategory, DiagnosticSeverity.Warning);
 
     private const string PatchMethodCategory = "PatchMethod";
     private static readonly DiagnosticDescriptor PatchMethodsMustBeStaticRule = 
@@ -83,6 +87,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         HarmonyPatchAttributeMustBeOnTypeRule,
         DontUseIndividualAnnotationsWithBulkPatchingRule,
         DontUseMultipleBulkPatchingMethodsRule,
+        DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsRule,
 
         PatchMethodsMustBeStaticRule,
         PatchMethodMustHaveSingleKindRule,
@@ -185,6 +190,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         protected virtual void PatchMethodChecks(HarmonyPatchMethod<TPatchDescription> patchMethod)
         {
+            CheckDontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods(patchMethod);
             CheckPatchMethodsMustBeStatic(patchMethod);
             CheckPatchMethodMustHaveSingleKind(patchMethod);
         }
@@ -480,9 +486,19 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
         }
 
+        private void CheckDontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods(HarmonyPatchMethod patchMethod)
+        {
+            if (patchMethod.PatchDescription is null || patchMethod.MethodKinds.Any(kind => kind.Value.IsPrimary()))
+                return;
+
+            var predicate = (AttributeData attribute) => attribute.Is(WellKnownTypes.HarmonyAttribute);
+            Context.ReportDiagnostic(Diagnostic.Create(DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsRule,
+                patchMethod.PatchDescription.GetLocation(predicate), patchMethod.PatchDescription.GetAdditionalLocations(predicate)));
+        }
+
         private void CheckPatchMethodsMustBeStatic(HarmonyPatchMethod patchMethod)
         {
-            if (patchMethod.Method.IsStatic)
+            if (patchMethod.Method.IsStatic || patchMethod.MethodKinds is [])
                 return;
 
             Context.ReportDiagnostic(Diagnostic.Create(PatchMethodsMustBeStaticRule,

@@ -12,6 +12,7 @@ public static class DiagnosticIds
     public const string HarmonyPatchAttributeMustBeOnType = "HT1008";
     public const string DontUseIndividualAnnotationsWithBulkPatching = "HT1009";
     public const string DontUseMultipleBulkPatchingMethods = "HT1010";
+    public const string DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods = "HT1011";
 
     public const string PatchMethodsMustBeStatic = "HT2001";
     public const string PatchMethodMustHaveSingleKind = "HT2002";

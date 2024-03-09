@@ -195,4 +195,10 @@
   <data name="TargetTypeMustExistTitle" xml:space="preserve">
     <value>Target type does not exist</value>
   </data>
+  <data name="DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsMessageFormat" xml:space="preserve">
+    <value>Target method annotations have no effect on non-primary patch methods.</value>
+  </data>
+  <data name="DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsTitle" xml:space="preserve">
+    <value>Target method annotations have no effect on non-primary patch methods</value>
+  </data>
 </root>

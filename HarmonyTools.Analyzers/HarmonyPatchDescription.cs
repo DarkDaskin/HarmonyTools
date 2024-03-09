@@ -117,7 +117,7 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
                 break;
         }
 
-        if (methodKinds is [])
+        if (methodKinds is [] && patchDescription is null)
             return null;
 
         return new HarmonyPatchMethod<TPatchDescription>(method, methodKinds, patchDescription);

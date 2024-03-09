@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyTools.Analyzers;
+using HarmonyTools.CodeFixes;
 using HarmonyTools.Test.Infrastructure;
+using HarmonyTools.Test.Verifiers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VerifyCS = HarmonyTools.Test.Verifiers.CSharpCodeFixVerifier<
-    HarmonyTools.Analyzers.HarmonyToolsAnalyzer,
-    HarmonyTools.CodeFixes.HarmonyPatchAttributeMustBeOnTypeCodeFixProvider>;
+using VerifyCS = HarmonyTools.Test.Verifiers.CSharpAnalyzerVerifier<
+    HarmonyTools.Analyzers.HarmonyToolsAnalyzer>;
 
 namespace HarmonyTools.Test;
 
@@ -273,7 +274,8 @@ public class TargetMethodTests
     [TestMethod, CodeDataSource("MissingHarmonyPatchOnType.cs", FixedPath = "MissingHarmonyPatchOnType_Fixed.cs")]
     public async Task WhenMissingHarmonyPatchOnType_ReportAndFix(string code, ReferenceAssemblies referenceAssemblies, string fixedCode)
     {
-        await VerifyCS.VerifyCodeFixAsync(code, referenceAssemblies,
+        await CSharpCodeFixVerifier<HarmonyToolsAnalyzer, HarmonyPatchAttributeMustBeOnTypeCodeFixProvider>
+            .VerifyCodeFixAsync(code, referenceAssemblies,
             new DiagnosticResult(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, DiagnosticSeverity.Warning)
                 .WithSpan(6, 20, 6, 45),
             fixedCode);
@@ -317,5 +319,22 @@ public class TargetMethodTests
             new DiagnosticResult(DiagnosticIds.DontUseMultipleBulkPatchingMethods, DiagnosticSeverity.Warning)
                 .WithSpan(16, 34, 16, 46)
                 .WithSpan(18, 47, 18, 60));
+    }
+
+    [TestMethod, CodeDataSource("TargetMethodAnnotationsOnNonPrimaryPatchMethods.cs", 
+         FixedPath = "TargetMethodAnnotationsOnNonPrimaryPatchMethods_Fixed.cs")]
+    public async Task WhenTargetMethodAnnotationsOnNonPrimaryPatchMethods_ReportAndFix(
+        string code, ReferenceAssemblies referenceAssemblies, string fixedCode)
+    {
+        await CSharpCodeFixVerifier<HarmonyToolsAnalyzer, DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsCodeFixProvider>
+            .VerifyCodeFixAsync(code, referenceAssemblies,
+            [
+                new DiagnosticResult(DiagnosticIds.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods, DiagnosticSeverity.Warning)
+                    .WithSpan(12, 26, 12, 59)
+                    .WithSpan(12, 61, 12, 107),
+                new DiagnosticResult(DiagnosticIds.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods, DiagnosticSeverity.Warning)
+                    .WithSpan(15, 10, 15, 43)
+                    .WithSpan(15, 45, 15, 91),
+            ], fixedCode);
     }
 }

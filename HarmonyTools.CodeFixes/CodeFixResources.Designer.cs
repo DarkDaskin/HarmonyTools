@@ -61,6 +61,15 @@ namespace HarmonyTools.CodeFixes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove attributes.
+        /// </summary>
+        internal static string DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsCodeFixTitle {
+            get {
+                return ResourceManager.GetString("DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add HarmonyPatch attribute.
         /// </summary>
         internal static string HarmonyPatchAttributeMustBeOnTypeCodeFixTitle {

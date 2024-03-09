@@ -151,6 +151,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Target method annotations have no effect on non-primary patch methods..
+        /// </summary>
+        internal static string DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsMessageFormat {
+            get {
+                return ResourceManager.GetString("DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method annotations have no effect on non-primary patch methods.
+        /// </summary>
+        internal static string DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsTitle {
+            get {
+                return ResourceManager.GetString("DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Missing HarmonyPatch attribute on type. Specified patches will not be discovered..
         /// </summary>
         internal static string HarmonyPatchAttributeMustBeOnTypeMessageFormat {
