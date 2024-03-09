@@ -12,6 +12,7 @@ internal class WellKnownTypes
     public readonly ITypeSymbol ArrayOfType;
     public readonly ITypeSymbol? HarmonyPatch;
     public readonly ITypeSymbol? HarmonyPatchAll;
+    public readonly ITypeSymbol? HarmonyPatchCategory;
     public readonly ITypeSymbol? HarmonyPrefix;
     public readonly ITypeSymbol? HarmonyPostfix;
     public readonly ITypeSymbol? HarmonyTranspiler;
@@ -33,6 +34,7 @@ internal class WellKnownTypes
         ArrayOfType = compilation.CreateArrayTypeSymbol(Type);
         HarmonyPatch = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatch");
         HarmonyPatchAll = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchAll");
+        HarmonyPatchCategory = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchCategory");
         HarmonyPrefix = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPrefix");
         HarmonyPostfix = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPostfix");
         HarmonyTranspiler = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyTranspiler");

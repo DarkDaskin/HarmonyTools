@@ -20,6 +20,7 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ITypeSymbol?>>> ArgumentTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ArgumentType>>> ArgumentVariations { get; protected set; } = [];
     public DetailWithSyntax<bool>? IsPatchAll { get; private set; }
+    public DetailWithSyntax<string?>? PatchCategory { get; private set; }
 
     protected static HarmonyPatchDescriptionSet<TPatchDescription> Parse<TPatchDescription>(INamedTypeSymbol type, 
         WellKnownTypes wellKnownTypes, Func<ISymbol, TPatchDescription> patchDescriptionConstructor)
@@ -128,6 +129,11 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
         {
             patchDescription = InitializePatchDescription(patchDescription, symbol, attribute, patchDescriptionConstructor);
             patchDescription.IsPatchAll = new DetailWithSyntax<bool>(true, attribute.GetSyntax());
+        }
+        else if (attribute.Is(wellKnownTypes.HarmonyPatchCategory))
+        {
+            patchDescription = InitializePatchDescription(patchDescription, symbol, attribute, patchDescriptionConstructor);
+            patchDescription.PatchCategory = GetDetailWithSyntax<string?>(attribute, 0);
         }
     }
 

@@ -37,4 +37,10 @@ namespace HarmonyTools.Test.Source.V2
         [HarmonyPatch((Type)null, (string)null)]
         public static void Postfix() { }
     }
+
+    [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod)), HarmonyPatchCategory(null)]
+    internal class InvalidArguments6
+    {
+        public static void Postfix() { }
+    }
 }

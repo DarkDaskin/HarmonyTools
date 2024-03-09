@@ -226,6 +226,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 for (var i = 0; i < detail.Value.Length; i++)
                     if (!IsValidEnumValue(detail.Value[i]))
                         ReportInvalidAttributeArgument(detail, i);
+
+            if (patchDescription.PatchCategory is { Value: null })
+                ReportInvalidAttributeArgument(patchDescription.PatchCategory);
         }
 
         private void CheckArgumentTypesAndVariationsMustMatch(HarmonyPatchDescription patchDescription)

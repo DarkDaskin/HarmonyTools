@@ -248,6 +248,9 @@ public class TargetTests
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
                 .WithSpan(37, 35, 37, 47),
         ]);
+        if (version == 2)
+            expected.Add(new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(41, 96, 41, 100));
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
