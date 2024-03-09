@@ -3,7 +3,7 @@ using HarmonyTools.Test.PatchBase;
 
 namespace HarmonyTools.Test.Source.V2
 {
-    [HarmonyLib.HarmonyPatch]
+    [HarmonyPatch]
     internal class MissingHarmonyPatchOnType
     {
         [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
