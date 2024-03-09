@@ -72,16 +72,22 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
     private static void RegisterActionsWithFullMetadata(CompilationStartAnalysisContext context)
     {
-        if (context.Compilation.Options.MetadataImportOptions == MetadataImportOptions.All)
-        {
-            context.RegisterSymbolAction(AnalyzeTypeV1, SymbolKind.NamedType);
-            context.RegisterSymbolAction(AnalyzeTypeV2, SymbolKind.NamedType);
+        if (context.Compilation.Options.MetadataImportOptions != MetadataImportOptions.All) 
+            return;
+
+        if (WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony1Namespace))
+            context.RegisterSymbolAction(symbolContext => new VerifierV1(symbolContext).Verify(), SymbolKind.NamedType);
+        if (WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony2Namespace))
+            context.RegisterSymbolAction(symbolContext => new VerifierV2(symbolContext).Verify(), SymbolKind.NamedType);
         }
-    }
 
     private void RunAnalyzerWithFullMetadata(CompilationAnalysisContext context)
     {
         if (context.Compilation.Options.MetadataImportOptions == MetadataImportOptions.All)
+            return;
+
+        if (!WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony1Namespace) &&
+            !WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony2Namespace))
             return;
 
         var compilation = context.Compilation.WithOptions(context.Compilation.Options.WithMetadataImportOptions(MetadataImportOptions.All));
@@ -91,9 +97,6 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(disgnostic);
     }
 
-    private static void AnalyzeTypeV1(SymbolAnalysisContext context) => new VerifierV1(context).Verify();
-
-    private static void AnalyzeTypeV2(SymbolAnalysisContext context) => new VerifierV2(context).Verify();
 
 
     private abstract class Verifier<TPatchDescription>(SymbolAnalysisContext context)

@@ -4,6 +4,9 @@ namespace HarmonyTools.Analyzers;
 
 internal class WellKnownTypes
 {
+    public const string Harmony1Namespace = "Harmony";
+    public const string Harmony2Namespace = "HarmonyLib";
+
     public readonly ITypeSymbol String;
     public readonly ITypeSymbol Type;
     public readonly ITypeSymbol ArrayOfType;
@@ -42,4 +45,7 @@ internal class WellKnownTypes
         ArrayOfArgumentType = ArgumentType == null ? null : compilation.CreateArrayTypeSymbol(ArgumentType);
         PropertyMethod = compilation.GetTypeByMetadataName($"{harmonyNamespace}.PropertyMethod");
     }
+
+    public static bool IsHarmonyLoaded(Compilation compilation, string harmonyNamespace) =>
+        compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatch") is not null;
 }
