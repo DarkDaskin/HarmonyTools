@@ -169,78 +169,6 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not enough information to target a method..
-        /// </summary>
-        internal static string MethodMustBeSpecifiedMessageFormat {
-            get {
-                return ResourceManager.GetString("MethodMustBeSpecifiedMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Not enough information to target a method.
-        /// </summary>
-        internal static string MethodMustBeSpecifiedTitle {
-            get {
-                return ResourceManager.GetString("MethodMustBeSpecifiedTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Target method &apos;{0}&apos; does not exist in type &apos;{1}&apos;..
-        /// </summary>
-        internal static string MethodMustExistMessageFormat {
-            get {
-                return ResourceManager.GetString("MethodMustExistMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Target method does not exist.
-        /// </summary>
-        internal static string MethodMustExistTitle {
-            get {
-                return ResourceManager.GetString("MethodMustExistTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ambiguous match on target method &apos;{0}&apos; in type &apos;{1}&apos;: {2} candidates found..
-        /// </summary>
-        internal static string MethodMustNotBeAmbiguousMessageFormat {
-            get {
-                return ResourceManager.GetString("MethodMustNotBeAmbiguousMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ambiguous match on target method.
-        /// </summary>
-        internal static string MethodMustNotBeAmbiguousTitle {
-            get {
-                return ResourceManager.GetString("MethodMustNotBeAmbiguousTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Conflicting method specifications found..
-        /// </summary>
-        internal static string MethodMustNotBeOverspecifiedMessageFormat {
-            get {
-                return ResourceManager.GetString("MethodMustNotBeOverspecifiedMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Conflicting method specifications found.
-        /// </summary>
-        internal static string MethodMustNotBeOverspecifiedTitle {
-            get {
-                return ResourceManager.GetString("MethodMustNotBeOverspecifiedTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Multiple method kinds are assigned to the patch method. Only one method kind will be recognized..
         /// </summary>
         internal static string PatchMethodMustHaveSingleKindMessageFormat {
@@ -277,20 +205,92 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not enough information to target a method..
+        /// </summary>
+        internal static string TargetMethodMustBeFullySpecifiedMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodMustBeFullySpecifiedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough information to target a method.
+        /// </summary>
+        internal static string TargetMethodMustBeFullySpecifiedTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodMustBeFullySpecifiedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method &apos;{0}&apos; does not exist in type &apos;{1}&apos;..
+        /// </summary>
+        internal static string TargetMethodMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method does not exist.
+        /// </summary>
+        internal static string TargetMethodMustExistTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodMustExistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous match on target method &apos;{0}&apos; in type &apos;{1}&apos;: {2} candidates found..
+        /// </summary>
+        internal static string TargetMethodMustNotBeAmbiguousMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodMustNotBeAmbiguousMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ambiguous match on target method.
+        /// </summary>
+        internal static string TargetMethodMustNotBeAmbiguousTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodMustNotBeAmbiguousTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Conflicting method specifications found..
+        /// </summary>
+        internal static string TargetMethodMustNotBeOverspecifiedMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodMustNotBeOverspecifiedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Conflicting method specifications found.
+        /// </summary>
+        internal static string TargetMethodMustNotBeOverspecifiedTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodMustNotBeOverspecifiedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target type &apos;{0}&apos; does not exist..
         /// </summary>
-        internal static string TypeMustExistMessageFormat {
+        internal static string TargetTypeMustExistMessageFormat {
             get {
-                return ResourceManager.GetString("TypeMustExistMessageFormat", resourceCulture);
+                return ResourceManager.GetString("TargetTypeMustExistMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Target type does not exist.
         /// </summary>
-        internal static string TypeMustExistTitle {
+        internal static string TargetTypeMustExistTitle {
             get {
-                return ResourceManager.GetString("TypeMustExistTitle", resourceCulture);
+                return ResourceManager.GetString("TargetTypeMustExistTitle", resourceCulture);
             }
         }
     }

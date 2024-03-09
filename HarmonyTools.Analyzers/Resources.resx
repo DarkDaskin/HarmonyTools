@@ -153,28 +153,28 @@
   <data name="HarmonyPatchAttributeMustBeOnTypeTitle" xml:space="preserve">
     <value>Missing HarmonyPatch attribute on type</value>
   </data>
-  <data name="MethodMustBeSpecifiedMessageFormat" xml:space="preserve">
+  <data name="TargetMethodMustBeFullySpecifiedMessageFormat" xml:space="preserve">
     <value>Not enough information to target a method.</value>
   </data>
-  <data name="MethodMustBeSpecifiedTitle" xml:space="preserve">
+  <data name="TargetMethodMustBeFullySpecifiedTitle" xml:space="preserve">
     <value>Not enough information to target a method</value>
   </data>
-  <data name="MethodMustExistMessageFormat" xml:space="preserve">
+  <data name="TargetMethodMustExistMessageFormat" xml:space="preserve">
     <value>Target method '{0}' does not exist in type '{1}'.</value>
   </data>
-  <data name="MethodMustExistTitle" xml:space="preserve">
+  <data name="TargetMethodMustExistTitle" xml:space="preserve">
     <value>Target method does not exist</value>
   </data>
-  <data name="MethodMustNotBeAmbiguousMessageFormat" xml:space="preserve">
+  <data name="TargetMethodMustNotBeAmbiguousMessageFormat" xml:space="preserve">
     <value>Ambiguous match on target method '{0}' in type '{1}': {2} candidates found.</value>
   </data>
-  <data name="MethodMustNotBeAmbiguousTitle" xml:space="preserve">
+  <data name="TargetMethodMustNotBeAmbiguousTitle" xml:space="preserve">
     <value>Ambiguous match on target method</value>
   </data>
-  <data name="MethodMustNotBeOverspecifiedMessageFormat" xml:space="preserve">
+  <data name="TargetMethodMustNotBeOverspecifiedMessageFormat" xml:space="preserve">
     <value>Conflicting method specifications found.</value>
   </data>
-  <data name="MethodMustNotBeOverspecifiedTitle" xml:space="preserve">
+  <data name="TargetMethodMustNotBeOverspecifiedTitle" xml:space="preserve">
     <value>Conflicting method specifications found</value>
   </data>
   <data name="PatchMethodMustHaveSingleKindMessageFormat" xml:space="preserve">
@@ -189,10 +189,10 @@
   <data name="PatchMethodsMustBeStaticTitle" xml:space="preserve">
     <value>Patch method must be static</value>
   </data>
-  <data name="TypeMustExistMessageFormat" xml:space="preserve">
+  <data name="TargetTypeMustExistMessageFormat" xml:space="preserve">
     <value>Target type '{0}' does not exist.</value>
   </data>
-  <data name="TypeMustExistTitle" xml:space="preserve">
+  <data name="TargetTypeMustExistTitle" xml:space="preserve">
     <value>Target type does not exist</value>
   </data>
 </root>
