@@ -10,4 +10,7 @@ public static class DiagnosticIds
     public const string AttributeArgumentsMustBeValid = "HT1006";
     public const string ArgumentTypesAndVariationsMustMatch = "HT1007";
     public const string HarmonyPatchAttributeMustBeOnType = "HT1008";
+
+    public const string PatchMethodMustHaveSingleKind = "HT2001";
+    public const string DontDefineMultipleAuxiliaryPatchMethods = "HT2002";
 }

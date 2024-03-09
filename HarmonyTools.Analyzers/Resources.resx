@@ -129,6 +129,12 @@
   <data name="AttributeArgumentsMustBeValidTitle" xml:space="preserve">
     <value>Invalid attribute argument</value>
   </data>
+  <data name="DontDefineMultipleAuxiliaryPatchMethodsMessageFormat" xml:space="preserve">
+    <value>Multiple auxiliary patch methods of the same kind are defined. Only the first one will be executed.</value>
+  </data>
+  <data name="DontDefineMultipleAuxiliaryPatchMethodsTitle" xml:space="preserve">
+    <value>Multiple auxiliary patch methods of the same kind are defined</value>
+  </data>
   <data name="HarmonyPatchAttributeMustBeOnTypeMessageFormat" xml:space="preserve">
     <value>Missing HarmonyPatch attribute on type. Specified patches will not be discovered.</value>
   </data>
@@ -148,7 +154,7 @@
     <value>Target method does not exist</value>
   </data>
   <data name="MethodMustNotBeAmbiguousMessageFormat" xml:space="preserve">
-    <value>Ambiguous match on target method '{0}' in type '{1}': {2} canditates found.</value>
+    <value>Ambiguous match on target method '{0}' in type '{1}': {2} candidates found.</value>
   </data>
   <data name="MethodMustNotBeAmbiguousTitle" xml:space="preserve">
     <value>Ambiguous match on target method</value>
@@ -158,6 +164,12 @@
   </data>
   <data name="MethodMustNotBeOverspecifiedTitle" xml:space="preserve">
     <value>Conflicting method specifications found</value>
+  </data>
+  <data name="PatchMethodMustHaveSingleKindMessageFormat" xml:space="preserve">
+    <value>Multiple method kinds are assigned to the patch method. Only one method kind will be recognized.</value>
+  </data>
+  <data name="PatchMethodMustHaveSingleKindTitle" xml:space="preserve">
+    <value>Multiple method kinds are assigned to the patch method</value>
   </data>
   <data name="TypeMustExistMessageFormat" xml:space="preserve">
     <value>Target type '{0}' does not exist.</value>

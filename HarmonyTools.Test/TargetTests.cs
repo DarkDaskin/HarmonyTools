@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using HarmonyTools.Test.Infrastructure;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using HarmonyTools.Analyzers;
+using HarmonyTools.Test.Infrastructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VerifyCS = HarmonyTools.Test.Verifiers.CSharpCodeFixVerifier<
     HarmonyTools.Analyzers.HarmonyToolsAnalyzer,
     HarmonyTools.HarmonyToolsCodeFixProvider>;
@@ -12,7 +12,7 @@ using VerifyCS = HarmonyTools.Test.Verifiers.CSharpCodeFixVerifier<
 namespace HarmonyTools.Test;
 
 [TestClass]
-public class DummyTests
+public class TargetTests
 {
     [TestMethod]
     public async Task WhenEmptyFile_DoNothing()

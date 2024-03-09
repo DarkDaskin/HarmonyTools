@@ -26,6 +26,6 @@ internal static class HasSyntaxExtensions
         details.GetLocations().Skip(1);
 
     private static IEnumerable<Location> GetLocations(this IEnumerable<IHasSyntax> details) =>
-        details.Select(detail => detail.Syntax?.GetLocation()).Where(location => location is not null).Cast<Location>()
-            .OrderBy(location => location.SourceSpan.Start);
+        details.Select(detail => detail.Syntax?.GetIdentifierLocation() ?? detail.Syntax?.GetLocation())
+            .Where(location => location is not null).Cast<Location>().OrderBy(location => location.SourceSpan.Start);
 }

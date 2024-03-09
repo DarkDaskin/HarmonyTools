@@ -97,6 +97,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined. Only the first one will be executed..
+        /// </summary>
+        internal static string DontDefineMultipleAuxiliaryPatchMethodsMessageFormat {
+            get {
+                return ResourceManager.GetString("DontDefineMultipleAuxiliaryPatchMethodsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined.
+        /// </summary>
+        internal static string DontDefineMultipleAuxiliaryPatchMethodsTitle {
+            get {
+                return ResourceManager.GetString("DontDefineMultipleAuxiliaryPatchMethodsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Missing HarmonyPatch attribute on type. Specified patches will not be discovered..
         /// </summary>
         internal static string HarmonyPatchAttributeMustBeOnTypeMessageFormat {
@@ -151,7 +169,7 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ambiguous match on target method &apos;{0}&apos; in type &apos;{1}&apos;: {2} canditates found..
+        ///   Looks up a localized string similar to Ambiguous match on target method &apos;{0}&apos; in type &apos;{1}&apos;: {2} candidates found..
         /// </summary>
         internal static string MethodMustNotBeAmbiguousMessageFormat {
             get {
@@ -183,6 +201,24 @@ namespace HarmonyTools.Analyzers {
         internal static string MethodMustNotBeOverspecifiedTitle {
             get {
                 return ResourceManager.GetString("MethodMustNotBeOverspecifiedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple method kinds are assigned to the patch method. Only one method kind will be recognized..
+        /// </summary>
+        internal static string PatchMethodMustHaveSingleKindMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodMustHaveSingleKindMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple method kinds are assigned to the patch method.
+        /// </summary>
+        internal static string PatchMethodMustHaveSingleKindTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodMustHaveSingleKindTitle", resourceCulture);
             }
         }
         

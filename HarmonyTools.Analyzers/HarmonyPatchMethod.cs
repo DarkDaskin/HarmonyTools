@@ -4,13 +4,15 @@ using Microsoft.CodeAnalysis;
 namespace HarmonyTools.Analyzers;
 
 internal class HarmonyPatchMethod(IMethodSymbol method, ImmutableArray<DetailWithSyntax<PatchMethodKind>> methodKinds, 
-    HarmonyPatchDescription? patchDescription)
+    HarmonyPatchDescription? patchDescription) : IHasSyntax
 {
     public IMethodSymbol Method { get; } = method;
     public ImmutableArray<DetailWithSyntax<PatchMethodKind>> MethodKinds { get; } = methodKinds;
     public HarmonyPatchDescription? PatchDescription { get; } = patchDescription;
 
     public override string ToString() => Method.ToString();
+
+    public SyntaxNode? Syntax => Method.GetSyntax();
 }
 
 internal class HarmonyPatchMethod<TPatchDescription>(IMethodSymbol method, ImmutableArray<DetailWithSyntax<PatchMethodKind>> methodKinds, 
