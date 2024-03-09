@@ -11,15 +11,13 @@ namespace HarmonyTools.Test.Source.V1
         public static void Postfix() { }
 
         public static void Transpiler() { }
-
-        public static void Finalizer() { }
-
-        public static void ReversePatch() { }
-
+        
         public static void Prepare() { }
 
         public static void Cleanup() { }
 
         public static MethodBase TargetMethod() => default;
+
+        public void NonPatchMethod() { }
     }
 }

@@ -30,9 +30,13 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
 
         var patchMethods = ImmutableArray.CreateBuilder<HarmonyPatchMethod<TPatchDescription>>();
         var methods = type.GetMembers().OfType<IMethodSymbol>().Where(method => method.MethodKind == MethodKind.Ordinary);
-        foreach (var method in methods) 
-            patchMethods.Add(GetPatchMethod(method, wellKnownTypes, patchDescriptionConstructor));
-        
+        foreach (var method in methods)
+        {
+            var patchMethod = GetPatchMethod(method, wellKnownTypes, patchDescriptionConstructor);
+            if (patchMethod is not null)
+                patchMethods.Add(patchMethod);
+        }
+
         return new HarmonyPatchDescriptionSet<TPatchDescription>(typePatchDescription, patchMethods.DrainToImmutable());
     }
     private static TPatchDescription? GetTypePatchDescription<TPatchDescription>(INamedTypeSymbol type, WellKnownTypes wellKnownTypes,
@@ -48,7 +52,7 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
         return patchDescription;
     }
 
-    private static HarmonyPatchMethod<TPatchDescription> GetPatchMethod<TPatchDescription>(IMethodSymbol method, 
+    private static HarmonyPatchMethod<TPatchDescription>? GetPatchMethod<TPatchDescription>(IMethodSymbol method, 
         WellKnownTypes wellKnownTypes, Func<ISymbol, TPatchDescription> patchDescriptionConstructor) 
         where TPatchDescription: HarmonyPatchDescription
     {
@@ -112,6 +116,9 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
                 methodKinds = methodKinds.Add(new DetailWithSyntax<PatchMethodKind>(PatchMethodKind.TargetMethods, methodSyntax));
                 break;
         }
+
+        if (methodKinds is [])
+            return null;
 
         return new HarmonyPatchMethod<TPatchDescription>(method, methodKinds, patchDescription);
     }

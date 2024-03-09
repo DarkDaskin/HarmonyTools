@@ -36,11 +36,11 @@ public class PatchMethodTests
                 .WithSpan(12, 28, 12, 36));
     }
 
-    [TestMethod, CodeDataSource("NonStaticPatchMethods.cs", FixedPath = "NonStaticPatchMethods_Fixed.cs")]
-    public async Task WhenNonStaticPatchMethods_ReportAndFix(string code, ReferenceAssemblies referenceAssemblies, string fixedCode)
+    [TestMethod, CodeDataSource("NonStaticPatchMethods.cs", FixedPath = "NonStaticPatchMethods_Fixed.cs", ProvideVersion = true)]
+    public async Task WhenNonStaticPatchMethods_ReportAndFix(string code, ReferenceAssemblies referenceAssemblies, string fixedCode, int version)
     {
-        await VerifyCS.VerifyCodeFixAsync(code, referenceAssemblies, 
-        [
+        var expected = new List<DiagnosticResult>
+        {
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
                 .WithSpan(9, 21, 9, 27),
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
@@ -48,15 +48,21 @@ public class PatchMethodTests
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
                 .WithSpan(13, 21, 13, 31),
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
-                .WithSpan(15, 21, 15, 30),
+                .WithSpan(15, 21, 15, 28),
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
-                .WithSpan(17, 21, 17, 33),
+                .WithSpan(17, 21, 17, 28),
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
-                .WithSpan(19, 21, 19, 28),
-            new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
-                .WithSpan(21, 21, 21, 28),
-            new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
-                .WithSpan(23, 27, 23, 39),
-        ], fixedCode);
+                .WithSpan(19, 27, 19, 39),
+        };
+        if (version == 2)
+            expected.AddRange(
+            [
+                new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
+                    .WithSpan(21, 21, 21, 30),
+                new DiagnosticResult(DiagnosticIds.PatchMethodsMustBeStatic, DiagnosticSeverity.Warning)
+                    .WithSpan(23, 21, 23, 33),
+            ]);
+
+        await VerifyCS.VerifyCodeFixAsync(code, referenceAssemblies, expected.ToArray(), fixedCode);
     }
 }
