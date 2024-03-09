@@ -18,11 +18,7 @@ public class HarmonyToolsCodeFixProvider : CodeFixProvider
 {
     public sealed override ImmutableArray<string> FixableDiagnosticIds => [DiagnosticIds.HarmonyPatchAttributeMustBeOnType];
 
-    public sealed override FixAllProvider GetFixAllProvider()
-    {
-        // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
-        return WellKnownFixAllProviders.BatchFixer;
-    }
+    public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
@@ -36,9 +32,10 @@ public class HarmonyToolsCodeFixProvider : CodeFixProvider
             var diagnosticSpan = diagnostic.Location.SourceSpan;
             var harmonyNamespace = diagnostic.Properties[HarmonyToolsAnalyzer.HarmonyNamespaceKey]!;
             var declaration = root.FindToken(diagnosticSpan.Start).Parent!.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
-            context.RegisterCodeFix(CodeAction.Create("test", 
-                cancellationToken => AddAttribute(context.Document, root, declaration, $"{harmonyNamespace}.HarmonyPatch", cancellationToken), 
-                "test"), diagnostic);
+            context.RegisterCodeFix(CodeAction.Create(CodeFixResources.HarmonyPatchAttributeMustBeOnTypeCodeFixTitle, 
+                cancellationToken => 
+                   AddAttribute(context.Document, root, declaration, $"{harmonyNamespace}.HarmonyPatch", cancellationToken),
+                CodeFixResources.HarmonyPatchAttributeMustBeOnTypeCodeFixTitle), diagnostic);
         }
     }
 
