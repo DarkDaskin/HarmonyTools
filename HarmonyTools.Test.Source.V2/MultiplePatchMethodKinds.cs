@@ -7,12 +7,12 @@ namespace HarmonyTools.Test.Source.V2
     internal class MultiplePatchMethodKinds
     {
         [HarmonyPostfix]
-        public void Prefix() { }
+        public static void Prefix() { }
 
         [HarmonyPrepare, HarmonyCleanup, HarmonyPrefix]
-        public void InvalidMethod() { }
+        public static void InvalidMethod() { }
 
         [HarmonyPrefix]
-        public void ValidMethod() { }
+        public static void ValidMethod() { }
     }
 }

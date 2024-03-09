@@ -24,16 +24,16 @@ namespace HarmonyTools.Test.Verifiers
             => CSharpAnalyzerVerifier<TAnalyzer, MSTestVerifier>.Diagnostic(descriptor);
 
         /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
-            => VerifyAnalyzerAsync(source, null,  expected);
+        public static Task VerifyAnalyzerAsync(string code, params DiagnosticResult[] expected)
+            => VerifyAnalyzerAsync(code, null,  expected);
 
         /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static async Task VerifyAnalyzerAsync(string source, ReferenceAssemblies? referenceAssemblies = null, params DiagnosticResult[] expected)
+        public static async Task VerifyAnalyzerAsync(string code, ReferenceAssemblies? referenceAssemblies = null, params DiagnosticResult[] expected)
         {
             var test = new Test
             {
                 ReferenceAssemblies = referenceAssemblies ?? CSharpVerifierHelper.DefaultReferenceAssemblies,
-                TestCode = source,
+                TestCode = code,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

@@ -26,11 +26,11 @@ namespace HarmonyTools.Test.Verifiers
             => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic(descriptor);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+        public static async Task VerifyAnalyzerAsync(string code, params DiagnosticResult[] expected)
         {
             var test = new Test
             {
-                TestCode = source,
+                TestCode = code,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);
@@ -38,20 +38,20 @@ namespace HarmonyTools.Test.Verifiers
         }
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, string)"/>
-        public static async Task VerifyCodeFixAsync(string source, string fixedSource)
-            => await VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, string fixedCode)
+            => await VerifyCodeFixAsync(code, DiagnosticResult.EmptyDiagnosticResults, fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
-        public static async Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource)
-            => await VerifyCodeFixAsync(source, new[] { expected }, fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, DiagnosticResult expected, string fixedCode)
+            => await VerifyCodeFixAsync(code, new[] { expected }, fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
-        public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)
+        public static async Task VerifyCodeFixAsync(string code, DiagnosticResult[] expected, string fixedCode)
         {
             var test = new Test
             {
-                TestCode = source,
-                FixedCode = fixedSource,
+                TestCode = code,
+                FixedCode = fixedCode,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

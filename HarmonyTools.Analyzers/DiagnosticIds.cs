@@ -13,6 +13,7 @@ public static class DiagnosticIds
     public const string DontUseIndividualAnnotationsWithBulkPatching = "HT1009";
     public const string DontUseMultipleBulkPatchingMethods = "HT1010";
 
-    public const string PatchMethodMustHaveSingleKind = "HT2001";
-    public const string DontDefineMultipleAuxiliaryPatchMethods = "HT2002";
+    public const string PatchMethodsMustBeStatic = "HT2001";
+    public const string PatchMethodMustHaveSingleKind = "HT2002";
+    public const string DontDefineMultipleAuxiliaryPatchMethods = "HT2003";
 }

@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VerifyCS = HarmonyTools.Test.Verifiers.CSharpCodeFixVerifier<
     HarmonyTools.Analyzers.HarmonyToolsAnalyzer,
-    HarmonyTools.HarmonyToolsCodeFixProvider>;
+    HarmonyTools.CodeFixes.HarmonyPatchAttributeMustBeOnTypeCodeFixProvider>;
 
 namespace HarmonyTools.Test;
 

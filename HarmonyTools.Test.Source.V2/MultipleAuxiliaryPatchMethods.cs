@@ -6,10 +6,10 @@ namespace HarmonyTools.Test.Source.V2
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
     internal class MultipleAuxiliaryPatchMethods
     {
-        public void Prepare() { }
+        public static void Prepare() { }
 
         [HarmonyPrepare]
-        public void Prepare2() { }
+        public static void Prepare2() { }
 
         public static void Postfix() { }
     }

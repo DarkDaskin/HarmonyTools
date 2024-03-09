@@ -59,6 +59,10 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             TargetCategory, DiagnosticSeverity.Warning);
 
     private const string PatchMethodCategory = "PatchMethod";
+    private static readonly DiagnosticDescriptor PatchMethodsMustBeStaticRule = 
+        CreateRule(DiagnosticIds.PatchMethodsMustBeStatic, 
+            nameof(Resources.PatchMethodsMustBeStaticTitle), nameof(Resources.PatchMethodsMustBeStaticMessageFormat), 
+            PatchMethodCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor PatchMethodMustHaveSingleKindRule = 
         CreateRule(DiagnosticIds.PatchMethodMustHaveSingleKind, 
             nameof(Resources.PatchMethodMustHaveSingleKindTitle), nameof(Resources.PatchMethodMustHaveSingleKindMessageFormat), 
@@ -80,6 +84,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         DontUseIndividualAnnotationsWithBulkPatchingRule,
         DontUseMultipleBulkPatchingMethodsRule,
 
+        PatchMethodsMustBeStaticRule,
         PatchMethodMustHaveSingleKindRule,
         DontDefineMultipleAuxiliaryPatchMethodsRule,
     ];
@@ -123,8 +128,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         var compilation = context.Compilation.WithOptions(context.Compilation.Options.WithMetadataImportOptions(MetadataImportOptions.All));
         var compilationWithAnalyzer = new CompilationWithAnalyzers(compilation, [this], context.Options);
-        var disgnostics = compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(context.CancellationToken).Result;
-        foreach (var disgnostic in disgnostics)
+        var diagnostics = compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(context.CancellationToken).Result;
+        foreach (var disgnostic in diagnostics)
             context.ReportDiagnostic(disgnostic);
     }
     
@@ -180,6 +185,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         protected virtual void PatchMethodChecks(HarmonyPatchMethod<TPatchDescription> patchMethod)
         {
+            CheckPatchMethodsMustBeStatic(patchMethod);
             CheckPatchMethodMustHaveSingleKind(patchMethod);
         }
 
@@ -469,6 +475,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
                 return hasBulkPatchingMethods && patchDescription.TargetTypes.Any();
             }
+        }
+
+        private void CheckPatchMethodsMustBeStatic(HarmonyPatchMethod patchMethod)
+        {
+            if (patchMethod.Method.IsStatic)
+                return;
+
+            Context.ReportDiagnostic(Diagnostic.Create(PatchMethodsMustBeStaticRule,
+                patchMethod.Method.GetSyntax().GetIdentifierLocation()));
         }
 
         private void CheckPatchMethodMustHaveSingleKind(HarmonyPatchMethod patchMethod)

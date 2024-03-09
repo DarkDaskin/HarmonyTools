@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HarmonyTools {
+namespace HarmonyTools.CodeFixes {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace HarmonyTools {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HarmonyTools.CodeFixResources", typeof(CodeFixResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HarmonyTools.CodeFixes.CodeFixResources", typeof(CodeFixResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,6 +66,15 @@ namespace HarmonyTools {
         internal static string HarmonyPatchAttributeMustBeOnTypeCodeFixTitle {
             get {
                 return ResourceManager.GetString("HarmonyPatchAttributeMustBeOnTypeCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make method static.
+        /// </summary>
+        internal static string PatchMethodsMustBeStaticCodeFixTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustBeStaticCodeFixTitle", resourceCulture);
             }
         }
     }

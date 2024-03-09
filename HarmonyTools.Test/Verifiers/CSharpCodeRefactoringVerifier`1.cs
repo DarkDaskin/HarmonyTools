@@ -9,24 +9,24 @@ namespace HarmonyTools.Test.Verifiers
         where TCodeRefactoring : CodeRefactoringProvider, new()
     {
         /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, string)"/>
-        public static async Task VerifyRefactoringAsync(string source, string fixedSource)
+        public static async Task VerifyRefactoringAsync(string code, string fixedCode)
         {
-            await VerifyRefactoringAsync(source, DiagnosticResult.EmptyDiagnosticResults, fixedSource);
+            await VerifyRefactoringAsync(code, DiagnosticResult.EmptyDiagnosticResults, fixedCode);
         }
 
         /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, DiagnosticResult, string)"/>
-        public static async Task VerifyRefactoringAsync(string source, DiagnosticResult expected, string fixedSource)
+        public static async Task VerifyRefactoringAsync(string code, DiagnosticResult expected, string fixedCode)
         {
-            await VerifyRefactoringAsync(source, new[] { expected }, fixedSource);
+            await VerifyRefactoringAsync(code, new[] { expected }, fixedCode);
         }
 
         /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, DiagnosticResult[], string)"/>
-        public static async Task VerifyRefactoringAsync(string source, DiagnosticResult[] expected, string fixedSource)
+        public static async Task VerifyRefactoringAsync(string code, DiagnosticResult[] expected, string fixedCode)
         {
             var test = new Test
             {
-                TestCode = source,
-                FixedCode = fixedSource,
+                TestCode = code,
+                FixedCode = fixedCode,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

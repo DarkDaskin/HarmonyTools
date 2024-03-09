@@ -26,16 +26,16 @@ namespace HarmonyTools.Test.Verifiers
             CSharpCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic(descriptor);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
-            => VerifyAnalyzerAsync(source, null, expected);
+        public static Task VerifyAnalyzerAsync(string code, params DiagnosticResult[] expected)
+            => VerifyAnalyzerAsync(code, null, expected);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static async Task VerifyAnalyzerAsync(string source, ReferenceAssemblies? referenceAssemblies = null, params DiagnosticResult[] expected)
+        public static async Task VerifyAnalyzerAsync(string code, ReferenceAssemblies? referenceAssemblies = null, params DiagnosticResult[] expected)
         {
             var test = new Test
             {
                 ReferenceAssemblies = referenceAssemblies ?? CSharpVerifierHelper.DefaultReferenceAssemblies,
-                TestCode = source,
+                TestCode = code,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);
@@ -43,33 +43,33 @@ namespace HarmonyTools.Test.Verifiers
         }
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, string)"/>
-        public static async Task VerifyCodeFixAsync(string source, string fixedSource) => 
-            await VerifyCodeFixAsync(source, default(ReferenceAssemblies), fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, string fixedCode) => 
+            await VerifyCodeFixAsync(code, default(ReferenceAssemblies), fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, string)"/>
-        public static async Task VerifyCodeFixAsync(string source, ReferenceAssemblies? referenceAssemblies, string fixedSource) => 
-            await VerifyCodeFixAsync(source, referenceAssemblies, DiagnosticResult.EmptyDiagnosticResults, fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, ReferenceAssemblies? referenceAssemblies, string fixedCode) => 
+            await VerifyCodeFixAsync(code, referenceAssemblies, DiagnosticResult.EmptyDiagnosticResults, fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
-        public static async Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource) => 
-            await VerifyCodeFixAsync(source, null, expected, fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, DiagnosticResult expected, string fixedCode) => 
+            await VerifyCodeFixAsync(code, null, expected, fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
-        public static async Task VerifyCodeFixAsync(string source, ReferenceAssemblies? referenceAssemblies, DiagnosticResult expected, string fixedSource) =>
-            await VerifyCodeFixAsync(source, referenceAssemblies, [expected], fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, ReferenceAssemblies? referenceAssemblies, DiagnosticResult expected, string fixedCode) =>
+            await VerifyCodeFixAsync(code, referenceAssemblies, [expected], fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
-        public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource) =>
-            await VerifyCodeFixAsync(source, null, expected, fixedSource);
+        public static async Task VerifyCodeFixAsync(string code, DiagnosticResult[] expected, string fixedCode) =>
+            await VerifyCodeFixAsync(code, null, expected, fixedCode);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
-        public static async Task VerifyCodeFixAsync(string source, ReferenceAssemblies? referenceAssemblies, DiagnosticResult[] expected, string fixedSource)
+        public static async Task VerifyCodeFixAsync(string code, ReferenceAssemblies? referenceAssemblies, DiagnosticResult[] expected, string fixedCode)
         {
             var test = new Test
             {
                 ReferenceAssemblies = referenceAssemblies ?? CSharpVerifierHelper.DefaultReferenceAssemblies,
-                TestCode = source,
-                FixedCode = fixedSource,
+                TestCode = code,
+                FixedCode = fixedCode,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

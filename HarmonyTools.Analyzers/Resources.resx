@@ -183,6 +183,12 @@
   <data name="PatchMethodMustHaveSingleKindTitle" xml:space="preserve">
     <value>Multiple method kinds are assigned to the patch method</value>
   </data>
+  <data name="PatchMethodsMustBeStaticMessageFormat" xml:space="preserve">
+    <value>Patch method must be static.</value>
+  </data>
+  <data name="PatchMethodsMustBeStaticTitle" xml:space="preserve">
+    <value>Patch method must be static</value>
+  </data>
   <data name="TypeMustExistMessageFormat" xml:space="preserve">
     <value>Target type '{0}' does not exist.</value>
   </data>

@@ -24,11 +24,11 @@ namespace HarmonyTools.Test.Verifiers
             => VisualBasicAnalyzerVerifier<TAnalyzer, MSTestVerifier>.Diagnostic(descriptor);
 
         /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-        public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+        public static async Task VerifyAnalyzerAsync(string code, params DiagnosticResult[] expected)
         {
             var test = new Test
             {
-                TestCode = source,
+                TestCode = code,
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

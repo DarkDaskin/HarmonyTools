@@ -120,4 +120,7 @@
   <data name="HarmonyPatchAttributeMustBeOnTypeCodeFixTitle" xml:space="preserve">
     <value>Add HarmonyPatch attribute</value>
   </data>
+  <data name="PatchMethodsMustBeStaticCodeFixTitle" xml:space="preserve">
+    <value>Make method static</value>
+  </data>
 </root>

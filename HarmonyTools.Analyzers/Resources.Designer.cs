@@ -259,6 +259,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Patch method must be static..
+        /// </summary>
+        internal static string PatchMethodsMustBeStaticMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustBeStaticMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method must be static.
+        /// </summary>
+        internal static string PatchMethodsMustBeStaticTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustBeStaticTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target type &apos;{0}&apos; does not exist..
         /// </summary>
         internal static string TypeMustExistMessageFormat {
