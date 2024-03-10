@@ -43,4 +43,7 @@ namespace HarmonyTools.Test.Source.V2
     {
         public static void Postfix() { }
     }
+
+    [HarmonyDelegate(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod), (MethodDispatchType)3)]
+    internal delegate int InvalidArguments7(string question);
 }

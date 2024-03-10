@@ -33,4 +33,7 @@ namespace HarmonyTools.Test.Source.V2
     {
         public static void Postfix() { }
     }
+
+    [HarmonyDelegate(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod), MethodDispatchType.Call)]
+    internal delegate int AmbiguousMethodDelegate(int x, int y);
 }

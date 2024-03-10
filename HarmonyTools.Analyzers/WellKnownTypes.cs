@@ -14,6 +14,7 @@ internal class WellKnownTypes
     public readonly ITypeSymbol? HarmonyPatch;
     public readonly ITypeSymbol? HarmonyPatchAll;
     public readonly ITypeSymbol? HarmonyPatchCategory;
+    public readonly ITypeSymbol? HarmonyDelegate;
     public readonly ITypeSymbol? HarmonyPrefix;
     public readonly ITypeSymbol? HarmonyPostfix;
     public readonly ITypeSymbol? HarmonyTranspiler;
@@ -27,6 +28,7 @@ internal class WellKnownTypes
     public readonly ITypeSymbol? ArgumentType;
     public readonly ITypeSymbol? ArrayOfArgumentType;
     public readonly ITypeSymbol? PropertyMethod;
+    public readonly ITypeSymbol? MethodDispatchType;
 
     public WellKnownTypes(Compilation compilation, string harmonyNamespace)
     {
@@ -37,6 +39,7 @@ internal class WellKnownTypes
         HarmonyPatch = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatch");
         HarmonyPatchAll = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchAll");
         HarmonyPatchCategory = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchCategory");
+        HarmonyDelegate = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyDelegate");
         HarmonyPrefix = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPrefix");
         HarmonyPostfix = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPostfix");
         HarmonyTranspiler = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyTranspiler");
@@ -50,6 +53,7 @@ internal class WellKnownTypes
         ArgumentType = compilation.GetTypeByMetadataName($"{harmonyNamespace}.ArgumentType");
         ArrayOfArgumentType = ArgumentType == null ? null : compilation.CreateArrayTypeSymbol(ArgumentType);
         PropertyMethod = compilation.GetTypeByMetadataName($"{harmonyNamespace}.PropertyMethod");
+        MethodDispatchType = compilation.GetTypeByMetadataName($"{harmonyNamespace}.MethodDispatchType");
     }
 
     public static bool IsHarmonyLoaded(Compilation compilation, string harmonyNamespace) =>

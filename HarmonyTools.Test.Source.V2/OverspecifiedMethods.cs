@@ -74,4 +74,8 @@ namespace HarmonyTools.Test.Source.V2
     {
         public static void Postfix() { }
     }
+
+    [HarmonyDelegate(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod), MethodDispatchType.Call)]
+    [HarmonyDelegate(MethodDispatchType.VirtualCall)]
+    internal delegate int OverspecifiedMethodDelegate(string question);
 }

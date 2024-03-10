@@ -23,4 +23,8 @@ namespace HarmonyTools.Test.Source.V2
         [HarmonyPatch(new[] { typeof(int), typeof(int) }, new[] { ArgumentType.Normal })]
         public static void Postfix() { }
     }
+
+    [HarmonyDelegate(typeof(SimpleClass), nameof(SimpleClass.OverloadedMethod))]
+    [HarmonyDelegate(MethodDispatchType.Call, new[] { typeof(int), typeof(int) }, new[] { ArgumentType.Normal })]
+    internal delegate int ArgumentTypesAndVariationsMismatch4(int x, int y);
 }

@@ -168,8 +168,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 PostMergeChecks(patchMethod.PatchDescription, set);
             }
 
-            if (set.TypePatchDescription is not null && set.PatchMethods.Any(
-                    patchMethod => patchMethod.PatchDescription is null && patchMethod.MethodKinds.Any(kind => kind.Value.IsPrimary())))
+            var hasPrimaryPatchMethodWithoutAnnotations = set.PatchMethods.Any(
+                patchMethod => patchMethod.PatchDescription is null && patchMethod.MethodKinds.Any(kind => kind.Value.IsPrimary()));
+            if (set.TypePatchDescription is not null && (set.PatchMethods is [] || hasPrimaryPatchMethodWithoutAnnotations))
                 PostMergeChecks(set.TypePatchDescription, set);
 
             PatchDescriptionSetChecks(set);
@@ -595,7 +596,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             return true;
         }
 
-        private static bool IsValidEnumValue<TEnum>(TEnum value) where TEnum : struct => Enum.IsDefined(typeof(TEnum), value);
+        protected static bool IsValidEnumValue<TEnum>(TEnum value) where TEnum : struct => Enum.IsDefined(typeof(TEnum), value);
 
         private static IEnumerable<HarmonyPatchMethod<TPatchDescription>> GetBulkPatchMethods(
             HarmonyPatchDescriptionSet<TPatchDescription> set) =>
@@ -625,11 +626,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
             CheckMethodMustExistAndNotAmbiguousV2(patchDescription);
             CheckTypeMustExistV2(patchDescription);
+            CheckMethodMustNotBeOverspecifiedV2(patchDescription);
         }
 
         private void CheckAttributeArgumentsMustBeValidV2(HarmonyPatchDescriptionV2 patchDescription)
         {
             foreach (var detail in patchDescription.TargetTypeNames.Where(type => type.Value is null))
+                ReportInvalidAttributeArgument(detail);
+
+            foreach (var detail in patchDescription.MethodDispatchTypes.Where(type => !IsValidEnumValue(type.Value)))
                 ReportInvalidAttributeArgument(detail);
         }
 
@@ -655,6 +660,13 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 Context.ReportDiagnostic(Diagnostic.Create(TargetTypeMustExistRule,
                     patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
                     targetTypeName));
+        }
+
+        private void CheckMethodMustNotBeOverspecifiedV2(HarmonyPatchDescriptionV2 patchDescription)
+        {
+            if (patchDescription.MethodDispatchTypes.Length > 1)
+                Context.ReportDiagnostic(Diagnostic.Create(TargetMethodMustNotBeOverspecifiedRule,
+                    patchDescription.MethodDispatchTypes.GetLocation(), patchDescription.MethodDispatchTypes.GetAdditionalLocations()));
         }
     }
 }

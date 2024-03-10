@@ -65,4 +65,7 @@ namespace HarmonyTools.Test.Source.V2
     {
         public static void Postfix() { }
     }
+
+    [HarmonyDelegate(typeof(SimpleClass),"NonExistingMethod", MethodDispatchType.Call)]
+    internal delegate void NonExistingMethodDelegate();
 }
