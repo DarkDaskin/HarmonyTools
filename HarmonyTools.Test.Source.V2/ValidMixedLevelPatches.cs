@@ -18,6 +18,15 @@ namespace HarmonyTools.Test.Source.V2
         public static void Postfix() { }
     }
 
+    [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
+    internal class MixedLevelSimpleMethodWithOverride
+    {
+        public static void Postfix() { }
+
+        [HarmonyPostfix, HarmonyPatch(nameof(SimpleClass.OverloadedMethod), typeof(int), typeof(int))]
+        public static void OverloadedMethodPostfix() { }
+    }
+
     [HarmonyPatch(typeof(SimpleClass)), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
     internal class MixedLevelOverloadedMethod1
     {

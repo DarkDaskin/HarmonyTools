@@ -210,24 +210,21 @@ public class TargetMethodTests
             new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
                 .WithSpan(53, 44, 53, 76)
                 .WithSpan(53, 92, 53, 128),
-            new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                .WithSpan(57, 40, 57, 72)
-                .WithSpan(60, 23, 60, 59),
         };
         if (version == 2)
             expected.AddRange([
                 new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                    .WithSpan(57, 19, 57, 60)
+                    .WithSpan(58, 19, 58, 60),
+                new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
+                    .WithSpan(57, 62, 57, 94)
+                    .WithSpan(58, 62, 58, 98),
+                new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
                     .WithSpan(64, 19, 64, 60)
-                    .WithSpan(65, 19, 65, 60),
+                    .WithSpan(65, 19, 65, 38),
                 new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                    .WithSpan(64, 62, 64, 94)
-                    .WithSpan(65, 62, 65, 98),
-                new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                    .WithSpan(71, 19, 71, 60)
-                    .WithSpan(72, 19, 72, 38),
-                new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeOverspecified, DiagnosticSeverity.Warning)
-                    .WithSpan(78, 77, 78, 100)
-                    .WithSpan(79, 22, 79, 52),
+                    .WithSpan(71, 77, 71, 100)
+                    .WithSpan(72, 22, 72, 52),
             ]);
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());

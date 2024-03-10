@@ -53,11 +53,4 @@ namespace HarmonyTools.Test.Source.V1
         [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod)), HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
         public static void Postfix() { }
     }
-
-    [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
-    internal class OverspecifiedMethod8
-    {
-        [HarmonyPatch(nameof(SimpleClass.OverloadedMethod))]
-        public static void Postfix() { }
-    }
 }

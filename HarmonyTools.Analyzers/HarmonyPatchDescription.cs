@@ -295,10 +295,15 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
             // ReSharper disable once LocalizableElement
             throw new ArgumentException("Other type does not correspond to this type.", nameof(other));
 
-        TargetTypes = TargetTypes.AddRange(other.TargetTypes);
-        MethodNames = MethodNames.AddRange(other.MethodNames);
-        MethodTypes = MethodTypes.AddRange(other.MethodTypes);
-        ArgumentTypes = ArgumentTypes.AddRange(other.ArgumentTypes);
-        ArgumentVariations = ArgumentVariations.AddRange(other.ArgumentVariations);
+        // Rather than merging two arrays, use second array as fallback if the first one is empty.
+        // Thus, it allows to override type-level annotations at method level.
+        TargetTypes = UseFallback(TargetTypes, other.TargetTypes);
+        MethodNames = UseFallback(MethodNames, other.MethodNames);
+        MethodTypes = UseFallback(MethodTypes, other.MethodTypes);
+        ArgumentTypes = UseFallback(ArgumentTypes, other.ArgumentTypes);
+        ArgumentVariations = UseFallback(ArgumentVariations, other.ArgumentVariations);
     }
+    
+    protected static ImmutableArray<T> UseFallback<T>(ImmutableArray<T> first, ImmutableArray<T> second) =>
+        first.IsDefaultOrEmpty ? second : first;
 }

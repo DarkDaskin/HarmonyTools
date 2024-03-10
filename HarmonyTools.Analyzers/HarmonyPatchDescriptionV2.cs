@@ -75,7 +75,7 @@ internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescripti
         base.Merge(other);
 
         var otherV2 = (HarmonyPatchDescriptionV2)other;
-        TargetTypeNames = TargetTypeNames.AddRange(otherV2.TargetTypeNames);
-        MethodDispatchTypes = MethodDispatchTypes.AddRange(otherV2.MethodDispatchTypes);
+        TargetTypeNames = UseFallback(TargetTypeNames, otherV2.TargetTypeNames);
+        MethodDispatchTypes = UseFallback(MethodDispatchTypes, otherV2.MethodDispatchTypes);
     }
 }
