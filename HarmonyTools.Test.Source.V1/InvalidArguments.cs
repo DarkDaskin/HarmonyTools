@@ -17,8 +17,21 @@ namespace HarmonyTools.Test.Source.V1
         public static void Postfix() { }
     }
 
-    [HarmonyPatch((Type)null), HarmonyPatch((string)null, (MethodType)5)]
+    [HarmonyPatch]
     internal class InvalidArguments3
+    {
+        [HarmonyPatch((Type)null, (string)null)]
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch(typeof(SimpleClass), "")]
+    internal class InvalidArguments4
+    {
+        public static void Postfix() { }
+    }
+
+    [HarmonyPatch((Type)null), HarmonyPatch((string)null, (MethodType)5)]
+    internal class InvalidArguments5
     {
         public static void Postfix() { }
     }
@@ -26,15 +39,8 @@ namespace HarmonyTools.Test.Source.V1
     [HarmonyPatch(typeof(SimpleClass))]
     [HarmonyPatch(nameof(SimpleClass.SimpleMethod), (PropertyMethod)100)]
     [Obsolete("Testing obsolete constructor")]
-    internal class InvalidArguments4
+    internal class InvalidArguments6
     {
-        public static void Postfix() { }
-    }
-
-    [HarmonyPatch]
-    internal class InvalidArguments5
-    {
-        [HarmonyPatch((Type)null, (string)null)]
         public static void Postfix() { }
     }
 }

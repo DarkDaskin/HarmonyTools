@@ -248,42 +248,43 @@ public class TargetMethodTests
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
                 .WithSpan(14, 61, 14, 78),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(20, 19, 20, 29),
+                .WithSpan(23, 23, 23, 33),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(20, 45, 20, 57),
+                .WithSpan(23, 35, 23, 47),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(27, 40, 27, 42),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(33, 19, 33, 29),
+            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                .WithSpan(33, 45, 33, 57),
         };
         if (version == 1)
             expected.AddRange(
             [
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(20, 59, 20, 72),
+                    .WithSpan(33, 59, 33, 72),
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(27, 53, 27, 72),
+                    .WithSpan(40, 53, 40, 72),
             ]);
         else if (version == 2)
             expected.AddRange(
             [
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(20, 59, 20, 74),
+                    .WithSpan(33, 59, 33, 74),
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(26, 19, 26, 31),
+                    .WithSpan(39, 19, 39, 31),
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(26, 33, 26, 45),
-            ]);
-        expected.AddRange(
-        [
-            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(37, 23, 37, 33),
-            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(37, 35, 37, 47),
-        ]);
-        if (version == 2)
-            expected.AddRange(
-            [
+                    .WithSpan(39, 33, 39, 45),
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(41, 96, 41, 100),
+                    .WithSpan(45, 19, 45, 21),
                 new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                    .WithSpan(47, 77, 47, 98),
+                    .WithSpan(45, 23, 45, 25),
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(51, 96, 51, 100),
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(57, 96, 57, 98),
+                new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
+                    .WithSpan(63, 77, 63, 98),
             ]);
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());

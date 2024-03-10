@@ -208,7 +208,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             foreach (var detail in patchDescription.TargetTypes.Where(type => type.Value is null))
                 ReportInvalidAttributeArgument(detail);
 
-            foreach (var detail in patchDescription.MethodNames.Where(type => type.Value is null))
+            foreach (var detail in patchDescription.MethodNames.Where(type => string.IsNullOrWhiteSpace(type.Value)))
                 ReportInvalidAttributeArgument(detail);
 
             foreach (var detail in patchDescription.MethodTypes.Where(type => !IsValidEnumValue(type.Value)))
@@ -234,7 +234,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     if (!IsValidEnumValue(detail.Value[i]))
                         ReportInvalidAttributeArgument(detail, i);
 
-            if (patchDescription.PatchCategory is { Value: null })
+            if (patchDescription.PatchCategory is { } patchCategory && string.IsNullOrEmpty(patchCategory.Value))
                 ReportInvalidAttributeArgument(patchDescription.PatchCategory);
         }
 
@@ -277,7 +277,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 return;
 
             var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
-            var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null }];
+            var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null } detail] && !string.IsNullOrWhiteSpace(detail.Value);
 
             IEnumerable<ISymbol> targetMembers;
             string memberName;
@@ -631,7 +631,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         private void CheckAttributeArgumentsMustBeValidV2(HarmonyPatchDescriptionV2 patchDescription)
         {
-            foreach (var detail in patchDescription.TargetTypeNames.Where(type => type.Value is null))
+            foreach (var detail in patchDescription.TargetTypeNames.Where(type => string.IsNullOrWhiteSpace(type.Value)))
                 ReportInvalidAttributeArgument(detail);
 
             foreach (var detail in patchDescription.MethodDispatchTypes.Where(type => !IsValidEnumValue(type.Value)))
@@ -640,7 +640,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         private void CheckMethodMustExistAndNotAmbiguousV2(HarmonyPatchDescriptionV2 patchDescription)
         {
-            if (patchDescription.TargetTypeNames is not [{ Value: not null }])
+            if (patchDescription.TargetTypeNames is not [{ Value: not null } detail] || string.IsNullOrWhiteSpace(detail.Value))
                 return;
 
             var targetTypeName = patchDescription.TargetTypeNames[0].Value!;
@@ -651,7 +651,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         private void CheckTypeMustExistV2(HarmonyPatchDescriptionV2 patchDescription)
         {
-            if (patchDescription.TargetTypeNames is not [{ Value: not null }])
+            if (patchDescription.TargetTypeNames is not [{ Value: not null } detail] || string.IsNullOrWhiteSpace(detail.Value))
                 return;
 
             var targetTypeName = patchDescription.TargetTypeNames[0].Value!;
