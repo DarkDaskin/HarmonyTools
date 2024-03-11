@@ -295,6 +295,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Target type &apos;{0}&apos; is not a named type. Arrays and pointers are not allowed..
+        /// </summary>
+        internal static string TargetTypeMustBeNamedTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetTypeMustBeNamedTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type is not a named type.
+        /// </summary>
+        internal static string TargetTypeMustBeNamedTypeTitle {
+            get {
+                return ResourceManager.GetString("TargetTypeMustBeNamedTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target type &apos;{0}&apos; does not exist..
         /// </summary>
         internal static string TargetTypeMustExistMessageFormat {
@@ -309,6 +327,24 @@ namespace HarmonyTools.Analyzers {
         internal static string TargetTypeMustExistTitle {
             get {
                 return ResourceManager.GetString("TargetTypeMustExistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type &apos;{0}&apos; is an open generic type. Only non-generic and closed generic types are allowed..
+        /// </summary>
+        internal static string TargetTypeMustNotBeOpenGenericTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetTypeMustNotBeOpenGenericTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type is an open generic type.
+        /// </summary>
+        internal static string TargetTypeMustNotBeOpenGenericTypeTitle {
+            get {
+                return ResourceManager.GetString("TargetTypeMustNotBeOpenGenericTypeTitle", resourceCulture);
             }
         }
     }

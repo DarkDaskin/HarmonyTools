@@ -201,4 +201,16 @@
   <data name="DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsTitle" xml:space="preserve">
     <value>Target method annotations have no effect on non-primary patch methods</value>
   </data>
+  <data name="TargetTypeMustBeNamedTypeMessageFormat" xml:space="preserve">
+    <value>Target type '{0}' is not a named type. Arrays and pointers are not allowed.</value>
+  </data>
+  <data name="TargetTypeMustBeNamedTypeTitle" xml:space="preserve">
+    <value>Target type is not a named type</value>
+  </data>
+  <data name="TargetTypeMustNotBeOpenGenericTypeMessageFormat" xml:space="preserve">
+    <value>Target type '{0}' is an open generic type. Only non-generic and closed generic types are allowed.</value>
+  </data>
+  <data name="TargetTypeMustNotBeOpenGenericTypeTitle" xml:space="preserve">
+    <value>Target type is an open generic type</value>
+  </data>
 </root>

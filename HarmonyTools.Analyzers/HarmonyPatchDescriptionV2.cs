@@ -36,25 +36,25 @@ internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescripti
         // All below is for HarmonyDelegate.
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodDispatchType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodDispatchTypes = MethodDispatchTypes.Add(attribute.GetDetailWithSyntax<MethodDispatchType>(1));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodDispatchType!, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodDispatchTypes = MethodDispatchTypes.Add(attribute.GetDetailWithSyntax<MethodDispatchType>(1));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodDispatchType!, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodDispatchTypes = MethodDispatchTypes.Add(attribute.GetDetailWithSyntax<MethodDispatchType>(1));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
             ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(3));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.MethodDispatchType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
             MethodDispatchTypes = MethodDispatchTypes.Add(attribute.GetDetailWithSyntax<MethodDispatchType>(2));
         }

@@ -16,6 +16,8 @@ public static class DiagnosticIds
     public const string DontUseIndividualAnnotationsWithBulkPatching = "HT1007";
     public const string DontUseMultipleBulkPatchingMethods = "HT1008";
     public const string DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods = "HT1009";
+    public const string TargetTypeMustBeNamedType = "HT1010";
+    public const string TargetTypeMustNotBeOpenGenericType = "HT1011";
 
     //PatchMethod
     public const string PatchMethodsMustBeStatic = "HT2001";

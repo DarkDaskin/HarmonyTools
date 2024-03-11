@@ -297,4 +297,19 @@ public class TargetMethodTests
                     .WithSpan(15, 45, 15, 91),
             ], fixedCode);
     }
+
+    [TestMethod, CodeDataSource("InvalidTargetTypes.cs")]
+    public async Task WhenInvalidTargetTypes_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.TargetTypeMustBeNamedType, DiagnosticSeverity.Warning)
+                .WithSpan(6, 19, 6, 32)
+                .WithArguments("int[]"),
+            new DiagnosticResult(DiagnosticIds.TargetTypeMustBeNamedType, DiagnosticSeverity.Warning)
+                .WithSpan(12, 19, 12, 31)
+                .WithArguments("int*"),
+            new DiagnosticResult(DiagnosticIds.TargetTypeMustNotBeOpenGenericType, DiagnosticSeverity.Warning)
+                .WithSpan(18, 19, 18, 33)
+                .WithArguments("System.Collections.Generic.List<>"));
+    }
 }

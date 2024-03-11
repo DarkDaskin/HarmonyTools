@@ -63,6 +63,14 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods, 
             nameof(Resources.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsTitle), nameof(Resources.DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsMessageFormat), 
             TargetMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor TargetTypeMustBeNamedTypeRule = 
+        CreateRule(DiagnosticIds.TargetTypeMustBeNamedType, 
+            nameof(Resources.TargetTypeMustBeNamedTypeTitle), nameof(Resources.TargetTypeMustBeNamedTypeMessageFormat), 
+            TargetMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor TargetTypeMustNotBeOpenGenericTypeRule = 
+        CreateRule(DiagnosticIds.TargetTypeMustNotBeOpenGenericType, 
+            nameof(Resources.TargetTypeMustNotBeOpenGenericTypeTitle), nameof(Resources.TargetTypeMustNotBeOpenGenericTypeMessageFormat), 
+            TargetMethodCategory, DiagnosticSeverity.Warning);
 
     private const string PatchMethodCategory = "PatchMethod";
     private static readonly DiagnosticDescriptor PatchMethodsMustBeStaticRule = 
@@ -91,6 +99,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         DontUseIndividualAnnotationsWithBulkPatchingRule,
         DontUseMultipleBulkPatchingMethodsRule,
         DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsRule,
+        TargetTypeMustBeNamedTypeRule,
+        TargetTypeMustNotBeOpenGenericTypeRule,
 
         PatchMethodsMustBeStaticRule,
         PatchMethodMustHaveSingleKindRule,
@@ -183,6 +193,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         {
             CheckAttributeArgumentsMustBeValid(patchDescription);
             CheckArgumentTypesAndVariationsMustMatch(patchDescription);
+            CheckTargetTypeMustBeNamedType(patchDescription);
+            CheckTargetTypeMustNotBeOpenGenericType(patchDescription);
         }
 
         protected virtual void PostMergeChecks(TPatchDescription patchDescription, HarmonyPatchDescriptionSet<TPatchDescription> set)
@@ -288,12 +300,44 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        private void CheckMethodMustExistAndNotAmbiguous(HarmonyPatchDescription patchDescription)
+        private void CheckTargetTypeMustBeNamedType(TPatchDescription patchDescription)
         {
             if (patchDescription.TargetTypes is not [{ Value: not null }])
                 return;
 
             var targetType = patchDescription.TargetTypes[0].Value!;
+            if (targetType is INamedTypeSymbol)
+                return;
+
+            Context.ReportDiagnostic(Diagnostic.Create(TargetTypeMustBeNamedTypeRule,
+                patchDescription.TargetTypes.GetLocation(),
+                targetType.ToDisplayString()));
+        }
+
+        private void CheckTargetTypeMustNotBeOpenGenericType(TPatchDescription patchDescription)
+        {
+            if (patchDescription.TargetTypes is not [{ Value: INamedTypeSymbol }])
+                return;
+
+            var targetType = (INamedTypeSymbol)patchDescription.TargetTypes[0].Value!;
+            if (!targetType.IsUnboundGenericType)
+                return;
+
+            Context.ReportDiagnostic(Diagnostic.Create(TargetTypeMustNotBeOpenGenericTypeRule,
+                patchDescription.TargetTypes.GetLocation(),
+                targetType.ToDisplayString()));
+        }
+
+        private void CheckMethodMustExistAndNotAmbiguous(HarmonyPatchDescription patchDescription)
+        {
+            if (patchDescription.TargetTypes is not [{ Value: INamedTypeSymbol }])
+                return;
+
+            var targetType = (INamedTypeSymbol)patchDescription.TargetTypes[0].Value!;
+
+            if (targetType.IsUnboundGenericType)
+                return;
+
             CheckMethodMustExistAndNotAmbiguous(patchDescription, targetType);
         }
 

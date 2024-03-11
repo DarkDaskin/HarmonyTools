@@ -18,7 +18,7 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
     public bool IsDefining { get; private set; }
 
     public ImmutableList<AttributeData> Attrubutes { get; protected set; } = [];
-    public ImmutableArray<DetailWithSyntax<INamedTypeSymbol?>> TargetTypes { get; protected set; } = [];
+    public ImmutableArray<DetailWithSyntax<ITypeSymbol?>> TargetTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<string?>> MethodNames { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<MethodType>> MethodTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ITypeSymbol?>>> ArgumentTypes { get; protected set; } = [];
@@ -173,52 +173,52 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
     {
         if (attribute.IsMatch(wellKnownTypes.Type))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(1));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
             ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(3));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
             ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
             ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(3));
         }
         else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.MethodType!))
         {
-            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<ITypeSymbol?>(0));
             MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
             MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(2));
         }
