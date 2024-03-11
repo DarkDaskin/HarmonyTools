@@ -75,6 +75,10 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.TargetTypeMustNotBeOpenGenericType, 
             nameof(Resources.TargetTypeMustNotBeOpenGenericTypeTitle), nameof(Resources.TargetTypeMustNotBeOpenGenericTypeMessageFormat), 
             TargetMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor TargetMethodMustNotBeGenericRule = 
+        CreateRule(DiagnosticIds.TargetMethodMustNotBeGeneric, 
+            nameof(Resources.TargetMethodMustNotBeGenericTitle), nameof(Resources.TargetMethodMustNotBeGenericMessageFormat), 
+            TargetMethodCategory, DiagnosticSeverity.Warning);
 
     private const string PatchMethodCategory = "PatchMethod";
     private static readonly DiagnosticDescriptor PatchMethodsMustBeStaticRule = 
@@ -118,6 +122,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsRule,
         TargetTypeMustBeNamedTypeRule,
         TargetTypeMustNotBeOpenGenericTypeRule,
+        TargetMethodMustNotBeGenericRule,
 
         PatchMethodsMustBeStaticRule,
         PatchMethodMustHaveSingleKindRule,
@@ -249,6 +254,11 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckBulkPatching(set);
         }
 
+        protected virtual void TargetMethodChecks(IMethodSymbol targetMethod, HarmonyPatchDescription patchDescription)
+        {
+            CheckTargetMethodMustNotBeGeneric(targetMethod, patchDescription);
+        }
+
         private void CheckPatchTypeMustNotBeGeneric()
         {
             if (!PatchType.IsGenericType)
@@ -340,7 +350,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        private void CheckTargetTypeMustBeNamedType(TPatchDescription patchDescription)
+        private void CheckTargetTypeMustBeNamedType(HarmonyPatchDescription patchDescription)
         {
             if (patchDescription.TargetTypes is not [{ Value: not null }])
                 return;
@@ -354,7 +364,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 targetType.ToDisplayString()));
         }
 
-        private void CheckTargetTypeMustNotBeOpenGenericType(TPatchDescription patchDescription)
+        private void CheckTargetTypeMustNotBeOpenGenericType(HarmonyPatchDescription patchDescription)
         {
             if (patchDescription.TargetTypes is not [{ Value: INamedTypeSymbol }])
                 return;
@@ -389,35 +399,37 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             var methodType = patchDescription.MethodTypes.Length == 0 ? MethodType.Normal : patchDescription.MethodTypes[0].Value;
             var isMemberNameSpecified = patchDescription.MethodNames is [{ Value: not null } detail] && !string.IsNullOrWhiteSpace(detail.Value);
 
-            IEnumerable<ISymbol> targetMembers;
+            var targetMethods = Enumerable.Empty<IMethodSymbol>();
             string memberName;
             switch (methodType)
             {
                 case MethodType.Constructor when !isMemberNameSpecified:
-                    targetMembers = targetType.InstanceConstructors;
+                    targetMethods = targetType.InstanceConstructors;
                     memberName = ".ctor";
                     break;
                 case MethodType.StaticConstructor when !isMemberNameSpecified:
-                    targetMembers = targetType.StaticConstructors;
+                    targetMethods = targetType.StaticConstructors;
                     memberName = ".cctor";
                     break;
                 // TODO: check that Enumerator and Async methods are actually as such
                 case MethodType.Normal or MethodType.Getter or MethodType.Setter or MethodType.Enumerator or MethodType.Async
                     when isMemberNameSpecified:
                     memberName = patchDescription.MethodNames[0].Value!;
-                    targetMembers = targetType.GetMembers(memberName);
+                    var targetMembers = targetType.GetMembers(memberName);
                     switch (methodType)
                     {
                         case MethodType.Getter:
-                            targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.GetMethod is not null);
+                            targetMethods = targetMembers.OfType<IPropertySymbol>().Select(property => property.GetMethod)
+                                .Where(method => method is not null).Cast<IMethodSymbol>();
                             memberName = $"get_{memberName}";
                             break;
                         case MethodType.Setter:
-                            targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.SetMethod is not null);
+                            targetMethods = targetMembers.OfType<IPropertySymbol>().Select(property => property.SetMethod)
+                                .Where(method => method is not null).Cast<IMethodSymbol>();
                             memberName = $"set_{memberName}";
                             break;
                         default:
-                            targetMembers = targetMembers.OfType<IMethodSymbol>().Where(method => method.MethodKind == MethodKind.Ordinary);
+                            targetMethods = targetMembers.OfType<IMethodSymbol>().Where(method => method.MethodKind == MethodKind.Ordinary);
                             break;
                     }
                     break;
@@ -427,11 +439,13 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     switch (methodType)
                     {
                         case MethodType.Getter:
-                            targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.GetMethod is not null);
+                            targetMethods = targetMembers.OfType<IPropertySymbol>().Select(property => property.GetMethod)
+                                .Where(method => method is not null).Cast<IMethodSymbol>();
                             memberName = "get_Item";
                             break;
                         case MethodType.Setter:
-                            targetMembers = targetMembers.OfType<IPropertySymbol>().Where(property => property.SetMethod is not null);
+                            targetMethods = targetMembers.OfType<IPropertySymbol>().Select(property => property.SetMethod)
+                                .Where(method => method is not null).Cast<IMethodSymbol>();
                             memberName = "set_Item";
                             break;
                     }
@@ -459,18 +473,20 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 if (methodType is MethodType.Getter or MethodType.Setter && isMemberNameSpecified && argumentTypes.Length > 0)
                     return;
 
-                targetMembers = targetMembers.Where(member => IsMatch(member, argumentTypes, argumentVariations, Context.Compilation));
+                targetMethods = targetMethods.Where(method => IsMatch(method, argumentTypes, argumentVariations, Context.Compilation, methodType == MethodType.Setter));
             }
 
-            var count = targetMembers.Count();
-            if (count == 0)
+            var targetMethodsArray = targetMethods.ToArray();
+            if (targetMethodsArray.Length == 0)
                 Context.ReportDiagnostic(Diagnostic.Create(TargetMethodMustExistRule,
-                    patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
+                    patchDescription.GetLocation(IsHarmonyPatchAttribute), patchDescription.GetAdditionalLocations(IsHarmonyPatchAttribute),
                     memberName, targetType.ToDisplayString()));
-            else if (count > 1)
+            else if (targetMethodsArray.Length > 1)
                 Context.ReportDiagnostic(Diagnostic.Create(TargetMethodMustNotBeAmbiguousRule,
-                    patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
-                    memberName, targetType.ToDisplayString(), count));
+                    patchDescription.GetLocation(IsHarmonyPatchAttribute), patchDescription.GetAdditionalLocations(IsHarmonyPatchAttribute),
+                    memberName, targetType.ToDisplayString(), targetMethodsArray.Length));
+            else
+                TargetMethodChecks(targetMethodsArray[0], patchDescription);
         }
 
         private void CheckMethodMustBeSpecified(HarmonyPatchDescription patchDescription, HarmonyPatchDescriptionSet<TPatchDescription> set)
@@ -525,7 +541,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     patchDescription.ArgumentVariations.GetLocation(), patchDescription.ArgumentVariations.GetAdditionalLocations()));
         }
 
-        private void CheckArgumentsOnTypesAndMethodsMustHaveNewName(TPatchDescription patchDescription)
+        private void CheckArgumentsOnTypesAndMethodsMustHaveNewName(HarmonyPatchDescription patchDescription)
         {
             foreach (var argument in patchDescription.ArgumentOverrides.Where(argument => argument.NewName is null))
             {
@@ -534,7 +550,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        private void CheckArgumentNewNamesMustBeUniqueRule(TPatchDescription patchDescription)
+        private void CheckArgumentNewNamesMustBeUniqueRule(HarmonyPatchDescription patchDescription)
         {
             var argumentRenamesPerNewName =
                 from argument in patchDescription.ArgumentOverrides
@@ -669,6 +685,16 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
         }
 
+        private void CheckTargetMethodMustNotBeGeneric(IMethodSymbol targetMethod, HarmonyPatchDescription patchDescription)
+        {
+            if (!targetMethod.IsGenericMethod)
+                return;
+
+            Context.ReportDiagnostic(Diagnostic.Create(TargetMethodMustNotBeGenericRule,
+                patchDescription.GetLocation(IsHarmonyPatchAttribute), patchDescription.GetAdditionalLocations(IsHarmonyPatchAttribute),
+                targetMethod.Name, targetMethod.ContainingType.ToDisplayString()));
+        }
+
         protected void ReportInvalidAttributeArgument(IHasSyntax detail) =>
             Context.ReportDiagnostic(Diagnostic.Create(AttributeArgumentsMustBeValidRule, detail.Syntax?.GetLocation()));
 
@@ -701,16 +727,6 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
             return false;
         }
-
-        private static bool IsMatch(ISymbol member, ImmutableArray<ITypeSymbol?> types, ImmutableArray<ArgumentType> variations,
-            Compilation compilation) =>
-            member switch
-            {
-                IMethodSymbol method => IsMatch(method, types, variations, compilation),
-                IPropertySymbol { GetMethod: not null } property => IsMatch(property.GetMethod, types, variations, compilation),
-                IPropertySymbol { SetMethod: not null } property => IsMatch(property.SetMethod, types, variations, compilation, true),
-                _ => false
-            };
 
         private static bool IsMatch(IMethodSymbol method, ImmutableArray<ITypeSymbol?> types, ImmutableArray<ArgumentType> variations,
             Compilation compilation, bool isSetter = false)
@@ -751,6 +767,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             HarmonyPatchDescriptionSet<TPatchDescription> set) =>
             set.PatchMethods.Where(patchMethod => patchMethod.MethodKinds.Any(
                 detail => detail.Value is PatchMethodKind.TargetMethod or PatchMethodKind.TargetMethods));
+
+        protected bool IsHarmonyPatchAttribute(AttributeData attribute) => attribute.Is(WellKnownTypes.HarmonyPatch);
     }
 
     private sealed class VerifierV1(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV1>(context, WellKnownTypes.Harmony1Namespace)
@@ -810,7 +828,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             var targetType = Context.Compilation.GetTypeByMetadataName(targetTypeName);
             if (targetType is null)
                 Context.ReportDiagnostic(Diagnostic.Create(TargetTypeMustExistRule,
-                    patchDescription.GetLocation(), patchDescription.GetAdditionalLocations(),
+                    patchDescription.GetLocation(IsHarmonyPatchAttribute), patchDescription.GetAdditionalLocations(IsHarmonyPatchAttribute),
                     targetTypeName));
         }
 

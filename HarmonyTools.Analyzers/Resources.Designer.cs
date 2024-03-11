@@ -349,6 +349,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Target method &apos;{0}&apos; of type &apos;{1}&apos; is generic. Only non-generic methods are allowed when specifying target method via attributes..
+        /// </summary>
+        internal static string TargetMethodMustNotBeGenericMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodMustNotBeGenericMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method is generic.
+        /// </summary>
+        internal static string TargetMethodMustNotBeGenericTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodMustNotBeGenericTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Conflicting method specifications found..
         /// </summary>
         internal static string TargetMethodMustNotBeOverspecifiedMessageFormat {

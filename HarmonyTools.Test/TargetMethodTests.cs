@@ -312,4 +312,13 @@ public class TargetMethodTests
                 .WithSpan(18, 19, 18, 33)
                 .WithArguments("System.Collections.Generic.List<>"));
     }
+
+    [TestMethod, CodeDataSource("GenericTargetMethod.cs")]
+    public async Task WhenGenericTargetMethod_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.TargetMethodMustNotBeGeneric, DiagnosticSeverity.Warning)
+                .WithSpan(6, 6, 6, 74)
+                .WithArguments("GenericMethod", "HarmonyTools.Test.PatchBase.SimpleClass"));
+    }
 }

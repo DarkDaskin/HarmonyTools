@@ -245,4 +245,10 @@ namespace HarmonyTools.Test.Source.V2.TargetMethod
     {
         public static void Postfix() { }
     }
+
+    [HarmonyPatch(typeof(GenericClass<int>), nameof(GenericClass<int>.Method))]
+    internal class TypeLevelGenericTargetType
+    {
+        public static void Postfix() { }
+    }
 }

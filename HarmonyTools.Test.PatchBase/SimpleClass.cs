@@ -14,6 +14,7 @@ namespace HarmonyTools.Test.PatchBase
         public int OverloadedMethod(int x, int y) => x + y;
         public double OverloadedMethod(double x, double y) => x - y;
         public void OverloadedMethod(out int answer) => answer = _answer;
+        public void GenericMethod<T>() { }
 
         public IEnumerable<string> EnumeratorMethod()
         {

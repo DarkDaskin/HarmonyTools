@@ -237,4 +237,10 @@
   <data name="TargetTypeMustNotBeOpenGenericTypeTitle" xml:space="preserve">
     <value>Target type is an open generic type</value>
   </data>
+  <data name="TargetMethodMustNotBeGenericMessageFormat" xml:space="preserve">
+    <value>Target method '{0}' of type '{1}' is generic. Only non-generic methods are allowed when specifying target method via attributes.</value>
+  </data>
+  <data name="TargetMethodMustNotBeGenericTitle" xml:space="preserve">
+    <value>Target method is generic</value>
+  </data>
 </root>
