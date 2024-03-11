@@ -15,8 +15,18 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 {
     public const string HarmonyNamespaceKey = "HarmonyNamespace";
 
-    private const string TargetMethodCategory = "TargetMethod";
 #pragma warning disable RS2008
+    private const string GeneralCategory = "General";
+    private static readonly DiagnosticDescriptor AttributeArgumentsMustBeValidRule =
+        CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid,
+            nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat),
+            GeneralCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor HarmonyPatchAttributeMustBeOnTypeRule =
+        CreateRule(DiagnosticIds.HarmonyPatchAttributeMustBeOnType,
+            nameof(Resources.HarmonyPatchAttributeMustBeOnTypeTitle), nameof(Resources.HarmonyPatchAttributeMustBeOnTypeMessageFormat),
+            GeneralCategory, DiagnosticSeverity.Warning);
+
+    private const string TargetMethodCategory = "TargetMethod";
     private static readonly DiagnosticDescriptor TargetMethodMustExistRule = 
         CreateRule(DiagnosticIds.TargetMethodMustExist, 
             nameof(Resources.TargetMethodMustExistTitle), nameof(Resources.TargetMethodMustExistMessageFormat), 
@@ -37,17 +47,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.TargetMethodMustNotBeOverspecified, 
             nameof(Resources.TargetMethodMustNotBeOverspecifiedTitle), nameof(Resources.TargetMethodMustNotBeOverspecifiedMessageFormat), 
             TargetMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor AttributeArgumentsMustBeValidRule = 
-        CreateRule(DiagnosticIds.AttributeArgumentsMustBeValid, 
-            nameof(Resources.AttributeArgumentsMustBeValidTitle), nameof(Resources.AttributeArgumentsMustBeValidMessageFormat), 
-            TargetMethodCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor ArgumentTypesAndVariationsMustMatchRule = 
         CreateRule(DiagnosticIds.ArgumentTypesAndVariationsMustMatch, 
             nameof(Resources.ArgumentTypesAndVariationsMustMatchTitle), nameof(Resources.ArgumentTypesAndVariationsMustMatchMessageFormat), 
-            TargetMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor HarmonyPatchAttributeMustBeOnTypeRule = 
-        CreateRule(DiagnosticIds.HarmonyPatchAttributeMustBeOnType, 
-            nameof(Resources.HarmonyPatchAttributeMustBeOnTypeTitle), nameof(Resources.HarmonyPatchAttributeMustBeOnTypeMessageFormat), 
             TargetMethodCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor DontUseIndividualAnnotationsWithBulkPatchingRule = 
         CreateRule(DiagnosticIds.DontUseIndividualAnnotationsWithBulkPatching, 
@@ -77,14 +79,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
+        AttributeArgumentsMustBeValidRule,
+        HarmonyPatchAttributeMustBeOnTypeRule,
+
         TargetMethodMustExistRule,
         TargetMethodMustNotBeAmbiguousRule,
         TargetTypeMustExistRule,
         TargetMethodMustBeSpecifiedRule,
         TargetMethodMustNotBeOverspecifiedRule,
-        AttributeArgumentsMustBeValidRule,
         ArgumentTypesAndVariationsMustMatchRule,
-        HarmonyPatchAttributeMustBeOnTypeRule,
         DontUseIndividualAnnotationsWithBulkPatchingRule,
         DontUseMultipleBulkPatchingMethodsRule,
         DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsRule,

@@ -54,8 +54,8 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
     {
         foreach (var version in Versions)
         {
-            var fullPath = GetFullPath(Path, version);
-            var fullFixedPath = FixedPath is null ? null : GetFullPath(FixedPath, version);
+            var fullPath = GetFullPath(Path, version, methodInfo);
+            var fullFixedPath = FixedPath is null ? null : GetFullPath(FixedPath, version, methodInfo);
             if (File.Exists(fullPath) && (fullFixedPath is null || File.Exists(fullFixedPath)))
             {
                 List<object> data = [File.ReadAllText(fullPath), ReferenceAssembliesPerVersion[version]];
@@ -68,7 +68,15 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
         }
     }
 
-    private string GetFullPath(string path, int version) => PathIO.Combine($"{BasePath}.V{version}", path);
+    private static string GetFullPath(string path, int version, MethodInfo methodInfo)
+    {
+        var basePathWithVersion = $"{BasePath}.V{version}";
+        var directoryAttribute = methodInfo.GetCustomAttribute<CodeDirectoryAttribute>() ??
+                                 methodInfo.DeclaringType?.GetCustomAttribute<CodeDirectoryAttribute>();
+        return directoryAttribute is not null ?
+            PathIO.Combine(basePathWithVersion, directoryAttribute.Directory, path) :
+            PathIO.Combine(basePathWithVersion, path);
+    }
 
     public string GetDisplayName(MethodInfo methodInfo, object?[]? data) => $"{methodInfo.Name} ({Path}, v{GetVersion(data!)})";
 

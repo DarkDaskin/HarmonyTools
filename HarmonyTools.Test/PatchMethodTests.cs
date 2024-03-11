@@ -11,7 +11,7 @@ using VerifyCS = HarmonyTools.Test.Verifiers.CSharpCodeFixVerifier<
 
 namespace HarmonyTools.Test;
 
-[TestClass]
+[TestClass, CodeDirectory("PatchMethod")]
 public class PatchMethodTests
 {
     [TestMethod, CodeDataSource("MultiplePatchMethodKinds.cs")]
