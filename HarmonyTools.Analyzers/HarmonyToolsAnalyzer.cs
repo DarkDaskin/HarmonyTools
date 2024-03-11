@@ -218,24 +218,47 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 foreach (var detail in patchDescription.MethodTypes.Where(type => type.Value is >= MethodType.Enumerator and <= MethodType.Async))
                     ReportInvalidAttributeArgument(detail);
 
-            foreach (var detail in patchDescription.ArgumentTypes.Where(type => type.Value.IsDefault))
+            foreach (var detail in patchDescription.ArgumentTypes.Where(types => types.Value.IsDefault))
                 ReportInvalidAttributeArgument(detail);
 
-            foreach (var detail in patchDescription.ArgumentTypes.Where(type => !type.Value.IsDefault))
+            foreach (var detail in patchDescription.ArgumentTypes.Where(types => !types.Value.IsDefault))
                 for (var i = 0; i < detail.Value.Length; i++)
                     if (detail.Value[i] is null)
                         ReportInvalidAttributeArgument(detail, i);
 
-            foreach (var detail in patchDescription.ArgumentVariations.Where(type => type.Value.IsDefault))
+            foreach (var detail in patchDescription.ArgumentVariations.Where(variations => variations.Value.IsDefault))
                 ReportInvalidAttributeArgument(detail);
 
-            foreach (var detail in patchDescription.ArgumentVariations.Where(type => !type.Value.IsDefault))
+            foreach (var detail in patchDescription.ArgumentVariations.Where(variations => !variations.Value.IsDefault))
                 for (var i = 0; i < detail.Value.Length; i++)
                     if (!IsValidEnumValue(detail.Value[i]))
                         ReportInvalidAttributeArgument(detail, i);
 
-            if (patchDescription.PatchCategory is { } patchCategory && string.IsNullOrEmpty(patchCategory.Value))
-                ReportInvalidAttributeArgument(patchDescription.PatchCategory);
+            if (patchDescription.Before is { Value.IsDefaultOrEmpty: true })
+                ReportInvalidAttributeArgument(patchDescription.Before);
+
+            if (patchDescription.Before is { Value.IsDefaultOrEmpty: false })
+                for (var i = 0; i < patchDescription.Before.Value.Length; i++)
+                    if (string.IsNullOrWhiteSpace(patchDescription.Before.Value[i]))
+                        ReportInvalidAttributeArgument(patchDescription.Before, i);
+
+            if (patchDescription.After is { Value.IsDefaultOrEmpty: true })
+                ReportInvalidAttributeArgument(patchDescription.After);
+
+            if (patchDescription.After is { Value.IsDefaultOrEmpty: false })
+                for (var i = 0; i < patchDescription.After.Value.Length; i++)
+                    if (string.IsNullOrWhiteSpace(patchDescription.After.Value[i]))
+                        ReportInvalidAttributeArgument(patchDescription.After, i);
+
+            foreach (var argumentOverride in patchDescription.ArgumentOverrides)
+            {
+                if (argumentOverride.Name is not null && string.IsNullOrWhiteSpace(argumentOverride.Name.Value))
+                    ReportInvalidAttributeArgument(argumentOverride.Name);
+                if (argumentOverride.Index is not null && argumentOverride.Index.Value < 0)
+                    ReportInvalidAttributeArgument(argumentOverride.Index);
+                if (argumentOverride.NewName is not null && string.IsNullOrWhiteSpace(argumentOverride.NewName.Value))
+                    ReportInvalidAttributeArgument(argumentOverride.NewName);
+            }
         }
 
         private void CheckArgumentTypesAndVariationsMustMatch(HarmonyPatchDescription patchDescription)
@@ -417,7 +440,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         private void CheckHarmonyPatchAttributeMustBeOnType(HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
-            if (set.TypePatchDescription is not null)
+            if (set.TypePatchDescription is { IsDefining: true })
                 return;
 
             // Find any patch method having any Harmony attribute. Ignore convention-based methods, because in type not marked with HarmonyPatch
@@ -533,8 +556,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         private void ReportInvalidAttributeArgument<T>(DetailWithSyntax<ImmutableArray<T>> detail, int arrayIndex)
         {
             var attributeArgumentSyntax = detail.Syntax as AttributeArgumentSyntax;
-            var arrayCreationExpressionSyntax = attributeArgumentSyntax?.Expression as ArrayCreationExpressionSyntax;
-            var itemExpressionSyntax = arrayCreationExpressionSyntax?.Initializer?.Expressions.ElementAtOrDefault(arrayIndex);
+            SyntaxNode? itemExpressionSyntax = null;
+            if (attributeArgumentSyntax?.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
+                itemExpressionSyntax = arrayCreationExpressionSyntax?.Initializer?.Expressions.ElementAtOrDefault(arrayIndex);
+            // Params array
+            else if (attributeArgumentSyntax?.Parent is AttributeArgumentListSyntax attributeArgumentListSyntax)
+            {
+                var startIndex = attributeArgumentListSyntax.Arguments.IndexOf(attributeArgumentSyntax);
+                itemExpressionSyntax = attributeArgumentListSyntax.Arguments[startIndex + arrayIndex];
+            }
             Context.ReportDiagnostic(Diagnostic.Create(AttributeArgumentsMustBeValidRule, (itemExpressionSyntax ?? detail.Syntax)?.GetLocation()));
         }
 
@@ -636,6 +666,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
             foreach (var detail in patchDescription.MethodDispatchTypes.Where(type => !IsValidEnumValue(type.Value)))
                 ReportInvalidAttributeArgument(detail);
+
+            if (patchDescription.PatchCategory is { } patchCategory && string.IsNullOrEmpty(patchCategory.Value))
+                ReportInvalidAttributeArgument(patchDescription.PatchCategory);
         }
 
         private void CheckMethodMustExistAndNotAmbiguousV2(HarmonyPatchDescriptionV2 patchDescription)

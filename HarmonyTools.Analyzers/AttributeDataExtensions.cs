@@ -1,17 +1,33 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HarmonyTools.Analyzers;
 
 internal static class AttributeDataExtensions
 {
-    public static bool Is(this AttributeData attribute, ITypeSymbol? type)
-    {
-        for (var attributeType = attribute.AttributeClass; attributeType is not null; attributeType = attributeType.BaseType)
-            if (attributeType.Equals(type, SymbolEqualityComparer.Default))
-                return true;
+    public static bool Is(this AttributeData attribute, ITypeSymbol? type) => attribute.AttributeClass.Is(type);
 
-        return false;
-    }
+    public static bool IsMatch(this AttributeData attribute, params ITypeSymbol[] argumentTypes) =>
+        attribute.AttributeConstructor.IsMatch(argumentTypes);
 
     public static SyntaxNode? GetSyntax(this AttributeData attribute) => attribute.ApplicationSyntaxReference?.GetSyntax();
+
+    public static DetailWithSyntax<T> GetDetailWithSyntax<T>(this AttributeData attribute, int constructorParameterIndex)
+    {
+        var value = (T)attribute.ConstructorArguments[constructorParameterIndex].Value!;
+        var attributeSyntax = (AttributeSyntax?)attribute.ApplicationSyntaxReference?.GetSyntax();
+        var argumentSyntax = attributeSyntax?.ArgumentList?.Arguments[constructorParameterIndex];
+        return new DetailWithSyntax<T>(value, argumentSyntax);
+    }
+
+    public static DetailWithSyntax<ImmutableArray<T>> GetDetailWithSyntaxForArray<T>(this AttributeData attribute, int constructorParameterIndex)
+    {
+        var values = attribute.ConstructorArguments[constructorParameterIndex].Values;
+        var value = values.IsDefault ? default : values.Select(constant => (T)constant.Value!).ToImmutableArray();
+        var attributeSyntax = (AttributeSyntax?)attribute.ApplicationSyntaxReference?.GetSyntax();
+        var argumentSyntax = attributeSyntax?.ArgumentList?.Arguments[constructorParameterIndex];
+        return new DetailWithSyntax<ImmutableArray<T>>(value, (SyntaxNode?)argumentSyntax ?? attributeSyntax);
+    }
 }

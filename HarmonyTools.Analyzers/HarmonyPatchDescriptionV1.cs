@@ -14,10 +14,10 @@ internal class HarmonyPatchDescriptionV1(ISymbol symbol) : HarmonyPatchDescripti
     {
         base.ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
       
-        if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.String, wellKnownTypes.PropertyMethod!))
+        if (attribute.IsMatch(wellKnownTypes.String, wellKnownTypes.PropertyMethod!))
         {
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 0));
-            var propertyMethodDetail = GetDetailWithSyntax<PropertyMethod>(attribute, 1);
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(0));
+            var propertyMethodDetail = attribute.GetDetailWithSyntax<PropertyMethod>(1);
             MethodTypes = MethodTypes.Add(new DetailWithSyntax<MethodType>(Map(propertyMethodDetail.Value), propertyMethodDetail.Syntax));
         }
 

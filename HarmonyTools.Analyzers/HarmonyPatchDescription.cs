@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using HarmonyTools.Analyzers.HarmonyEnums;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HarmonyTools.Analyzers;
 
@@ -13,14 +12,23 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
     public abstract int HarmonyVersion { get; }
 
     public ISymbol Symbol { get; } = symbol;
+
+    /// <summary>Determines whether this description defines a patch.</summary>
+    /// <remarks>Set to <c>true</c> when there is at least one attribure deriving from <c>HarmonyAttribute</c> at type level.</remarks>
+    public bool IsDefining { get; private set; }
+
     public ImmutableList<AttributeData> Attrubutes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<INamedTypeSymbol?>> TargetTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<string?>> MethodNames { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<MethodType>> MethodTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ITypeSymbol?>>> ArgumentTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<ImmutableArray<ArgumentType>>> ArgumentVariations { get; protected set; } = [];
-    public DetailWithSyntax<bool>? IsPatchAll { get; private set; }
-    public DetailWithSyntax<string?>? PatchCategory { get; private set; }
+    public DetailWithSyntax<bool>? IsPatchAll { get; private set; }    
+    public DetailWithSyntax<int>? Priority { get; private set; }
+    public DetailWithSyntax<ImmutableArray<string?>>? Before { get; private set; }
+    public DetailWithSyntax<ImmutableArray<string?>>? After { get; private set; }
+    public DetailWithSyntax<bool>? IsDebug { get; private set; }
+    public ImmutableArray<HarmonyArgument> ArgumentOverrides { get; protected set; } = [];
 
     protected static HarmonyPatchDescriptionSet<TPatchDescription> Parse<TPatchDescription>(INamedTypeSymbol type, 
         WellKnownTypes wellKnownTypes, Func<ISymbol, TPatchDescription> patchDescriptionConstructor)
@@ -127,158 +135,137 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
         AttributeData attribute, WellKnownTypes wellKnownTypes, Func<ISymbol, TPatchDescription> patchDescriptionConstructor)
         where TPatchDescription : HarmonyPatchDescription
     {
-        if (attribute.Is(wellKnownTypes.HarmonyPatch))
+        if (attribute.Is(wellKnownTypes.HarmonyAttribute) || attribute.Is(wellKnownTypes.HarmonyArgument))
         {
-            patchDescription = InitializePatchDescription(patchDescription, symbol, attribute, patchDescriptionConstructor);
-            patchDescription.ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
-        }
-        else if (attribute.Is(wellKnownTypes.HarmonyPatchAll))
-        {
-            patchDescription = InitializePatchDescription(patchDescription, symbol, attribute, patchDescriptionConstructor);
-            patchDescription.IsPatchAll = new DetailWithSyntax<bool>(true, attribute.GetSyntax());
-        }
-        else if (attribute.Is(wellKnownTypes.HarmonyPatchCategory))
-        {
-            patchDescription = InitializePatchDescription(patchDescription, symbol, attribute, patchDescriptionConstructor);
-            patchDescription.PatchCategory = GetDetailWithSyntax<string?>(attribute, 0);
+            patchDescription ??= patchDescriptionConstructor(symbol);
+            patchDescription.ProcessAttribute(attribute, wellKnownTypes);
         }
     }
 
-    private static TPatchDescription InitializePatchDescription<TPatchDescription>(TPatchDescription? patchDescription, ISymbol symbol,
-        AttributeData attribute, Func<ISymbol, TPatchDescription> patchDescriptionConstructor)
-        where TPatchDescription : HarmonyPatchDescription
+    protected virtual void ProcessAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {
-        patchDescription ??= patchDescriptionConstructor(symbol);
-        patchDescription.Attrubutes = patchDescription.Attrubutes.Add(attribute);
-        return patchDescription;
+        Attrubutes = Attrubutes.Add(attribute);
+
+        if (attribute.Is(wellKnownTypes.HarmonyAttribute))
+            IsDefining = Symbol is INamedTypeSymbol;
+
+        if (attribute.Is(wellKnownTypes.HarmonyPatch))
+            ProcessHarmonyPatchAttribute(attribute, wellKnownTypes);
+        else if (attribute.Is(wellKnownTypes.HarmonyPatchAll))
+            IsPatchAll = new DetailWithSyntax<bool>(true, attribute.GetSyntax());
+        else if (attribute.Is(wellKnownTypes.HarmonyPriority))
+            Priority = attribute.GetDetailWithSyntax<int>(0);
+        else if (attribute.Is(wellKnownTypes.HarmonyBefore))
+            Before = attribute.GetDetailWithSyntaxForArray<string?>(0);
+        else if (attribute.Is(wellKnownTypes.HarmonyAfter))
+            After = attribute.GetDetailWithSyntaxForArray<string?>(0);
+        else if (attribute.Is(wellKnownTypes.HarmonyDebug))
+            IsDebug = new DetailWithSyntax<bool>(true, attribute.GetSyntax());
+        else if (attribute.Is(wellKnownTypes.HarmonyArgument))
+        {
+            var harmonyArgument = HarmonyArgument.Parse(attribute, wellKnownTypes);
+            if (harmonyArgument is not null)
+                ArgumentOverrides = ArgumentOverrides.Add(harmonyArgument);
+        }
     }
 
     protected virtual void ProcessHarmonyPatchAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {
-        if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type))
+        if (attribute.IsMatch(wellKnownTypes.Type))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.ArrayOfType))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol?>(attribute, 1));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(1));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.String))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 1));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.ArrayOfType))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 1));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol?>(attribute, 2));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 1));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol?>(attribute, 2));
-            ArgumentVariations = ArgumentVariations.Add(GetDetailWithSyntaxForArray<ArgumentType>(attribute, 3));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
+            ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(3));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.MethodType!))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodType!))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 1));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 1));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol?>(attribute, 2));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 1));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol?>(attribute, 2));
-            ArgumentVariations = ArgumentVariations.Add(GetDetailWithSyntaxForArray<ArgumentType>(attribute, 3));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(2));
+            ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(3));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.MethodType!))
+        else if (attribute.IsMatch(wellKnownTypes.Type, wellKnownTypes.String, wellKnownTypes.MethodType!))
         {
-            TargetTypes = TargetTypes.Add(GetDetailWithSyntax<INamedTypeSymbol?>(attribute, 0));
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 1));
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 2));
+            TargetTypes = TargetTypes.Add(attribute.GetDetailWithSyntax<INamedTypeSymbol?>(0));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(1));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(2));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.String))
+        else if (attribute.IsMatch(wellKnownTypes.String))
         {
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 0));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(0));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.String, wellKnownTypes.ArrayOfType))
+        else if (attribute.IsMatch(wellKnownTypes.String, wellKnownTypes.ArrayOfType))
         {
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 0));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol>(attribute, 1));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(0));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(1));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.String, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
+        else if (attribute.IsMatch(wellKnownTypes.String, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 0));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol>(attribute, 1));
-            ArgumentVariations = ArgumentVariations.Add(GetDetailWithSyntaxForArray<ArgumentType>(attribute, 2));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(0));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(1));
+            ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(2));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.String, wellKnownTypes.MethodType!))
+        else if (attribute.IsMatch(wellKnownTypes.String, wellKnownTypes.MethodType!))
         {
-            MethodNames = MethodNames.Add(GetDetailWithSyntax<string?>(attribute, 0));
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 1));
+            MethodNames = MethodNames.Add(attribute.GetDetailWithSyntax<string?>(0));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(1));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.MethodType!))
+        else if (attribute.IsMatch(wellKnownTypes.MethodType!))
         {
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 0));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(0));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType))
+        else if (attribute.IsMatch(wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType))
         {
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 0));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol>(attribute, 1));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(0));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(1));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
+        else if (attribute.IsMatch(wellKnownTypes.MethodType!, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            MethodTypes = MethodTypes.Add(GetDetailWithSyntax<MethodType>(attribute, 0));
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol>(attribute, 1));
-            ArgumentVariations = ArgumentVariations.Add(GetDetailWithSyntaxForArray<ArgumentType>(attribute, 2));
+            MethodTypes = MethodTypes.Add(attribute.GetDetailWithSyntax<MethodType>(0));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(1));
+            ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(2));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.ArrayOfType))
+        else if (attribute.IsMatch(wellKnownTypes.ArrayOfType))
         {
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol>(attribute, 0));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(0));
         }
-        else if (IsMatch(attribute.AttributeConstructor, wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
+        else if (attribute.IsMatch(wellKnownTypes.ArrayOfType, wellKnownTypes.ArrayOfArgumentType!))
         {
-            ArgumentTypes = ArgumentTypes.Add(GetDetailWithSyntaxForArray<ITypeSymbol>(attribute, 0));
-            ArgumentVariations = ArgumentVariations.Add(GetDetailWithSyntaxForArray<ArgumentType>(attribute, 1));
+            ArgumentTypes = ArgumentTypes.Add(attribute.GetDetailWithSyntaxForArray<ITypeSymbol?>(0));
+            ArgumentVariations = ArgumentVariations.Add(attribute.GetDetailWithSyntaxForArray<ArgumentType>(1));
         }
-    }
-
-    protected static bool IsMatch(IMethodSymbol? method, params ITypeSymbol[] argumentTypes)
-    {
-        if (method is null || method.Parameters.Length != argumentTypes.Length)
-            return false;
-
-        for (var i = 0; i < argumentTypes.Length; i++)
-            if (!method.Parameters[i].Type.Equals(argumentTypes[i], SymbolEqualityComparer.Default))
-                return false;
-
-        return true;
-    }
-
-    protected static DetailWithSyntax<T?> GetDetailWithSyntax<T>(AttributeData attribute, int constructorParameterIndex)
-    {
-        var value = (T?)attribute.ConstructorArguments[constructorParameterIndex].Value;
-        var attributeSyntax = (AttributeSyntax?)attribute.ApplicationSyntaxReference?.GetSyntax();
-        var argumentSyntax = attributeSyntax?.ArgumentList?.Arguments[constructorParameterIndex];
-        return new DetailWithSyntax<T?>(value, argumentSyntax);
-    }
-
-    protected static DetailWithSyntax<ImmutableArray<T?>> GetDetailWithSyntaxForArray<T>(AttributeData attribute, int constructorParameterIndex)
-    {
-        var values = attribute.ConstructorArguments[constructorParameterIndex].Values;
-        var value = values.IsDefault ? default : values.Select(constant => (T?)constant.Value).ToImmutableArray();
-        var attributeSyntax = (AttributeSyntax?)attribute.ApplicationSyntaxReference?.GetSyntax();
-        var argumentSyntax = attributeSyntax?.ArgumentList?.Arguments[constructorParameterIndex];
-        return new DetailWithSyntax<ImmutableArray<T?>>(value, argumentSyntax);
     }
 
     public Location? GetLocation(Func<AttributeData, bool>? predicate = null) => GetAttributeSyntaxes(predicate).GetLocation();
@@ -295,6 +282,8 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
             // ReSharper disable once LocalizableElement
             throw new ArgumentException("Other type does not correspond to this type.", nameof(other));
 
+        IsDefining |= other.IsDefining;
+
         // Rather than merging two arrays, use second array as fallback if the first one is empty.
         // Thus, it allows to override type-level annotations at method level.
         TargetTypes = UseFallback(TargetTypes, other.TargetTypes);
@@ -302,6 +291,13 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
         MethodTypes = UseFallback(MethodTypes, other.MethodTypes);
         ArgumentTypes = UseFallback(ArgumentTypes, other.ArgumentTypes);
         ArgumentVariations = UseFallback(ArgumentVariations, other.ArgumentVariations);
+        IsPatchAll ??= other.IsPatchAll;
+        Priority ??= other.Priority;
+        Before ??= other.Before;
+        After ??= other.After;
+        IsDebug ??= other.IsDebug;
+
+        ArgumentOverrides = ArgumentOverrides.AddRange(other.ArgumentOverrides);
     }
     
     protected static ImmutableArray<T> UseFallback<T>(ImmutableArray<T> first, ImmutableArray<T> second) =>
