@@ -73,4 +73,24 @@ public class PatchMethodTests
             new DiagnosticResult(DiagnosticIds.PatchMethodsMustNotBeGeneric, DiagnosticSeverity.Warning)
                 .WithSpan(9, 28, 9, 35));
     }
+
+    [TestMethod, CodeDataSource("MissingArgumentNewName.cs")]
+    public async Task WhenMissingArgumentNewName_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.ArgumentsOnTypesAndMethodsMustHaveNewName, DiagnosticSeverity.Warning)
+                .WithSpan(7, 6, 7, 24),
+            new DiagnosticResult(DiagnosticIds.ArgumentsOnTypesAndMethodsMustHaveNewName, DiagnosticSeverity.Warning)
+                .WithSpan(10, 10, 10, 30));
+    }
+
+    [TestMethod, CodeDataSource("DuplicateArgumentNewName.cs")]
+    public async Task WhenDuplicateArgumentNewName_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.ArgumentNewNamesMustBeUnique, DiagnosticSeverity.Warning)
+                .WithSpan(7, 25, 7, 30)
+                .WithSpan(10, 29, 10, 34)
+                .WithArguments("foo"));
+    }
 }

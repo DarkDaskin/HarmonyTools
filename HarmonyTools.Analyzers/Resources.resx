@@ -195,6 +195,18 @@
   <data name="TargetTypeMustExistTitle" xml:space="preserve">
     <value>Target type does not exist</value>
   </data>
+  <data name="ArgumentNewNamesMustBeUniqueMessageFormat" xml:space="preserve">
+    <value>Duplicate argument name '{0}'.</value>
+  </data>
+  <data name="ArgumentNewNamesMustBeUniqueTitle" xml:space="preserve">
+    <value>Duplicate argument name</value>
+  </data>
+  <data name="ArgumentsOnTypesAndMethodsMustHaveNewNameMessageFormat" xml:space="preserve">
+    <value>Missing new name for an argument.</value>
+  </data>
+  <data name="ArgumentsOnTypesAndMethodsMustHaveNewNameTitle" xml:space="preserve">
+    <value>Missing new name for an argument</value>
+  </data>
   <data name="DontUseTargetMethodAnnotationsOnNonPrimaryPatchMethodsMessageFormat" xml:space="preserve">
     <value>Target method annotations have no effect on non-primary patch methods.</value>
   </data>

@@ -110,19 +110,13 @@ public class GeneralTests
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
                 .WithSpan(28, 22, 28, 26),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(28, 45, 28, 49),
-            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(28, 51, 28, 55),
+                .WithSpan(28, 28, 28, 32),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
                 .WithSpan(29, 22, 29, 24),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(29, 43, 29, 45),
+                .WithSpan(29, 26, 29, 28),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(29, 47, 29, 49),
-            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(30, 22, 30, 24),
-            new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(30, 43, 30, 45));
+                .WithSpan(30, 22, 30, 24));
     }
     
     [TestMethod, CodeDataSource("MissingHarmonyPatchOnType.cs", FixedPath = "MissingHarmonyPatchOnType_Fixed.cs")]

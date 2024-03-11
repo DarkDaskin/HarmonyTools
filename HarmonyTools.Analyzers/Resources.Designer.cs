@@ -61,6 +61,42 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duplicate argument name &apos;{0}&apos;..
+        /// </summary>
+        internal static string ArgumentNewNamesMustBeUniqueMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentNewNamesMustBeUniqueMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate argument name.
+        /// </summary>
+        internal static string ArgumentNewNamesMustBeUniqueTitle {
+            get {
+                return ResourceManager.GetString("ArgumentNewNamesMustBeUniqueTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing new name for an argument..
+        /// </summary>
+        internal static string ArgumentsOnTypesAndMethodsMustHaveNewNameMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentsOnTypesAndMethodsMustHaveNewNameMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing new name for an argument.
+        /// </summary>
+        internal static string ArgumentsOnTypesAndMethodsMustHaveNewNameTitle {
+            get {
+                return ResourceManager.GetString("ArgumentsOnTypesAndMethodsMustHaveNewNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Argument types and argument variations have differing number of items..
         /// </summary>
         internal static string ArgumentTypesAndVariationsMustMatchMessageFormat {

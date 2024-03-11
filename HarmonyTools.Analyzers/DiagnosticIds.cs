@@ -7,7 +7,7 @@ public static class DiagnosticIds
     public const string HarmonyPatchAttributeMustBeOnType = "HT0002";
     public const string PatchTypeMustNotBeGeneric = "HT0003";
 
-    //TargetMethod
+    // TargetMethod
     public const string TargetMethodMustExist = "HT1001";
     public const string TargetMethodMustNotBeAmbiguous = "HT1002";
     public const string TargetTypeMustExist = "HT1003";
@@ -20,9 +20,11 @@ public static class DiagnosticIds
     public const string TargetTypeMustBeNamedType = "HT1010";
     public const string TargetTypeMustNotBeOpenGenericType = "HT1011";
 
-    //PatchMethod
+    // PatchMethod
     public const string PatchMethodsMustBeStatic = "HT2001";
     public const string PatchMethodMustHaveSingleKind = "HT2002";
     public const string DontDefineMultipleAuxiliaryPatchMethods = "HT2003";
     public const string PatchMethodsMustNotBeGeneric = "HT2004";
+    public const string ArgumentsOnTypesAndMethodsMustHaveNewName = "HT2005";
+    public const string ArgumentNewNamesMustBeUnique = "HT2006";
 }

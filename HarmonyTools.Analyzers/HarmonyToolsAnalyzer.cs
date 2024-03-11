@@ -93,6 +93,14 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.PatchMethodsMustNotBeGeneric,
             nameof(Resources.PatchMethodsMustNotBeGenericTitle), nameof(Resources.PatchMethodsMustNotBeGenericMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor ArgumentsOnTypesAndMethodsMustHaveNewNameRule =
+        CreateRule(DiagnosticIds.ArgumentsOnTypesAndMethodsMustHaveNewName,
+            nameof(Resources.ArgumentsOnTypesAndMethodsMustHaveNewNameTitle), nameof(Resources.ArgumentsOnTypesAndMethodsMustHaveNewNameMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor ArgumentNewNamesMustBeUniqueRule =
+        CreateRule(DiagnosticIds.ArgumentNewNamesMustBeUnique,
+            nameof(Resources.ArgumentNewNamesMustBeUniqueTitle), nameof(Resources.ArgumentNewNamesMustBeUniqueMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         AttributeArgumentsMustBeValidRule,
@@ -115,6 +123,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         PatchMethodMustHaveSingleKindRule,
         DontDefineMultipleAuxiliaryPatchMethodsRule,
         PatchMethodsMustNotBeGenericRule,
+        ArgumentsOnTypesAndMethodsMustHaveNewNameRule,
+        ArgumentNewNamesMustBeUniqueRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -220,6 +230,8 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckMethodMustExistAndNotAmbiguous(patchDescription);
             CheckMethodMustBeSpecified(patchDescription, set);
             CheckMethodMustNotBeOverspecified(patchDescription);
+            CheckArgumentsOnTypesAndMethodsMustHaveNewName(patchDescription);
+            CheckArgumentNewNamesMustBeUniqueRule(patchDescription);
         }
 
         protected virtual void PatchMethodChecks(HarmonyPatchMethod<TPatchDescription> patchMethod)
@@ -513,6 +525,29 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     patchDescription.ArgumentVariations.GetLocation(), patchDescription.ArgumentVariations.GetAdditionalLocations()));
         }
 
+        private void CheckArgumentsOnTypesAndMethodsMustHaveNewName(TPatchDescription patchDescription)
+        {
+            foreach (var argument in patchDescription.ArgumentOverrides.Where(argument => argument.NewName is null))
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(ArgumentsOnTypesAndMethodsMustHaveNewNameRule,
+                    argument.Attribute.GetSyntax()?.GetLocation()));
+            }
+        }
+
+        private void CheckArgumentNewNamesMustBeUniqueRule(TPatchDescription patchDescription)
+        {
+            var argumentRenamesPerNewName =
+                from argument in patchDescription.ArgumentOverrides
+                where argument.NewName is { Value: not null }
+                group argument.NewName! by argument.NewName!.Value!;
+            foreach (var argumentGroup in argumentRenamesPerNewName.Where(argumentGroup => argumentGroup.Count() > 1))
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(ArgumentNewNamesMustBeUniqueRule,
+                    argumentGroup.GetLocation(), argumentGroup.GetAdditionalLocations(),
+                    argumentGroup.Key));
+            }
+        }
+
         private void CheckHarmonyPatchAttributeMustBeOnType(HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
             if (set.TypePatchDescription is { IsDefining: true })
@@ -642,7 +677,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             var attributeArgumentSyntax = detail.Syntax as AttributeArgumentSyntax;
             SyntaxNode? itemExpressionSyntax = null;
             if (attributeArgumentSyntax?.Expression is ArrayCreationExpressionSyntax arrayCreationExpressionSyntax)
-                itemExpressionSyntax = arrayCreationExpressionSyntax?.Initializer?.Expressions.ElementAtOrDefault(arrayIndex);
+                itemExpressionSyntax = arrayCreationExpressionSyntax.Initializer?.Expressions.ElementAtOrDefault(arrayIndex);
             // Params array
             else if (attributeArgumentSyntax?.Parent is AttributeArgumentListSyntax attributeArgumentListSyntax)
             {
