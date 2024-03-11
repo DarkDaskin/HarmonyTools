@@ -25,6 +25,10 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.HarmonyPatchAttributeMustBeOnType,
             nameof(Resources.HarmonyPatchAttributeMustBeOnTypeTitle), nameof(Resources.HarmonyPatchAttributeMustBeOnTypeMessageFormat),
             GeneralCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor PatchTypeMustNotBeGenericRule =
+        CreateRule(DiagnosticIds.PatchTypeMustNotBeGeneric,
+            nameof(Resources.PatchTypeMustNotBeGenericTitle), nameof(Resources.PatchTypeMustNotBeGenericMessageFormat),
+            GeneralCategory, DiagnosticSeverity.Warning);
 
     private const string TargetMethodCategory = "TargetMethod";
     private static readonly DiagnosticDescriptor TargetMethodMustExistRule = 
@@ -85,10 +89,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.DontDefineMultipleAuxiliaryPatchMethods,
             nameof(Resources.DontDefineMultipleAuxiliaryPatchMethodsTitle), nameof(Resources.DontDefineMultipleAuxiliaryPatchMethodsMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor PatchMethodsMustNotBeGenericRule =
+        CreateRule(DiagnosticIds.PatchMethodsMustNotBeGeneric,
+            nameof(Resources.PatchMethodsMustNotBeGenericTitle), nameof(Resources.PatchMethodsMustNotBeGenericMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         AttributeArgumentsMustBeValidRule,
         HarmonyPatchAttributeMustBeOnTypeRule,
+        PatchTypeMustNotBeGenericRule,
 
         TargetMethodMustExistRule,
         TargetMethodMustNotBeAmbiguousRule,
@@ -105,6 +114,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         PatchMethodsMustBeStaticRule,
         PatchMethodMustHaveSingleKindRule,
         DontDefineMultipleAuxiliaryPatchMethodsRule,
+        PatchMethodsMustNotBeGenericRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -156,12 +166,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         where TPatchDescription : HarmonyPatchDescription
     {
         protected readonly SymbolAnalysisContext Context = context;
+        protected readonly INamedTypeSymbol PatchType = (INamedTypeSymbol)context.Symbol;
         protected readonly WellKnownTypes WellKnownTypes = new(context.Compilation, harmonyNamespace);
         
         public abstract void Verify();
 
         protected void VerifyCore(HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
+            PatchTypeChecks();
+
             if (set.TypePatchDescription is not null)
                 PreMergeChecks(set.TypePatchDescription);
 
@@ -189,6 +202,11 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             PatchDescriptionSetChecks(set);
         }
 
+        protected virtual void PatchTypeChecks()
+        {
+            CheckPatchTypeMustNotBeGeneric();
+        }
+
         protected virtual void PreMergeChecks(TPatchDescription patchDescription)
         {
             CheckAttributeArgumentsMustBeValid(patchDescription);
@@ -209,6 +227,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckDontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods(patchMethod);
             CheckPatchMethodsMustBeStatic(patchMethod);
             CheckPatchMethodMustHaveSingleKind(patchMethod);
+            CheckPatchMethodsMustNotBeGeneric(patchMethod);
         }
 
         protected virtual void PatchDescriptionSetChecks(HarmonyPatchDescriptionSet<TPatchDescription> set)
@@ -216,6 +235,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckHarmonyPatchAttributeMustBeOnType(set);
             CheckDontDefineMultipleAuxiliaryPatchMethods(set);
             CheckBulkPatching(set);
+        }
+
+        private void CheckPatchTypeMustNotBeGeneric()
+        {
+            if (!PatchType.IsGenericType)
+                return;
+
+            Context.ReportDiagnostic(Diagnostic.Create(PatchTypeMustNotBeGenericRule,
+                PatchType.GetSyntax()?.GetIdentifierLocation()));
         }
 
         private void CheckAttributeArgumentsMustBeValid(HarmonyPatchDescription patchDescription)
@@ -585,6 +613,15 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 patchMethod.MethodKinds.GetLocation(), patchMethod.MethodKinds.GetAdditionalLocations()));
         }
 
+        private void CheckPatchMethodsMustNotBeGeneric(HarmonyPatchMethod patchMethod)
+        {
+            if (!patchMethod.Method.IsGenericMethod)
+                return;
+
+            Context.ReportDiagnostic(Diagnostic.Create(PatchMethodsMustNotBeGenericRule,
+                patchMethod.Method.GetSyntax().GetIdentifierLocation()));
+        }
+
         private void CheckDontDefineMultipleAuxiliaryPatchMethods(HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
             foreach (var kind in Enum.GetValues(typeof(PatchMethodKind)).Cast<PatchMethodKind>().Where(kind => kind.IsAuxiliary()))
@@ -683,12 +720,12 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
     private sealed class VerifierV1(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV1>(context, WellKnownTypes.Harmony1Namespace)
     {
-        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV1.Parse((INamedTypeSymbol)Context.Symbol, WellKnownTypes));
+        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV1.Parse(PatchType, WellKnownTypes));
     }
 
     private sealed class VerifierV2(SymbolAnalysisContext context) : Verifier<HarmonyPatchDescriptionV2>(context, WellKnownTypes.Harmony2Namespace)
     {
-        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV2.Parse((INamedTypeSymbol)Context.Symbol, WellKnownTypes));
+        public override void Verify() => VerifyCore(HarmonyPatchDescriptionV2.Parse(PatchType, WellKnownTypes));
 
         protected override void PreMergeChecks(HarmonyPatchDescriptionV2 patchDescription)
         {

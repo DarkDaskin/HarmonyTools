@@ -223,6 +223,42 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Patch method is generic. Only non-generic methods are allowed..
+        /// </summary>
+        internal static string PatchMethodsMustNotBeGenericMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustNotBeGenericMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method is generic.
+        /// </summary>
+        internal static string PatchMethodsMustNotBeGenericTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustNotBeGenericTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch type is generic. Only non-generic types are allowed..
+        /// </summary>
+        internal static string PatchTypeMustNotBeGenericMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchTypeMustNotBeGenericMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch type is generic.
+        /// </summary>
+        internal static string PatchTypeMustNotBeGenericTitle {
+            get {
+                return ResourceManager.GetString("PatchTypeMustNotBeGenericTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not enough information to target a method..
         /// </summary>
         internal static string TargetMethodMustBeFullySpecifiedMessageFormat {

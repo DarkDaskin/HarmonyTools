@@ -65,4 +65,12 @@ public class PatchMethodTests
 
         await VerifyCS.VerifyCodeFixAsync(code, referenceAssemblies, expected.ToArray(), fixedCode);
     }
+
+    [TestMethod, CodeDataSource("GenericPatchMethod.cs")]
+    public async Task WhenGenericPatchMethod_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.PatchMethodsMustNotBeGeneric, DiagnosticSeverity.Warning)
+                .WithSpan(9, 28, 9, 35));
+    }
 }

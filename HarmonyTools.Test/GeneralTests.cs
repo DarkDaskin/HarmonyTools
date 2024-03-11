@@ -134,4 +134,12 @@ public class GeneralTests
                 .WithSpan(6, 20, 6, 45),
             fixedCode);
     }
+
+    [TestMethod, CodeDataSource("GenericPatchType.cs")]
+    public async Task WhenGenericPatchType_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.PatchTypeMustNotBeGeneric, DiagnosticSeverity.Warning)
+                .WithSpan(7, 20, 7, 36));
+    }
 }

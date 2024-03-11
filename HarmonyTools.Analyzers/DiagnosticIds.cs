@@ -5,6 +5,7 @@ public static class DiagnosticIds
     // General
     public const string AttributeArgumentsMustBeValid = "HT0001";
     public const string HarmonyPatchAttributeMustBeOnType = "HT0002";
+    public const string PatchTypeMustNotBeGeneric = "HT0003";
 
     //TargetMethod
     public const string TargetMethodMustExist = "HT1001";
@@ -23,4 +24,5 @@ public static class DiagnosticIds
     public const string PatchMethodsMustBeStatic = "HT2001";
     public const string PatchMethodMustHaveSingleKind = "HT2002";
     public const string DontDefineMultipleAuxiliaryPatchMethods = "HT2003";
+    public const string PatchMethodsMustNotBeGeneric = "HT2004";
 }
