@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace HarmonyTools.Test.PatchBase
@@ -15,6 +16,7 @@ namespace HarmonyTools.Test.PatchBase
         public double OverloadedMethod(double x, double y) => x - y;
         public void OverloadedMethod(out int answer) => answer = _answer;
         public void GenericMethod<T>() { }
+        public FileSystemInfo GetFile() => null;
 
         public IEnumerable<string> EnumeratorMethod()
         {

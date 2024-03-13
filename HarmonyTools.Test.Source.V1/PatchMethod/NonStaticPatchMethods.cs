@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using Harmony;
 
 namespace HarmonyTools.Test.Source.V1.PatchMethod
@@ -10,7 +11,7 @@ namespace HarmonyTools.Test.Source.V1.PatchMethod
 
         public void Postfix() { }
 
-        public void Transpiler() { }
+        public IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) => instructions;
 
         public void Prepare() { }
 

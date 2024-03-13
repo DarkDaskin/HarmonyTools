@@ -241,6 +241,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; return type. Valid types are: {1}..
+        /// </summary>
+        internal static string PatchMethodReturnTypesMustBeCorrectMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method return type.
+        /// </summary>
+        internal static string PatchMethodReturnTypesMustBeCorrectTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Patch method must be static..
         /// </summary>
         internal static string PatchMethodsMustBeStaticMessageFormat {

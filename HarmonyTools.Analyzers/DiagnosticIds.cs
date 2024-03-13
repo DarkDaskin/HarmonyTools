@@ -28,4 +28,5 @@ public static class DiagnosticIds
     public const string PatchMethodsMustNotBeGeneric = "HT2004";
     public const string ArgumentsOnTypesAndMethodsMustHaveNewName = "HT2005";
     public const string ArgumentNewNamesMustBeUnique = "HT2006";
+    public const string PatchMethodReturnTypesMustBeCorrect = "HT2007";
 }

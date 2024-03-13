@@ -17,6 +17,8 @@ internal abstract class HarmonyPatchDescription(ISymbol symbol)
     /// <remarks>Set to <c>true</c> when there is at least one attribure deriving from <c>HarmonyAttribute</c> at type level.</remarks>
     public bool IsDefining { get; private set; }
 
+    public IMethodSymbol? TargetMethod { get; set; }
+
     public ImmutableList<AttributeData> Attrubutes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<ITypeSymbol?>> TargetTypes { get; protected set; } = [];
     public ImmutableArray<DetailWithSyntax<string?>> MethodNames { get; protected set; } = [];

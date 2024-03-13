@@ -237,6 +237,12 @@
   <data name="TargetTypeMustNotBeOpenGenericTypeTitle" xml:space="preserve">
     <value>Target type is an open generic type</value>
   </data>
+  <data name="PatchMethodReturnTypesMustBeCorrectMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' return type. Valid types are: {1}.</value>
+  </data>
+  <data name="PatchMethodReturnTypesMustBeCorrectTitle" xml:space="preserve">
+    <value>Incorrect patch method return type</value>
+  </data>
   <data name="TargetMethodMustNotBeGenericMessageFormat" xml:space="preserve">
     <value>Target method '{0}' of type '{1}' is generic. Only non-generic methods are allowed when specifying target method via attributes.</value>
   </data>

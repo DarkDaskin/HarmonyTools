@@ -105,6 +105,10 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         CreateRule(DiagnosticIds.ArgumentNewNamesMustBeUnique,
             nameof(Resources.ArgumentNewNamesMustBeUniqueTitle), nameof(Resources.ArgumentNewNamesMustBeUniqueMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor PatchMethodReturnTypesMustBeCorrectRule =
+        CreateRule(DiagnosticIds.PatchMethodReturnTypesMustBeCorrect,
+            nameof(Resources.PatchMethodReturnTypesMustBeCorrectTitle), nameof(Resources.PatchMethodReturnTypesMustBeCorrectMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
         AttributeArgumentsMustBeValidRule,
@@ -130,6 +134,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         PatchMethodsMustNotBeGenericRule,
         ArgumentsOnTypesAndMethodsMustHaveNewNameRule,
         ArgumentNewNamesMustBeUniqueRule,
+        PatchMethodReturnTypesMustBeCorrectRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,
@@ -143,7 +148,9 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-        context.EnableConcurrentExecution();
+
+        if (!Debugger.IsAttached)
+            context.EnableConcurrentExecution();
 
         context.RegisterCompilationStartAction(RegisterActionsWithFullMetadata);
         context.RegisterCompilationAction(RunAnalyzerWithFullMetadata);
@@ -195,24 +202,34 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
             foreach (var patchMethod in set.PatchMethods)
             {
-                if (set.TypePatchDescription is not null)
-                    PatchMethodChecks(patchMethod);
-
                 if (patchMethod.PatchDescription is null) 
                     continue;
 
                 PreMergeChecks(patchMethod.PatchDescription);
 
-                if (set.TypePatchDescription is not null)
+                if (set.TypePatchDescription is not null) 
                     patchMethod.PatchDescription.Merge(set.TypePatchDescription);
 
                 PostMergeChecks(patchMethod.PatchDescription, set);
+
+                if (set.TypePatchDescription is not null) 
+                    PatchMethodChecks(patchMethod);
             }
 
             var hasPrimaryPatchMethodWithoutAnnotations = set.PatchMethods.Any(
-                patchMethod => patchMethod.PatchDescription is null && patchMethod.MethodKinds.Any(kind => kind.Value.IsPrimary()));
+                patchMethod => patchMethod.PatchDescription is null && patchMethod.IsPrimary);
             if (set.TypePatchDescription is not null && (set.PatchMethods is [] || hasPrimaryPatchMethodWithoutAnnotations))
+            {
                 PostMergeChecks(set.TypePatchDescription, set);
+
+                foreach (var patchMethod in set.PatchMethods.Where(patchMethod => patchMethod.PatchDescription is null))
+                {
+                    if (patchMethod.IsPrimary)
+                        patchMethod.PatchDescription = set.TypePatchDescription;
+
+                    PatchMethodChecks(patchMethod);
+                }
+            }
 
             PatchDescriptionSetChecks(set);
         }
@@ -245,6 +262,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckPatchMethodsMustBeStatic(patchMethod);
             CheckPatchMethodMustHaveSingleKind(patchMethod);
             CheckPatchMethodsMustNotBeGeneric(patchMethod);
+            CheckPatchMethodReturnTypeMustBeCorrect(patchMethod);
         }
 
         protected virtual void PatchDescriptionSetChecks(HarmonyPatchDescriptionSet<TPatchDescription> set)
@@ -265,7 +283,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 return;
 
             Context.ReportDiagnostic(Diagnostic.Create(PatchTypeMustNotBeGenericRule,
-                PatchType.GetSyntax()?.GetIdentifierLocation()));
+                PatchType.GetSyntax(cancellationToken: Context.CancellationToken)?.GetIdentifierLocation()));
         }
 
         private void CheckAttributeArgumentsMustBeValid(HarmonyPatchDescription patchDescription)
@@ -486,7 +504,11 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     patchDescription.GetLocation(IsHarmonyPatchAttribute), patchDescription.GetAdditionalLocations(IsHarmonyPatchAttribute),
                     memberName, targetType.ToDisplayString(), targetMethodsArray.Length));
             else
-                TargetMethodChecks(targetMethodsArray[0], patchDescription);
+            {
+                var targetMethod = targetMethodsArray[0];
+                patchDescription.TargetMethod = targetMethod;
+                TargetMethodChecks(targetMethod, patchDescription);
+            }
         }
 
         private void CheckMethodMustBeSpecified(HarmonyPatchDescription patchDescription, HarmonyPatchDescriptionSet<TPatchDescription> set)
@@ -584,7 +606,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 var properties = ImmutableDictionary.Create<string, string?>().Add(HarmonyNamespaceKey, harmonyNamespace);
                 Context.ReportDiagnostic(Diagnostic.Create(HarmonyPatchAttributeMustBeOnTypeRule,
                     patchMethodWithAttributeSyntax.patchMethod.Method.ContainingType
-                        .GetSyntax(patchMethodWithAttributeSyntax.syntax)?.GetIdentifierLocation(), properties));
+                        .GetSyntax(patchMethodWithAttributeSyntax.syntax, Context.CancellationToken)?.GetIdentifierLocation(), properties));
             }
         }
 
@@ -609,7 +631,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
 
             var conflictingPatchDescriptions = set.PatchMethods.Select(patchMethod => patchMethod.PatchDescription).Concat([set.TypePatchDescription])
-                .Where(patchDescription => IsConflictingPatchDescription(patchDescription, hasBulkPatchMethods)).ToArray();
+                .Distinct().Where(patchDescription => IsConflictingPatchDescription(patchDescription, hasBulkPatchMethods)).ToArray();
             if (conflictingPatchDescriptions is [])
                 return;
 
@@ -624,7 +646,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 conflictingSyntaxes.GetLocation(), conflictingSyntaxes.GetAdditionalLocations()));
 
 
-            static bool IsConflictingPatchDescription(TPatchDescription? patchDescription, bool hasBulkPatchingMethods)
+            static bool IsConflictingPatchDescription(TPatchDescription? patchDescription, bool hasBulkPatchMethods)
             {
                 if (patchDescription is null) 
                     return false;
@@ -632,7 +654,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 if (patchDescription.MethodNames.Concat<IHasSyntax>(patchDescription.MethodTypes).Concat(patchDescription.ArgumentTypes).Any())
                     return true;
 
-                return hasBulkPatchingMethods && patchDescription.TargetTypes.Any();
+                return hasBulkPatchMethods && patchDescription.TargetTypes.Any();
             }
         }
 
@@ -652,7 +674,7 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 return;
 
             Context.ReportDiagnostic(Diagnostic.Create(PatchMethodsMustBeStaticRule,
-                patchMethod.Method.GetSyntax().GetIdentifierLocation()));
+                patchMethod.Method.GetSyntax(cancellationToken: Context.CancellationToken).GetIdentifierLocation()));
         }
 
         private void CheckPatchMethodMustHaveSingleKind(HarmonyPatchMethod patchMethod)
@@ -670,15 +692,85 @@ public class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 return;
 
             Context.ReportDiagnostic(Diagnostic.Create(PatchMethodsMustNotBeGenericRule,
-                patchMethod.Method.GetSyntax().GetIdentifierLocation()));
+                patchMethod.Method.GetSyntax(cancellationToken: Context.CancellationToken).GetIdentifierLocation()));
+        }
+
+        private void CheckPatchMethodReturnTypeMustBeCorrect(HarmonyPatchMethod patchMethod)
+        {
+            if (patchMethod.MethodKinds is [])
+                return;
+
+            var targetMethodReturnType = patchMethod.PatchDescription?.TargetMethod?.ReturnType;
+
+            var isInNullableContext = patchMethod.Method.IsInNullableContext(Context.Compilation);
+
+            ITypeSymbol[] validReturnTypes = [];
+            var matchTypeInReverse = false;
+            var skipValidation = false;
+            if (patchMethod.Is(PatchMethodKind.Prefix))
+                validReturnTypes = [WellKnownTypes.Void, WellKnownTypes.Boolean];
+            else if (patchMethod.Is(PatchMethodKind.Postfix))
+            {
+                if (patchMethod.PatchDescription?.TargetMethod is not null)
+                {
+                    validReturnTypes = patchMethod.IsPassthrough() switch
+                    {
+                        true => [targetMethodReturnType!],
+                        false => [WellKnownTypes.Void],
+                        null when !targetMethodReturnType!.Is(WellKnownTypes.Void) => [WellKnownTypes.Void, targetMethodReturnType!],
+                        _ => [WellKnownTypes.Void]
+                    };
+                }
+                else
+                    skipValidation = true;
+            }
+            else if (patchMethod.Is(PatchMethodKind.Transpiler))
+                validReturnTypes = [WellKnownTypes.EnumerableOfCodeInstruction!.WithNullableAnnotation(NullableAnnotation.NotAnnotated)];
+            else if (patchMethod.Is(PatchMethodKind.Finalizer))
+                validReturnTypes = [WellKnownTypes.Void, WellKnownTypes.Exception.WithNullableAnnotation(NullableAnnotation.Annotated)];
+            else if (patchMethod.Is(PatchMethodKind.ReversePatch))
+            {
+                if (patchMethod.PatchDescription?.TargetMethod is not null && 
+                    !patchMethod.ContainsTranspiler(WellKnownTypes, Context.Compilation, Context.CancellationToken))
+                {
+                    validReturnTypes = [targetMethodReturnType!];
+                    matchTypeInReverse = true;
+                }
+                else
+                    skipValidation = true;
+            }
+            else if (patchMethod.Is(PatchMethodKind.Prepare))
+                validReturnTypes = [WellKnownTypes.Void, WellKnownTypes.Boolean];
+            else if (patchMethod.Is(PatchMethodKind.Cleanup))
+                validReturnTypes = [WellKnownTypes.Void, WellKnownTypes.Exception.WithNullableAnnotation(NullableAnnotation.Annotated)];
+            else if (patchMethod.Is(PatchMethodKind.TargetMethod))
+                validReturnTypes = [WellKnownTypes.MethodBase.WithNullableAnnotation(NullableAnnotation.NotAnnotated)];
+            else if (patchMethod.Is(PatchMethodKind.TargetMethods))
+                validReturnTypes = [WellKnownTypes.EnumerableOfMethodBase.WithNullableAnnotation(NullableAnnotation.NotAnnotated)];
+
+            if (skipValidation)
+                return;
+
+            foreach (var type in validReturnTypes)
+                if (!patchMethod.Method.ReturnsByRef && 
+                    matchTypeInReverse
+                        ? type.Is(patchMethod.Method.ReturnType, Context.Compilation, includeNullability: isInNullableContext)
+                        : patchMethod.Method.ReturnType.Is(type, Context.Compilation, includeNullability: isInNullableContext))
+                    return;
+
+            var methodDeclarationSyntax = patchMethod.Method.GetSyntax(cancellationToken: Context.CancellationToken) as MethodDeclarationSyntax;
+            Context.ReportDiagnostic(Diagnostic.Create(PatchMethodReturnTypesMustBeCorrectRule,
+                methodDeclarationSyntax?.ReturnType.GetLocation(),
+                 patchMethod.Method.Name, string.Join(", ", validReturnTypes
+                    .Select(type => isInNullableContext ? type : type.WithNullableAnnotation(NullableAnnotation.None))
+                    .Select(type => $"'{type.ToDisplayString()}'"))));
         }
 
         private void CheckDontDefineMultipleAuxiliaryPatchMethods(HarmonyPatchDescriptionSet<TPatchDescription> set)
         {
             foreach (var kind in Enum.GetValues(typeof(PatchMethodKind)).Cast<PatchMethodKind>().Where(kind => kind.IsAuxiliary()))
             {
-                var patchMethods = set.PatchMethods
-                    .Where(patchMethod => patchMethod.MethodKinds.Contains(kind)).ToArray();
+                var patchMethods = set.PatchMethods.Where(patchMethod => patchMethod.Is(kind)).ToArray();
                 if (patchMethods.Length > 1)
                     Context.ReportDiagnostic(Diagnostic.Create(DontDefineMultipleAuxiliaryPatchMethodsRule,
                         patchMethods.GetLocation(), patchMethods.GetAdditionalLocations()));
