@@ -65,13 +65,13 @@ namespace HarmonyTools.Test.Source.V2.PatchMethod
     internal class ValidPatchMethodReturnTypes5
     {
         [HarmonyReversePatch]
-        public static FileSystemInfo ReversePatch1() => throw new InvalidOperationException();
+        public static FileSystemInfo ReversePatch1(SimpleClass instance) => throw new InvalidOperationException();
 
         [HarmonyReversePatch]
-        public static object ReversePatch2() => throw new InvalidOperationException();
+        public static object ReversePatch2(SimpleClass instance) => throw new InvalidOperationException();
 
         [HarmonyReversePatch]
-        public static string ReversePatch3()
+        public static string ReversePatch3(SimpleClass instance)
         {
             _ = Transpiler(default);
             return default;
@@ -80,7 +80,7 @@ namespace HarmonyTools.Test.Source.V2.PatchMethod
         }
 
         [HarmonyReversePatch, HarmonyPatch(nameof(SimpleClass.EnumeratorMethod))]
-        public static IEnumerable<object> ReversePatch4() => throw new InvalidOperationException();
+        public static IEnumerable<object> ReversePatch4(SimpleClass instance) => throw new InvalidOperationException();
     }
 
     [HarmonyPatch]
@@ -137,10 +137,10 @@ namespace HarmonyTools.Test.Source.V2.PatchMethod
     {
 #nullable enable
         [HarmonyReversePatch]
-        public static string ReversePatch1() => throw new InvalidOperationException();
+        public static string ReversePatch1(string s) => throw new InvalidOperationException();
 
         [HarmonyReversePatch]
-        public static string? ReversePatch2() => throw new InvalidOperationException();
+        public static string? ReversePatch2(string s) => throw new InvalidOperationException();
 #nullable restore
     }
 }

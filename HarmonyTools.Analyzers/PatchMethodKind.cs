@@ -9,6 +9,8 @@ internal enum PatchMethodKind
     Finalizer,
     /// <remarks>Only valid in Harmony 2.x.</remarks>
     ReversePatch,
+    /// <remarks>Only valid in Harmony 2.x.</remarks>
+    DelegateInvoke,
     Prepare,
     Cleanup,
     TargetMethod,
@@ -17,9 +19,9 @@ internal enum PatchMethodKind
 
 internal static class PatchMethodKindExtensions
 {
-    public static bool IsPrimary(this PatchMethodKind kind) => kind is >= PatchMethodKind.Prefix and <= PatchMethodKind.ReversePatch;
+    public static bool IsPrimary(this PatchMethodKind kind) => kind is >= PatchMethodKind.Prefix and <= PatchMethodKind.DelegateInvoke;
 
     public static bool IsAuxiliary(this PatchMethodKind kind) => kind is >= PatchMethodKind.Prepare and <= PatchMethodKind.TargetMethods;
 
-    public static bool IsHarmony2Only(this PatchMethodKind kind) => kind is >= PatchMethodKind.Finalizer and <= PatchMethodKind.ReversePatch;
+    public static bool IsHarmony2Only(this PatchMethodKind kind) => kind is >= PatchMethodKind.Finalizer and <= PatchMethodKind.DelegateInvoke;
 }

@@ -3,12 +3,12 @@ using Microsoft.CodeAnalysis;
 
 namespace HarmonyTools.Analyzers;
 
-internal class HarmonyPatchDescriptionV1(ISymbol symbol) : HarmonyPatchDescription(symbol)
+internal class PatchDescriptionV1(ISymbol symbol) : PatchDescription(symbol)
 {
     public override int HarmonyVersion => 1;
 
-    public static HarmonyPatchDescriptionSet<HarmonyPatchDescriptionV1> Parse(INamedTypeSymbol type, WellKnownTypes wellKnownTypes) =>
-        Parse(type, wellKnownTypes, symbol => new HarmonyPatchDescriptionV1(symbol));
+    public static PatchDescriptionSet<PatchDescriptionV1> Parse(INamedTypeSymbol type, WellKnownTypes wellKnownTypes) =>
+        Parse(type, wellKnownTypes, symbol => new PatchDescriptionV1(symbol));
 
     protected override void ProcessHarmonyPatchAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {

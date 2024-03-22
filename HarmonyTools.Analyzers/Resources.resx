@@ -237,8 +237,8 @@
   <data name="TargetTypeMustNotBeOpenGenericTypeTitle" xml:space="preserve">
     <value>Target type is an open generic type</value>
   </data>
-  <data name="PatchMethodReturnTypesMustBeCorrectMessageFormat" xml:space="preserve">
-    <value>Incorrect patch method '{0}' return type. Valid types are: {1}.</value>
+  <data name="PatchMethodReturnTypesMustBeCorrectWithSubtypesMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' return type. Valid types are: {1} and their subtypes.</value>
   </data>
   <data name="PatchMethodReturnTypesMustBeCorrectTitle" xml:space="preserve">
     <value>Incorrect patch method return type</value>
@@ -248,5 +248,143 @@
   </data>
   <data name="TargetMethodMustNotBeGenericTitle" xml:space="preserve">
     <value>Target method is generic</value>
+  </data>
+  <data name="PatchMethodParametersMustBeValidInjectionsMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' parameter '{1}' is not a recognized injection.</value>
+  </data>
+  <data name="PatchMethodParametersMustBeValidInjectionsTitle" xml:space="preserve">
+    <value>Patch method parameter is not a recognized injection</value>
+  </data>
+  <data name="PatchMethodParameterTypesMustBeCorrectWithSupertypesMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' parameter '{1}' type. Valid types are: {2} and their supertypes.</value>
+  </data>
+  <data name="PatchMethodParameterTypesMustBeCorrectTitle" xml:space="preserve">
+    <value>Incorrect patch method parameter type</value>
+  </data>
+  <data name="DoNotUseInstanceParameterWithStaticMethodsMessageFormat" xml:space="preserve">
+    <value>'__instance' parameter is used with static target method '{0}'. The parameter will be always null.</value>
+  </data>
+  <data name="DoNotUseInstanceParameterWithStaticMethodsTitle" xml:space="preserve">
+    <value>'__instance' parameter is used with static target method</value>
+  </data>
+  <data name="DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat" xml:space="preserve">
+    <value>'__resultRef' parameter is used with target method '{0}' which does not return by reference.</value>
+  </data>
+  <data name="DoNotUseResultRefWithMethodsNotReturningByRefTitle" xml:space="preserve">
+    <value>'__resultRef' parameter is used with target method which does not return by reference</value>
+  </data>
+  <data name="DoNotUseResultWithMethodsReturningByRefMessageFormat" xml:space="preserve">
+    <value>'__result' parameter is used with target method '{0}' which returns by reference.</value>
+  </data>
+  <data name="DoNotUseResultWithMethodsReturningByRefTitle" xml:space="preserve">
+    <value>'__result' parameter is used with target method which returns by reference</value>
+  </data>
+  <data name="DoNotUseResultWithMethodsReturningVoidMessageFormat" xml:space="preserve">
+    <value>'__result' parameter is used with target method '{0}' which returns 'void'.</value>
+  </data>
+  <data name="DoNotUseResultWithMethodsReturningVoidTitle" xml:space="preserve">
+    <value>'__result' parameter is used with target method which returns 'void'</value>
+  </data>
+  <data name="ParameterMustBeByRefMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' parameter '{1}' must be passed by reference.</value>
+  </data>
+  <data name="ParameterMustBeByRefTitle" xml:space="preserve">
+    <value>Patch method parameter must be passed by reference</value>
+  </data>
+  <data name="ParameterMustNotBeByRefMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' parameter '{1}' must not be passed by reference.</value>
+  </data>
+  <data name="ParameterMustNotBeByRefTitle" xml:space="preserve">
+    <value>Patch method parameter must not be passed by reference</value>
+  </data>
+  <data name="PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' parameter '{1}' type '{2}' is not annotated with HarmonyDelegate.</value>
+  </data>
+  <data name="PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateTitle" xml:space="preserve">
+    <value>Patch method parameter type is not annotated with HarmonyDelegate</value>
+  </data>
+  <data name="PatchMethodParameterTypesMustBeCorrectExactMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' parameter '{1}' type. Valid types are: {2}.</value>
+  </data>
+  <data name="TargetMethodParameterWithSpecifiedIndexMustExistMessageFormat" xml:space="preserve">
+    <value>Target method '{0}' parameter with index {1} corresponding to patch method '{2}' parameter '{3}' does not exist.</value>
+  </data>
+  <data name="TargetMethodParameterWithSpecifiedIndexMustExistTitle" xml:space="preserve">
+    <value>Target method parameter with specified index does not exist</value>
+  </data>
+  <data name="TargetMethodParameterWithSpecifiedNameMustExistMessageFormat" xml:space="preserve">
+    <value>Target method '{0}' parameter with name '{1}' corresponding to patch method '{2}' parameter '{3}' does not exist.</value>
+  </data>
+  <data name="TargetMethodParameterWithSpecifiedNameMustExistTitle" xml:space="preserve">
+    <value>Target method parameter with specified name does not exist</value>
+  </data>
+  <data name="TargetTypeFieldWithSpecifiedIndexMustExistMessageFormat" xml:space="preserve">
+    <value>Target type '{0}' field with index {1} corresponding to patch method '{2}' parameter '{3}' does not exist.</value>
+  </data>
+  <data name="TargetTypeFieldWithSpecifiedIndexMustExistTitle" xml:space="preserve">
+    <value>Target type field with specified index does not exist</value>
+  </data>
+  <data name="TargetTypeFieldWithSpecifiedNameMustExistMessageFormat" xml:space="preserve">
+    <value>Target type '{0}' field with name '{1}' corresponding to patch method '{2}' parameter '{3}' does not exist.</value>
+  </data>
+  <data name="TargetTypeFieldWithSpecifiedNameMustExistTitle" xml:space="preserve">
+    <value>Target type field with specified name does not exist</value>
+  </data>
+  <data name="AllTargetMethodParametersMustBeIncludedMessageFormat" xml:space="preserve">
+    <value>Target method '{0}' parameter '{1}' does not have a corresponding patch method '{2}' parameter.</value>
+  </data>
+  <data name="AllTargetMethodParametersMustBeIncludedTitle" xml:space="preserve">
+    <value>Target method parameter does not have a corresponding patch method parameter</value>
+  </data>
+  <data name="InstanceParameterMustBePresentMessageFormat" xml:space="preserve">
+    <value>A parameter for target type '{0}' instance must be present as the first parameter of the patch method '{1}'.</value>
+  </data>
+  <data name="InstanceParameterMustBePresentTitle" xml:space="preserve">
+    <value>A parameter for target type instance must be present</value>
+  </data>
+  <data name="InstanceParameterMustNotBePresentMessageFormat" xml:space="preserve">
+    <value>A parameter for target type '{0}' instance must not be present as the first parameter of the patch method '{1}'.</value>
+  </data>
+  <data name="InstanceParameterMustNotBePresentTitle" xml:space="preserve">
+    <value>A parameter for target type instance must not be present</value>
+  </data>
+  <data name="PatchMethodParameterTypesMustBeCorrectWithSubtypesMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' parameter '{1}' type. Valid types are: {2} and their subtypes.</value>
+  </data>
+  <data name="PatchMethodReturnTypesMustBeCorrectExactMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' return type. Valid types are: {1}.</value>
+  </data>
+  <data name="PatchMethodReturnTypesMustBeCorrectWithSupertypesMessageFormat" xml:space="preserve">
+    <value>Incorrect patch method '{0}' return type. Valid types are: {1} and their supertypes.</value>
+  </data>
+  <data name="PatchMethodsMustNotReturnByRefMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' must not return by reference.</value>
+  </data>
+  <data name="PatchMethodsMustNotReturnByRefTitle" xml:space="preserve">
+    <value>Patch method must not return by reference</value>
+  </data>
+  <data name="ReversePatchMethodParameterMustCorrespondToTargetMethodParameterMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' parameter '{1}' does not correspond to a target method '{2}' parameter.</value>
+  </data>
+  <data name="ReversePatchMethodParameterMustCorrespondToTargetMethodParameterTitle" xml:space="preserve">
+    <value>Patch method parameter does not correspond to a target method parameter</value>
+  </data>
+  <data name="ReversePatchMethodParameterMustHaveCorrectRefKindMessageFormat" xml:space="preserve">
+    <value>Patch method '{0}' parameter '{1}' does not have the same reference kind as the target method '{2}' parameter. Expected: {3}.</value>
+  </data>
+  <data name="ReversePatchMethodParameterMustHaveCorrectRefKindTitle" xml:space="preserve">
+    <value>Patch method parameter does not have the same reference kind as the target method parameter</value>
+  </data>
+  <data name="StateShouldBeInitializedMessageFormat" xml:space="preserve">
+    <value>'__state' parameter is never assigned by reference. It will always have the default value.</value>
+  </data>
+  <data name="StateShouldBeInitializedTitle" xml:space="preserve">
+    <value>'__state' parameter is never assigned</value>
+  </data>
+  <data name="StateTypeMustNotDifferMessageFormat" xml:space="preserve">
+    <value>'__state' parameter type must not differ within same patch type.</value>
+  </data>
+  <data name="StateTypeMustNotDifferTitle" xml:space="preserve">
+    <value>'__state' parameter type must not differ</value>
   </data>
 </root>

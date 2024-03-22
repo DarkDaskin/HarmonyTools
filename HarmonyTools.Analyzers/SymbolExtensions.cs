@@ -21,7 +21,21 @@ internal static class SymbolExtensions
         {
             BaseTypeDeclarationSyntax typeDeclarationSyntax => typeDeclarationSyntax.Identifier.GetLocation(),
             MethodDeclarationSyntax methodDeclarationSyntax => methodDeclarationSyntax.Identifier.GetLocation(),
+            DelegateDeclarationSyntax delegateDeclarationSyntax => delegateDeclarationSyntax.Identifier.GetLocation(),
             PropertyDeclarationSyntax propertyDeclarationSyntax => propertyDeclarationSyntax.Identifier.GetLocation(),
+            ParameterSyntax parameterSyntax => parameterSyntax.Identifier.GetLocation(),
+            _ => null
+        };
+    }
+
+    public static Location? GetTypeLocation(this SyntaxNode? syntax)
+    {
+        return syntax switch
+        {
+            MethodDeclarationSyntax methodDeclarationSyntax => methodDeclarationSyntax.ReturnType.GetLocation(),
+            DelegateDeclarationSyntax delegateDeclarationSyntax => delegateDeclarationSyntax.ReturnType.GetLocation(),
+            PropertyDeclarationSyntax propertyDeclarationSyntax => propertyDeclarationSyntax.Type.GetLocation(),
+            ParameterSyntax parameterSyntax => parameterSyntax.Type?.GetLocation(),
             _ => null
         };
     }
@@ -49,16 +63,34 @@ internal static class SymbolExtensions
                 if (!includeNullability)
                     return true;
 
-                if (otherType is not INamedTypeSymbol { IsGenericType: true } && currentType.NullableAnnotation.Is(otherType.NullableAnnotation))
+                if (otherType is not (INamedTypeSymbol { IsGenericType: true } or IArrayTypeSymbol) && currentType.NullableAnnotation.Is(otherType.NullableAnnotation))
                     return true;
 
-                if (currentType is INamedTypeSymbol { IsGenericType: true } namedType &&
-                    otherType is INamedTypeSymbol { IsGenericType: true } otherNamedType &&
-                    namedType.Arity == otherNamedType.Arity &&
-                    namedType.TypeArguments.Zip(otherNamedType.TypeArguments,
-                            (typeArgument, otherTypeArgument) => typeArgument.NullableAnnotation.Is(otherTypeArgument.NullableAnnotation))
-                        .All(v => v))
-                    return true;
+                if (currentType is INamedTypeSymbol { IsGenericType: true } namedType)
+                {
+                    if (otherType is INamedTypeSymbol { IsGenericType: true } otherNamedType &&
+                        namedType.Arity == otherNamedType.Arity &&
+                        namedType.TypeArguments.Zip(otherNamedType.TypeArguments,
+                                (typeArgument, otherTypeArgument) =>
+                                    typeArgument.NullableAnnotation.Is(otherTypeArgument.NullableAnnotation))
+                            .All(v => v))
+                        return true;
+
+                    if (otherType is IArrayTypeSymbol otherArrayType &&
+                        namedType.Arity == 1 &&
+                        namedType.TypeArguments[0].NullableAnnotation.Is(otherArrayType.ElementNullableAnnotation))
+                        return true;
+                }
+                else if (currentType is IArrayTypeSymbol arrayType)
+                {
+                    if (otherType is INamedTypeSymbol { IsGenericType: true, Arity: 1 } otherNamedType &&
+                        arrayType.ElementNullableAnnotation.Is(otherNamedType.TypeArguments[0].NullableAnnotation))
+                        return true;
+
+                    if (otherType is IArrayTypeSymbol otherArrayType &&
+                        arrayType.ElementNullableAnnotation.Is(otherArrayType.ElementNullableAnnotation))
+                        return true;                    
+                }
             }
 
             if (exactlyEquals)
@@ -94,7 +126,7 @@ internal static class SymbolExtensions
             if (!type.NullableAnnotation.Is(otherType.NullableAnnotation))
                 return false;
 
-            if (otherType is INamedTypeSymbol { IsGenericType: true })
+            if (otherType is INamedTypeSymbol { IsGenericType: true } || otherType is IArrayTypeSymbol)
                 return type.Is(otherType, false, true);
         }
 
@@ -149,5 +181,19 @@ internal static class SymbolExtensions
         }
 
         return false;
+    }
+
+    public static IEnumerable<ISymbol> GetMembersIncludingBaseTypes(this ITypeSymbol type)
+    {
+        for (var currentType = type; currentType is not null; currentType = currentType.BaseType)
+            foreach (var member in currentType.GetMembers())
+                yield return member;
+    }
+
+    public static IEnumerable<ISymbol> GetMembersIncludingBaseTypes(this ITypeSymbol type, string name)
+    {
+        for (var currentType = type; currentType is not null; currentType = currentType.BaseType)
+            foreach (var member in currentType.GetMembers(name))
+                yield return member;
     }
 }

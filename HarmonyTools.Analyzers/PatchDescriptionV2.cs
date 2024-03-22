@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using HarmonyTools.Analyzers.HarmonyEnums;
 using Microsoft.CodeAnalysis;
 
 namespace HarmonyTools.Analyzers;
 
-internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescription(symbol)
+internal class PatchDescriptionV2(ISymbol symbol) : PatchDescription(symbol)
 {
     public override int HarmonyVersion => 2;
 
@@ -13,8 +12,8 @@ internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescripti
     public ImmutableArray<DetailWithSyntax<MethodDispatchType>> MethodDispatchTypes { get; private set; } = [];
     public DetailWithSyntax<string?>? PatchCategory { get; private set; }
 
-    public static HarmonyPatchDescriptionSet<HarmonyPatchDescriptionV2> Parse(INamedTypeSymbol type, WellKnownTypes wellKnownTypes) =>
-        Parse(type, wellKnownTypes, symbol => new HarmonyPatchDescriptionV2(symbol));
+    public static PatchDescriptionSet<PatchDescriptionV2> Parse(INamedTypeSymbol type, WellKnownTypes wellKnownTypes) =>
+        Parse(type, wellKnownTypes, symbol => new PatchDescriptionV2(symbol));
 
     protected override void ProcessAttribute(AttributeData attribute, WellKnownTypes wellKnownTypes)
     {
@@ -80,11 +79,11 @@ internal class HarmonyPatchDescriptionV2(ISymbol symbol) : HarmonyPatchDescripti
         }
     }
 
-    public override void Merge(HarmonyPatchDescription other)
+    public override void Merge(PatchDescription other)
     {
         base.Merge(other);
 
-        var otherV2 = (HarmonyPatchDescriptionV2)other;
+        var otherV2 = (PatchDescriptionV2)other;
         TargetTypeNames = UseFallback(TargetTypeNames, otherV2.TargetTypeNames);
         MethodDispatchTypes = UseFallback(MethodDispatchTypes, otherV2.MethodDispatchTypes);
         PatchCategory ??= otherV2.PatchCategory;

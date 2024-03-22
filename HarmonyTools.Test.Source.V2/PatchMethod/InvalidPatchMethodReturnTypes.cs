@@ -88,6 +88,14 @@ namespace HarmonyTools.Test.Source.V2.PatchMethod
     [HarmonyPatch(typeof(SimpleClass), nameof(SimpleClass.GetFile))]
     internal class InvalidPatchMethodReturnTypes4
     {
-        public static FileInfo ReversePatch() => throw new InvalidOperationException();
+        public static FileInfo ReversePatch(SimpleClass instance) => throw new InvalidOperationException();
     }
+
+    [HarmonyDelegate(typeof(SimpleClass), nameof(SimpleClass.SimpleMethod))]
+    internal delegate string InvalidDelegateReturnType(string question);
+
+#nullable enable
+    [HarmonyDelegate(typeof(ClassWithNullables), nameof(ClassWithNullables.Nullable))]
+    internal delegate string InvalidDelegateNullableReturnType(string? s);
+#nullable restore
 }

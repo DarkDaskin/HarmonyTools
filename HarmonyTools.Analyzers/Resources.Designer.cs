@@ -61,6 +61,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Target method &apos;{0}&apos; parameter &apos;{1}&apos; does not have a corresponding patch method &apos;{2}&apos; parameter..
+        /// </summary>
+        internal static string AllTargetMethodParametersMustBeIncludedMessageFormat {
+            get {
+                return ResourceManager.GetString("AllTargetMethodParametersMustBeIncludedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method parameter does not have a corresponding patch method parameter.
+        /// </summary>
+        internal static string AllTargetMethodParametersMustBeIncludedTitle {
+            get {
+                return ResourceManager.GetString("AllTargetMethodParametersMustBeIncludedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Duplicate argument name &apos;{0}&apos;..
         /// </summary>
         internal static string ArgumentNewNamesMustBeUniqueMessageFormat {
@@ -129,6 +147,78 @@ namespace HarmonyTools.Analyzers {
         internal static string AttributeArgumentsMustBeValidTitle {
             get {
                 return ResourceManager.GetString("AttributeArgumentsMustBeValidTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__instance&apos; parameter is used with static target method &apos;{0}&apos;. The parameter will be always null..
+        /// </summary>
+        internal static string DoNotUseInstanceParameterWithStaticMethodsMessageFormat {
+            get {
+                return ResourceManager.GetString("DoNotUseInstanceParameterWithStaticMethodsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__instance&apos; parameter is used with static target method.
+        /// </summary>
+        internal static string DoNotUseInstanceParameterWithStaticMethodsTitle {
+            get {
+                return ResourceManager.GetString("DoNotUseInstanceParameterWithStaticMethodsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__resultRef&apos; parameter is used with target method &apos;{0}&apos; which does not return by reference..
+        /// </summary>
+        internal static string DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat {
+            get {
+                return ResourceManager.GetString("DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__resultRef&apos; parameter is used with target method which does not return by reference.
+        /// </summary>
+        internal static string DoNotUseResultRefWithMethodsNotReturningByRefTitle {
+            get {
+                return ResourceManager.GetString("DoNotUseResultRefWithMethodsNotReturningByRefTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method &apos;{0}&apos; which returns by reference..
+        /// </summary>
+        internal static string DoNotUseResultWithMethodsReturningByRefMessageFormat {
+            get {
+                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningByRefMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method which returns by reference.
+        /// </summary>
+        internal static string DoNotUseResultWithMethodsReturningByRefTitle {
+            get {
+                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningByRefTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method &apos;{0}&apos; which returns &apos;void&apos;..
+        /// </summary>
+        internal static string DoNotUseResultWithMethodsReturningVoidMessageFormat {
+            get {
+                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningVoidMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method which returns &apos;void&apos;.
+        /// </summary>
+        internal static string DoNotUseResultWithMethodsReturningVoidTitle {
+            get {
+                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningVoidTitle", resourceCulture);
             }
         }
         
@@ -223,6 +313,96 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A parameter for target type &apos;{0}&apos; instance must be present as the first parameter of the patch method &apos;{1}&apos;..
+        /// </summary>
+        internal static string InstanceParameterMustBePresentMessageFormat {
+            get {
+                return ResourceManager.GetString("InstanceParameterMustBePresentMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A parameter for target type instance must be present.
+        /// </summary>
+        internal static string InstanceParameterMustBePresentTitle {
+            get {
+                return ResourceManager.GetString("InstanceParameterMustBePresentTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A parameter for target type &apos;{0}&apos; instance must not be present as the first parameter of the patch method &apos;{1}&apos;..
+        /// </summary>
+        internal static string InstanceParameterMustNotBePresentMessageFormat {
+            get {
+                return ResourceManager.GetString("InstanceParameterMustNotBePresentMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A parameter for target type instance must not be present.
+        /// </summary>
+        internal static string InstanceParameterMustNotBePresentTitle {
+            get {
+                return ResourceManager.GetString("InstanceParameterMustNotBePresentTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; parameter &apos;{1}&apos; must be passed by reference..
+        /// </summary>
+        internal static string ParameterMustBeByRefMessageFormat {
+            get {
+                return ResourceManager.GetString("ParameterMustBeByRefMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method parameter must be passed by reference.
+        /// </summary>
+        internal static string ParameterMustBeByRefTitle {
+            get {
+                return ResourceManager.GetString("ParameterMustBeByRefTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; parameter &apos;{1}&apos; must not be passed by reference..
+        /// </summary>
+        internal static string ParameterMustNotBeByRefMessageFormat {
+            get {
+                return ResourceManager.GetString("ParameterMustNotBeByRefMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method parameter must not be passed by reference.
+        /// </summary>
+        internal static string ParameterMustNotBeByRefTitle {
+            get {
+                return ResourceManager.GetString("ParameterMustNotBeByRefTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; parameter &apos;{1}&apos; type &apos;{2}&apos; is not annotated with HarmonyDelegate..
+        /// </summary>
+        internal static string PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method parameter type is not annotated with HarmonyDelegate.
+        /// </summary>
+        internal static string PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple method kinds are assigned to the patch method. Only one method kind will be recognized..
         /// </summary>
         internal static string PatchMethodMustHaveSingleKindMessageFormat {
@@ -241,11 +421,65 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; parameter &apos;{1}&apos; is not a recognized injection..
+        /// </summary>
+        internal static string PatchMethodParametersMustBeValidInjectionsMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodParametersMustBeValidInjectionsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method parameter is not a recognized injection.
+        /// </summary>
+        internal static string PatchMethodParametersMustBeValidInjectionsTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodParametersMustBeValidInjectionsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; parameter &apos;{1}&apos; type. Valid types are: {2}..
+        /// </summary>
+        internal static string PatchMethodParameterTypesMustBeCorrectExactMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodParameterTypesMustBeCorrectExactMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method parameter type.
+        /// </summary>
+        internal static string PatchMethodParameterTypesMustBeCorrectTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodParameterTypesMustBeCorrectTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; parameter &apos;{1}&apos; type. Valid types are: {2} and their subtypes..
+        /// </summary>
+        internal static string PatchMethodParameterTypesMustBeCorrectWithSubtypesMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodParameterTypesMustBeCorrectWithSubtypesMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; parameter &apos;{1}&apos; type. Valid types are: {2} and their supertypes..
+        /// </summary>
+        internal static string PatchMethodParameterTypesMustBeCorrectWithSupertypesMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodParameterTypesMustBeCorrectWithSupertypesMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; return type. Valid types are: {1}..
         /// </summary>
-        internal static string PatchMethodReturnTypesMustBeCorrectMessageFormat {
+        internal static string PatchMethodReturnTypesMustBeCorrectExactMessageFormat {
             get {
-                return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectMessageFormat", resourceCulture);
+                return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectExactMessageFormat", resourceCulture);
             }
         }
         
@@ -255,6 +489,24 @@ namespace HarmonyTools.Analyzers {
         internal static string PatchMethodReturnTypesMustBeCorrectTitle {
             get {
                 return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; return type. Valid types are: {1} and their subtypes..
+        /// </summary>
+        internal static string PatchMethodReturnTypesMustBeCorrectWithSubtypesMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectWithSubtypesMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect patch method &apos;{0}&apos; return type. Valid types are: {1} and their supertypes..
+        /// </summary>
+        internal static string PatchMethodReturnTypesMustBeCorrectWithSupertypesMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodReturnTypesMustBeCorrectWithSupertypesMessageFormat", resourceCulture);
             }
         }
         
@@ -295,6 +547,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; must not return by reference..
+        /// </summary>
+        internal static string PatchMethodsMustNotReturnByRefMessageFormat {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustNotReturnByRefMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method must not return by reference.
+        /// </summary>
+        internal static string PatchMethodsMustNotReturnByRefTitle {
+            get {
+                return ResourceManager.GetString("PatchMethodsMustNotReturnByRefTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Patch type is generic. Only non-generic types are allowed..
         /// </summary>
         internal static string PatchTypeMustNotBeGenericMessageFormat {
@@ -309,6 +579,78 @@ namespace HarmonyTools.Analyzers {
         internal static string PatchTypeMustNotBeGenericTitle {
             get {
                 return ResourceManager.GetString("PatchTypeMustNotBeGenericTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; parameter &apos;{1}&apos; does not correspond to a target method &apos;{2}&apos; parameter..
+        /// </summary>
+        internal static string ReversePatchMethodParameterMustCorrespondToTargetMethodParameterMessageFormat {
+            get {
+                return ResourceManager.GetString("ReversePatchMethodParameterMustCorrespondToTargetMethodParameterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method parameter does not correspond to a target method parameter.
+        /// </summary>
+        internal static string ReversePatchMethodParameterMustCorrespondToTargetMethodParameterTitle {
+            get {
+                return ResourceManager.GetString("ReversePatchMethodParameterMustCorrespondToTargetMethodParameterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method &apos;{0}&apos; parameter &apos;{1}&apos; does not have the same reference kind as the target method &apos;{2}&apos; parameter. Expected: {3}..
+        /// </summary>
+        internal static string ReversePatchMethodParameterMustHaveCorrectRefKindMessageFormat {
+            get {
+                return ResourceManager.GetString("ReversePatchMethodParameterMustHaveCorrectRefKindMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patch method parameter does not have the same reference kind as the target method parameter.
+        /// </summary>
+        internal static string ReversePatchMethodParameterMustHaveCorrectRefKindTitle {
+            get {
+                return ResourceManager.GetString("ReversePatchMethodParameterMustHaveCorrectRefKindTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__state&apos; parameter is never assigned by reference. It will always have the default value..
+        /// </summary>
+        internal static string StateShouldBeInitializedMessageFormat {
+            get {
+                return ResourceManager.GetString("StateShouldBeInitializedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__state&apos; parameter is never assigned.
+        /// </summary>
+        internal static string StateShouldBeInitializedTitle {
+            get {
+                return ResourceManager.GetString("StateShouldBeInitializedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__state&apos; parameter type must not differ within same patch type..
+        /// </summary>
+        internal static string StateTypeMustNotDifferMessageFormat {
+            get {
+                return ResourceManager.GetString("StateTypeMustNotDifferMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;__state&apos; parameter type must not differ.
+        /// </summary>
+        internal static string StateTypeMustNotDifferTitle {
+            get {
+                return ResourceManager.GetString("StateTypeMustNotDifferTitle", resourceCulture);
             }
         }
         
@@ -399,6 +741,78 @@ namespace HarmonyTools.Analyzers {
         internal static string TargetMethodMustNotBeOverspecifiedTitle {
             get {
                 return ResourceManager.GetString("TargetMethodMustNotBeOverspecifiedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method &apos;{0}&apos; parameter with index {1} corresponding to patch method &apos;{2}&apos; parameter &apos;{3}&apos; does not exist..
+        /// </summary>
+        internal static string TargetMethodParameterWithSpecifiedIndexMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodParameterWithSpecifiedIndexMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method parameter with specified index does not exist.
+        /// </summary>
+        internal static string TargetMethodParameterWithSpecifiedIndexMustExistTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodParameterWithSpecifiedIndexMustExistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method &apos;{0}&apos; parameter with name &apos;{1}&apos; corresponding to patch method &apos;{2}&apos; parameter &apos;{3}&apos; does not exist..
+        /// </summary>
+        internal static string TargetMethodParameterWithSpecifiedNameMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetMethodParameterWithSpecifiedNameMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target method parameter with specified name does not exist.
+        /// </summary>
+        internal static string TargetMethodParameterWithSpecifiedNameMustExistTitle {
+            get {
+                return ResourceManager.GetString("TargetMethodParameterWithSpecifiedNameMustExistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type &apos;{0}&apos; field with index {1} corresponding to patch method &apos;{2}&apos; parameter &apos;{3}&apos; does not exist..
+        /// </summary>
+        internal static string TargetTypeFieldWithSpecifiedIndexMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetTypeFieldWithSpecifiedIndexMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type field with specified index does not exist.
+        /// </summary>
+        internal static string TargetTypeFieldWithSpecifiedIndexMustExistTitle {
+            get {
+                return ResourceManager.GetString("TargetTypeFieldWithSpecifiedIndexMustExistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type &apos;{0}&apos; field with name &apos;{1}&apos; corresponding to patch method &apos;{2}&apos; parameter &apos;{3}&apos; does not exist..
+        /// </summary>
+        internal static string TargetTypeFieldWithSpecifiedNameMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("TargetTypeFieldWithSpecifiedNameMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target type field with specified name does not exist.
+        /// </summary>
+        internal static string TargetTypeFieldWithSpecifiedNameMustExistTitle {
+            get {
+                return ResourceManager.GetString("TargetTypeFieldWithSpecifiedNameMustExistTitle", resourceCulture);
             }
         }
         

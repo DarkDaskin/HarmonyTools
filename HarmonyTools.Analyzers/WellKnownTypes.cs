@@ -7,6 +7,8 @@ internal class WellKnownTypes
     public const string Harmony1Namespace = "Harmony";
     public const string Harmony2Namespace = "HarmonyLib";
 
+    public readonly ITypeSymbol Object;
+    public readonly ITypeSymbol ArrayOfObject;
     public readonly ITypeSymbol Void;
     public readonly ITypeSymbol Boolean;
     public readonly ITypeSymbol Int32;
@@ -14,8 +16,11 @@ internal class WellKnownTypes
     public readonly ITypeSymbol Type;
     public readonly ITypeSymbol ArrayOfType;
     public readonly ITypeSymbol Exception;
+    public readonly ITypeSymbol Delegate;
     public readonly ITypeSymbol MethodBase;
     public readonly ITypeSymbol EnumerableOfMethodBase;
+    // ReSharper disable once InconsistentNaming
+    public readonly ITypeSymbol ILGenerator;
     public readonly ITypeSymbol? HarmonyAttribute;
     public readonly ITypeSymbol? HarmonyPatch;
     public readonly ITypeSymbol? HarmonyPatchAll;
@@ -42,9 +47,14 @@ internal class WellKnownTypes
     public readonly ITypeSymbol? MethodDispatchType;
     public readonly ITypeSymbol? CodeInstruction;
     public readonly ITypeSymbol? EnumerableOfCodeInstruction;
+    public readonly ITypeSymbol? HarmonyInstance;
+    public readonly INamedTypeSymbol? RefResultOfT;
 
     public WellKnownTypes(Compilation compilation, string harmonyNamespace)
     {
+        Object = compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.Annotated);
+        ArrayOfObject = compilation.CreateArrayTypeSymbol(Object, elementNullableAnnotation: NullableAnnotation.Annotated)
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         Void = compilation.GetSpecialType(SpecialType.System_Void);
         Boolean = compilation.GetSpecialType(SpecialType.System_Boolean);
         Int32 = compilation.GetSpecialType(SpecialType.System_Int32);
@@ -56,10 +66,14 @@ internal class WellKnownTypes
             .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         Exception = compilation.GetTypeByMetadataName("System.Exception")!
             .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        Delegate = compilation.GetTypeByMetadataName("System.Delegate")!
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         MethodBase = compilation.GetTypeByMetadataName("System.Reflection.MethodBase")!
             .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         EnumerableOfMethodBase = compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T)
             .Construct(MethodBase).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        ILGenerator = compilation.GetTypeByMetadataName("System.Reflection.Emit.ILGenerator")!
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         HarmonyAttribute = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyAttribute");
         HarmonyPatch = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatch");
         HarmonyPatchAll = compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatchAll");
@@ -86,11 +100,17 @@ internal class WellKnownTypes
         PropertyMethod = compilation.GetTypeByMetadataName($"{harmonyNamespace}.PropertyMethod");
         MethodDispatchType = compilation.GetTypeByMetadataName($"{harmonyNamespace}.MethodDispatchType");
         CodeInstruction = compilation.GetTypeByMetadataName($"{harmonyNamespace}.CodeInstruction")?
-            .WithNullableAnnotation(NullableAnnotation.NotAnnotated); ;
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated); 
         EnumerableOfCodeInstruction = CodeInstruction == null
             ? null
             : compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T).Construct(CodeInstruction)
                 .WithNullableAnnotation(NullableAnnotation.NotAnnotated); ;
+        HarmonyInstance = (harmonyNamespace == Harmony2Namespace
+            ? compilation.GetTypeByMetadataName($"{harmonyNamespace}.Harmony")
+            : compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyInstance"))?
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        RefResultOfT = (INamedTypeSymbol?)compilation.GetTypeByMetadataName($"{harmonyNamespace}.RefResult`1")?
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
     }
 
     public static bool IsHarmonyLoaded(Compilation compilation, string harmonyNamespace) =>
