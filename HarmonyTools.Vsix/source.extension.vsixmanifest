@@ -3,7 +3,10 @@
   <Metadata>
     <Identity Id="HarmonyTools.8a77c0eb-71a9-4829-823b-3cfdef233438" Version="|%CurrentProject%;GetBuildVersion|" Language="en-US" Publisher="Dark Daskin"/>
     <DisplayName>Harmony Tools</DisplayName>
-    <Description xml:space="preserve">This is a sample diagnostic extension for the .NET Compiler Platform ("Roslyn").</Description>
+    <Description xml:space="preserve">Roslyn analyzers for Harmony library users.</Description>
+    <MoreInfo>https://github.com/DarkDaskin/HarmonyTools</MoreInfo>
+    <Icon>HarmonyTools.png</Icon>
+    <Tags>Harmony, analyzers</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />

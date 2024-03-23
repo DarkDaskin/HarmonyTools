@@ -17,7 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HarmonyTools.Test.Source.V1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HarmonyTools.Test.Source.V2", "HarmonyTools.Test.Source.V2\HarmonyTools.Test.Source.V2.csproj", "{061308A2-3384-46CC-A7D9-0FDAC70A8731}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarmonyTools.Test.PatchBase", "HarmonyTools.Test.PatchBase\HarmonyTools.Test.PatchBase.csproj", "{A8C619F6-4601-44A4-A591-F0A205E29A06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HarmonyTools.Test.PatchBase", "HarmonyTools.Test.PatchBase\HarmonyTools.Test.PatchBase.csproj", "{A8C619F6-4601-44A4-A591-F0A205E29A06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{12C22B65-3D5C-48B9-B4DF-28BC5C8D43C3}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

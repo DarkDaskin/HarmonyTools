@@ -8,18 +8,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>HarmonyTools</PackageId>
-    <PackageVersion>1.0.0.0</PackageVersion>
-    <Authors>DarkDaskin</Authors>
-    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <PackageId>HarmonyTools.Analyzers</PackageId>
+    <Authors>Dark Daskin</Authors>
+    <PackageLicenseUrl>https://github.com/DarkDaskin/HarmonyTools/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/DarkDaskin/HarmonyTools</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/DarkDaskin/HarmonyTools/blob/master/HarmonyTools.png</PackageIconUrl>
+    <PackageIcon>HarmonyTools.png</PackageIcon>
+    <RepositoryUrl>https://github.com/DarkDaskin/HarmonyTools</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>HarmonyTools</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
-    <PackageTags>HarmonyTools, analyzers</PackageTags>
+    <Description>Roslyn analyzers for Harmony library users.</Description>
+    <PackageTags>Harmony, analyzers</PackageTags>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
@@ -27,11 +25,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="IndexRange" Version="1.0.3" PrivateAssets="all" IncludeInPackage="true" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\HarmonyTools.CodeFixes\HarmonyTools.CodeFixes.csproj" />
     <ProjectReference Include="..\HarmonyTools.Analyzers\HarmonyTools.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\HarmonyTools.png" Pack="true" PackagePath="" />
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
   </ItemGroup>
 
@@ -39,6 +42,34 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\HarmonyTools.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\HarmonyTools.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
+
+  <!-- 👇 Add a new target that runs before the task that lists all the files to include in the NuGet package.
+          This task must run after the packages resolution target -->
+  <Target Name="AddNuGetDlls" BeforeTargets="_GetPackageFiles">
+    <!-- Merge the collection of PackageReference and Assemblies using the NuGetPackageId key.
+         This produces a new list containing the DLL path and the "IncludeInPackage" metadata -->
+    <JoinItems Left="@(ResolvedCompileFileDefinitions)" LeftKey="NuGetPackageId" LeftMetadata="*"
+               Right="@(PackageReference)" RightKey="" RightMetadata="*"
+               ItemSpecToUse="Left">
+      <Output TaskParameter="JoinResult" ItemName="_PackagesToPack" />
+    </JoinItems>
+
+    <ItemGroup>
+      <!-- Remove NETStandard DLLs -->
+      <_PackagesToPack Remove="@(_PackagesToPack)" Condition="%(NuGetPackageId) == 'NETStandard.Library'" />
+      <_PackagesToPack Remove="@(_PackagesToPack)" Condition="%(_PackagesToPack.IncludeInPackage) != 'true'" />
+    </ItemGroup>
+
+    <Message Importance="High" Text="Adding DLLs from the following packages: @(_PackagesToPack->'%(NuGetPackageId)')" />
+
+    <ItemGroup>
+      <!-- Update the collection of items to pack with the DLLs from the NuGet packages -->
+      <None Include="@(_PackagesToPack)"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
     </ItemGroup>
   </Target>
 
