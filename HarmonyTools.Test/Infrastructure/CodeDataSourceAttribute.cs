@@ -17,7 +17,7 @@ namespace HarmonyTools.Test.Infrastructure;
 public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
 {
     private static readonly int[] Versions = [1, 2];
-    private static readonly string BasePath = @"..\..\..\..\HarmonyTools.Test.Source";
+    private static readonly string BasePath = @"..\..\..\..\HarmonyTools.Test.Source".Replace('\\', PathIO.DirectorySeparatorChar);
     private static readonly Dictionary<int, ReferenceAssemblies> ReferenceAssembliesPerVersion = new();
 
     public string Path { get; } = path;
@@ -73,9 +73,9 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
         var basePathWithVersion = $"{BasePath}.V{version}";
         var directoryAttribute = methodInfo.GetCustomAttribute<CodeDirectoryAttribute>() ??
                                  methodInfo.DeclaringType?.GetCustomAttribute<CodeDirectoryAttribute>();
-        return directoryAttribute is not null ?
-            PathIO.Combine(basePathWithVersion, directoryAttribute.Directory, path) :
-            PathIO.Combine(basePathWithVersion, path);
+        return directoryAttribute is not null
+            ? PathIO.Combine(basePathWithVersion, directoryAttribute.Directory.Replace('\\', PathIO.DirectorySeparatorChar), path)
+            : PathIO.Combine(basePathWithVersion, path);
     }
 
     public string GetDisplayName(MethodInfo methodInfo, object?[]? data) => $"{methodInfo.Name} ({Path}, v{GetVersion(data!)})";
