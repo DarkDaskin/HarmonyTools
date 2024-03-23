@@ -24,11 +24,11 @@ jobs:
         dotnet-version: 8.0.x
     - uses: microsoft/setup-msbuild@v2
     - name: Restore dependencies
-      run: msbuild /t:Restore
+      run: msbuild /p:Configuration=Release /t:Restore
     - name: Build
       run: msbuild /p:Configuration=Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test -c Release --no-build --verbosity normal
     - name: Upload NuGet artifacts
       uses: actions/upload-artifact@v4.3.1
       with:
