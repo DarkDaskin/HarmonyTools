@@ -41,7 +41,16 @@ public class CodeDataSourceAttribute(string path) : Attribute, ITestDataSource
     private static ReferenceAssemblies GetReferenceAssemblies(int version)
     {
         var projectFilePath = PathIO.Combine($"{BasePath}.V{version}", $"HarmonyTools.Test.Source.V{version}.csproj");
-        using var workspace = MSBuildWorkspace.Create();
+        var properties = new Dictionary<string, string>()
+        {
+#if DEBUG
+            ["Configuration"] = "Debug"
+
+#else
+            ["Configuration"] = "Release"
+#endif
+        };
+        using var workspace = MSBuildWorkspace.Create(properties);
         workspace.LoadMetadataForReferencedProjects = true;
         var project = workspace.OpenProjectAsync(projectFilePath).Result;
 
