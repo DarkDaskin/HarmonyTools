@@ -22,45 +22,45 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
         if (!Debugger.IsAttached)
             context.EnableConcurrentExecution();
 
-        context.RegisterCompilationStartAction(RegisterActionsWithFullMetadata);
-        context.RegisterCompilationAction(RunAnalyzerWithFullMetadata);
+        context.RegisterCompilationStartAction(OnCompilationStart);
     }
 
-    private static void RegisterActionsWithFullMetadata(CompilationStartAnalysisContext context)
+    private static void OnCompilationStart(CompilationStartAnalysisContext context)
     {
-        if (context.Compilation.Options.MetadataImportOptions != MetadataImportOptions.All) 
+        if (!WellKnownTypes.IsHarmonyLoaded(context.Compilation))
             return;
+
+        var fullMetadataCompilation = context.Compilation.Options.MetadataImportOptions != MetadataImportOptions.All
+            ? context.Compilation.WithOptions(context.Compilation.Options.WithMetadataImportOptions(MetadataImportOptions.All))
+            : context.Compilation;
 
         if (WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony1Namespace))
-            context.RegisterSymbolAction(symbolContext => new VerifierV1(symbolContext).Verify(), SymbolKind.NamedType);
+            context.RegisterSymbolAction(symbolContext => new VerifierV1(symbolContext, fullMetadataCompilation).Verify(), SymbolKind.NamedType);
         if (WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony2Namespace))
-            context.RegisterSymbolAction(symbolContext => new VerifierV2(symbolContext).Verify(), SymbolKind.NamedType);
+            context.RegisterSymbolAction(symbolContext => new VerifierV2(symbolContext, fullMetadataCompilation).Verify(), SymbolKind.NamedType);
     }
 
-    private void RunAnalyzerWithFullMetadata(CompilationAnalysisContext context)
-    {
-        if (context.Compilation.Options.MetadataImportOptions == MetadataImportOptions.All)
-            return;
-
-        if (!WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony1Namespace) &&
-            !WellKnownTypes.IsHarmonyLoaded(context.Compilation, WellKnownTypes.Harmony2Namespace))
-            return;
-
-        var compilation = context.Compilation.WithOptions(context.Compilation.Options.WithMetadataImportOptions(MetadataImportOptions.All));
-        var compilationWithAnalyzer = new CompilationWithAnalyzers(compilation, [this], context.Options);
-        var diagnostics = compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(context.CancellationToken).Result;
-        foreach (var disgnostic in diagnostics)
-            context.ReportDiagnostic(disgnostic);
-    }
     
 
-    private abstract class Verifier<TPatchDescription>(SymbolAnalysisContext context, string harmonyNamespace)
-        where TPatchDescription : PatchDescription
+    private abstract class Verifier<TPatchDescription> where TPatchDescription : PatchDescription
     {
-        protected readonly SymbolAnalysisContext Context = context;
-        protected readonly INamedTypeSymbol PatchType = (INamedTypeSymbol)context.Symbol;
-        protected readonly WellKnownTypes WellKnownTypes = new(context.Compilation, harmonyNamespace);
-        
+        protected readonly SymbolAnalysisContext Context;
+        protected readonly INamedTypeSymbol PatchType;
+        protected readonly Compilation Compilation;
+        protected readonly WellKnownTypes WellKnownTypes;
+
+        private readonly string _harmonyNamespace;
+
+        protected Verifier(SymbolAnalysisContext context, Compilation fullMetadataCompilation, string harmonyNamespace)
+        {
+            _harmonyNamespace = harmonyNamespace;
+            Context = context;
+            var patchTypeFromOriginalCompilation = (INamedTypeSymbol)context.Symbol;
+            PatchType = fullMetadataCompilation.GetTypeByMetadataName(patchTypeFromOriginalCompilation.GetFullMetadataName())!;
+            Compilation = fullMetadataCompilation;
+            WellKnownTypes = new WellKnownTypes(fullMetadataCompilation, harmonyNamespace);
+        }
+
         public abstract void Verify();
 
         protected void VerifyCore(PatchDescriptionSet<TPatchDescription> set)
@@ -128,7 +128,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         protected virtual void PatchMethodChecks(PatchMethod<TPatchDescription> patchMethod)
         {
-            patchMethod.UpdateParameters(WellKnownTypes, Context.Compilation);
+            patchMethod.UpdateParameters(WellKnownTypes, Compilation);
 
             CheckDontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods(patchMethod);
             CheckPatchMethodsMustBeStatic(patchMethod);
@@ -368,7 +368,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 if (methodType is MethodType.Getter or MethodType.Setter && isMemberNameSpecified && argumentTypes.Length > 0)
                     return;
 
-                targetMethods = targetMethods.Where(method => IsMatch(method, argumentTypes, argumentVariations, Context.Compilation, methodType == MethodType.Setter));
+                targetMethods = targetMethods.Where(method => IsMatch(method, argumentTypes, argumentVariations, Compilation, methodType == MethodType.Setter));
             }
 
             var targetMethodsArray = targetMethods.ToArray();
@@ -480,7 +480,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 select (patchMethod, syntax)).FirstOrDefault();
             if (patchMethodWithAttributeSyntax.patchMethod is not null)
             {
-                var properties = ImmutableDictionary.Create<string, string?>().Add(HarmonyNamespaceKey, harmonyNamespace);
+                var properties = ImmutableDictionary.Create<string, string?>().Add(HarmonyNamespaceKey, _harmonyNamespace);
                 Context.ReportDiagnostic(Diagnostic.Create(HarmonyPatchAttributeMustBeOnTypeRule,
                     patchMethodWithAttributeSyntax.patchMethod.Method.ContainingType
                         .GetSyntax(patchMethodWithAttributeSyntax.syntax, Context.CancellationToken)?.GetIdentifierLocation(), properties));
@@ -595,7 +595,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
             var targetMethodReturnType = patchMethod.TargetMethod?.ReturnType;
 
-            var isInNullableContext = patchMethod.Method.IsInNullableContext(Context.Compilation);
+            var isInNullableContext = patchMethod.Method.IsInNullableContext(Compilation);
 
             ITypeSymbol[] validReturnTypes = [];
             var matchTypeInReverse = false;
@@ -625,7 +625,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             else if (patchMethod.Is(PatchMethodKind.ReversePatch) || patchMethod.Is(PatchMethodKind.DelegateInvoke))
             {
                 if (patchMethod.TargetMethod is not null && 
-                    !patchMethod.ContainsTranspiler(WellKnownTypes, Context.Compilation, Context.CancellationToken))
+                    !patchMethod.ContainsTranspiler(WellKnownTypes, Compilation, Context.CancellationToken))
                 {
                     validReturnTypes = [targetMethodReturnType!];
                     matchTypeInReverse = true;
@@ -651,8 +651,8 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             foreach (var type in validReturnTypes)
             {
                 if (matchTypeInReverse
-                        ? type.Is(patchMethod.Method.ReturnType, Context.Compilation, typeExactlyEquals, isInNullableContext)
-                        : patchMethod.Method.ReturnType.Is(type, Context.Compilation, typeExactlyEquals, isInNullableContext))
+                        ? type.Is(patchMethod.Method.ReturnType, Compilation, typeExactlyEquals, isInNullableContext)
+                        : patchMethod.Method.ReturnType.Is(type, Compilation, typeExactlyEquals, isInNullableContext))
                     return;
             }
 
@@ -678,7 +678,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
 
         private void CheckPatchMethodParameters(PatchMethod patchMethod)
         {
-            var isInNullableContext = patchMethod.Method.IsInNullableContext(Context.Compilation);
+            var isInNullableContext = patchMethod.Method.IsInNullableContext(Compilation);
 
             if (patchMethod.Is(PatchMethodKind.ReversePatch) || patchMethod.Is(PatchMethodKind.DelegateInvoke))
             {
@@ -946,7 +946,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             bool includeNullability, bool allowObject = true)
         {
             var exactlyEquals = expectedType.IsValueType || parameter.Parameter.RefKind is RefKind.Ref or RefKind.Out;
-            if (!expectedType.IsValueType && expectedType.Is(parameter.Parameter.Type, Context.Compilation, exactlyEquals, includeNullability)) 
+            if (!expectedType.IsValueType && expectedType.Is(parameter.Parameter.Type, Compilation, exactlyEquals, includeNullability)) 
                 return;
             if (expectedType.IsValueType && (parameter.Parameter.Type.Is(expectedType, true) ||
                                              allowObject && parameter.Parameter.Type.Is(WellKnownTypes.Object, true)))
@@ -969,7 +969,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             bool includeNullability)
         {
             var exactlyEquals = parameter.Parameter.RefKind is RefKind.Ref or RefKind.Out;
-            if (parameter.Parameter.Type.Is(expectedType, Context.Compilation, exactlyEquals, includeNullability))
+            if (parameter.Parameter.Type.Is(expectedType, Compilation, exactlyEquals, includeNullability))
                 return;
 
             var rule = exactlyEquals
@@ -1102,18 +1102,20 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
 
             if (type is IArrayTypeSymbol { LowerBounds.IsDefaultOrEmpty: true } arrayType)
-                return Context.Compilation.CreateArrayTypeSymbol(StripNullableAnnotations(arrayType.ElementType), arrayType.Rank, NullableAnnotation.None);
+                return Compilation.CreateArrayTypeSymbol(StripNullableAnnotations(arrayType.ElementType), arrayType.Rank, NullableAnnotation.None);
 
             return type;
         }
     }
 
-    private sealed class VerifierV1(SymbolAnalysisContext context) : Verifier<PatchDescriptionV1>(context, WellKnownTypes.Harmony1Namespace)
+    private sealed class VerifierV1(SymbolAnalysisContext context, Compilation fullMetadataCompilation)
+        : Verifier<PatchDescriptionV1>(context, fullMetadataCompilation, WellKnownTypes.Harmony1Namespace)
     {
         public override void Verify() => VerifyCore(PatchDescriptionV1.Parse(PatchType, WellKnownTypes));
     }
 
-    private sealed class VerifierV2(SymbolAnalysisContext context) : Verifier<PatchDescriptionV2>(context, WellKnownTypes.Harmony2Namespace)
+    private sealed class VerifierV2(SymbolAnalysisContext context, Compilation fullMetadataCompilation)
+        : Verifier<PatchDescriptionV2>(context, fullMetadataCompilation, WellKnownTypes.Harmony2Namespace)
     {
         public override void Verify() => VerifyCore(PatchDescriptionV2.Parse(PatchType, WellKnownTypes));
 
@@ -1151,7 +1153,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 return;
 
             var targetTypeName = patchDescription.TargetTypeNames[0].Value!;
-            var targetType = Context.Compilation.GetTypeByMetadataName(targetTypeName);
+            var targetType = Compilation.GetTypeByMetadataName(targetTypeName);
             if (targetType is not null)
                 CheckMethodMustExistAndNotAmbiguous(patchDescription, targetType);
         }
@@ -1162,7 +1164,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 return;
 
             var targetTypeName = patchDescription.TargetTypeNames[0].Value!;
-            var targetType = Context.Compilation.GetTypeByMetadataName(targetTypeName);
+            var targetType = Compilation.GetTypeByMetadataName(targetTypeName);
             if (targetType is null)
                 Context.ReportDiagnostic(Diagnostic.Create(TargetTypeMustExistRule,
                     patchDescription.GetLocation(IsHarmonyPatchAttribute), patchDescription.GetAdditionalLocations(IsHarmonyPatchAttribute),

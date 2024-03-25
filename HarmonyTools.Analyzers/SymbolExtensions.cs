@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -195,5 +196,43 @@ internal static class SymbolExtensions
         for (var currentType = type; currentType is not null; currentType = currentType.BaseType)
             foreach (var member in currentType.GetMembers(name))
                 yield return member;
+    }
+
+    private static readonly SymbolDisplayFormat SimpleQualifiedDisplayFormat = new(
+        SymbolDisplayGlobalNamespaceStyle.Omitted,
+        SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+        miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable);
+
+    public static string GetFullMetadataName(this INamedTypeSymbol type)
+    {
+        var builder = new StringBuilder();
+        var previous = default(SymbolDisplayPart);
+        foreach (var part in type.ToDisplayParts(SimpleQualifiedDisplayFormat))
+        {
+            switch (part.Kind)
+            {
+                case SymbolDisplayPartKind.ClassName:
+                case SymbolDisplayPartKind.InterfaceName:
+                case SymbolDisplayPartKind.StructName:
+                case SymbolDisplayPartKind.NamespaceName:
+                case SymbolDisplayPartKind.DelegateName:
+                    if (part.Symbol is { } symbol)
+                        builder.Append(symbol.MetadataName);
+                    else
+                        throw new InvalidOperationException($"Part symbol is null {part}.");
+                    break;
+
+                case SymbolDisplayPartKind.Punctuation when part.ToString() == ".":
+                    builder.Append(previous.Symbol is null || previous.Symbol.Kind == SymbolKind.Namespace ? "." : "+");
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Not handling member {part.Kind}.");
+            }
+
+            if (part.Symbol is not null) 
+                previous = part;
+        }
+        return builder.ToString();
     }
 }

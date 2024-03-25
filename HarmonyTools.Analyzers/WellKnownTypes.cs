@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace HarmonyTools.Analyzers;
 
@@ -6,6 +7,8 @@ internal class WellKnownTypes
 {
     public const string Harmony1Namespace = "Harmony";
     public const string Harmony2Namespace = "HarmonyLib";
+
+    private static string[] _allHarmonyNamespaces = [Harmony1Namespace, Harmony2Namespace];
 
     public readonly ITypeSymbol Object;
     public readonly ITypeSymbol ArrayOfObject;
@@ -112,6 +115,9 @@ internal class WellKnownTypes
         RefResultOfT = (INamedTypeSymbol?)compilation.GetTypeByMetadataName($"{harmonyNamespace}.RefResult`1")?
             .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
     }
+
+    public static bool IsHarmonyLoaded(Compilation compilation) =>
+        _allHarmonyNamespaces.Any(harmonyNamespace => IsHarmonyLoaded(compilation, harmonyNamespace));
 
     public static bool IsHarmonyLoaded(Compilation compilation, string harmonyNamespace) =>
         compilation.GetTypeByMetadataName($"{harmonyNamespace}.HarmonyPatch") is not null;
