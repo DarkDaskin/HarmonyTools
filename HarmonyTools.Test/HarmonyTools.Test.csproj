@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.9.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.9.2" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.Analyzers" Version="3.2.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.2.2" />
@@ -29,6 +29,10 @@
     <ProjectReference Include="..\HarmonyTools.CodeFixes\HarmonyTools.CodeFixes.csproj" />
     <ProjectReference Include="..\HarmonyTools.Analyzers\HarmonyTools.Analyzers.csproj" />
     <ProjectReference Include="..\HarmonyTools.Test.PatchBase\HarmonyTools.Test.PatchBase.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="$(PKGMicrosoft_CodeAnalysis_Workspaces_MSBuild)\**\*" Visible="false" />
   </ItemGroup>
 
 </Project>
