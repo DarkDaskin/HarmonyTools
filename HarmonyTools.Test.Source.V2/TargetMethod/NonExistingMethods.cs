@@ -59,6 +59,12 @@ namespace HarmonyTools.Test.Source.V2.TargetMethod
         public static void Postfix() { }
     }
 
+    [HarmonyPatch(typeof(SimpleSubClass), nameof(SimpleClass.SimpleMethod))]
+    internal class NonExistingMethod3
+    {
+        public static void Postfix() { }
+    }
+
     [HarmonyPatch("HarmonyTools.Test.PatchBase.SimpleClass", nameof(SimpleClass.OverloadedMethod))]
     [HarmonyPatch(new[] { typeof(string) })]
     internal class NonExistingOverload3

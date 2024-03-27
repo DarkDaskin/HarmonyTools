@@ -77,16 +77,19 @@ public class TargetMethodTests
             new DiagnosticResult(DiagnosticIds.TargetMethodMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(58, 10, 58, 43)
                 .WithArguments("NonExistingMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.TargetMethodMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(62, 6, 62, 76)
+                .WithArguments("SimpleMethod", "HarmonyTools.Test.PatchBase.SimpleSubClass"),
         };
         if (version == 2)
             expected.AddRange(
             [
                 new DiagnosticResult(DiagnosticIds.TargetMethodMustExist, DiagnosticSeverity.Warning)
-                    .WithSpan(62, 6, 62, 99)
-                    .WithSpan(63, 6, 63, 44)
+                    .WithSpan(68, 6, 68, 99)
+                    .WithSpan(69, 6, 69, 44)
                     .WithArguments("OverloadedMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
                 new DiagnosticResult(DiagnosticIds.TargetMethodMustExist, DiagnosticSeverity.Warning)
-                    .WithSpan(69, 6, 69, 88)
+                    .WithSpan(75, 6, 75, 88)
                     .WithArguments("NonExistingMethod", "HarmonyTools.Test.PatchBase.SimpleClass"),
             ]);
 

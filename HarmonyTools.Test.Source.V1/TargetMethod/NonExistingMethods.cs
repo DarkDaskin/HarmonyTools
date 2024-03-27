@@ -58,4 +58,10 @@ namespace HarmonyTools.Test.Source.V1.TargetMethod
         [HarmonyPatch("NonExistingMethod")]
         public static void Postfix() { }
     }
+
+    [HarmonyPatch(typeof(SimpleSubClass), nameof(SimpleClass.SimpleMethod))]
+    internal class NonExistingMethod3
+    {
+        public static void Postfix() { }
+    }
 }
