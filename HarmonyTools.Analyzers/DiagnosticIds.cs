@@ -20,6 +20,7 @@ public static class DiagnosticIds
     public const string TargetTypeMustBeNamedType = "HT1010";
     public const string TargetTypeMustNotBeOpenGenericType = "HT1011";
     public const string TargetMethodMustNotBeGeneric = "HT1012";
+    public const string DontUseBulkPatchingMethodsWithReversePatches = "HT1013";
 
     // PatchMethod
     public const string PatchMethodsMustBeStatic = "HT2001";

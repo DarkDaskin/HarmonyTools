@@ -399,4 +399,10 @@
   <data name="DontUseArgumentsWithSpecialParametersTitle" xml:space="preserve">
     <value>HarmonyArgument is used on special patch method parameter</value>
   </data>
+  <data name="DontUseBulkPatchingMethodsWithReversePatchesMessageFormat" xml:space="preserve">
+    <value>Reverse patch cannot be used with bulk patching.</value>
+  </data>
+  <data name="DontUseBulkPatchingMethodsWithReversePatchesTitle" xml:space="preserve">
+    <value>Reverse patch cannot be used with bulk patching</value>
+  </data>
 </root>

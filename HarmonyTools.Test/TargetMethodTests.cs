@@ -321,4 +321,14 @@ public class TargetMethodTests
                 .WithSpan(6, 6, 6, 74)
                 .WithArguments("GenericMethod", "HarmonyTools.Test.PatchBase.SimpleClass"));
     }
+
+    [TestMethod, CodeDataSource("BulkPatchingMethodsWithReversePatch.cs")]
+    public async Task WhenBulkPatchingMethodsWithReversePatch_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.DontUseBulkPatchingMethodsWithReversePatches, DiagnosticSeverity.Warning)
+                .WithSpan(11, 28, 11, 40),
+            new DiagnosticResult(DiagnosticIds.DontUseBulkPatchingMethodsWithReversePatches, DiagnosticSeverity.Warning)
+                .WithSpan(19, 28, 19, 40));
+    }
 }

@@ -147,6 +147,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckBulkPatching(set);
             CheckPatchMethodStateParameters(set);
             CheckArgumentNewNamesMustCorrespondToParameterNames(set);
+            CheckDontUseBulkPatchingMethodsWithReversePatches(set);
         }
 
         protected virtual void TargetMethodChecks(IMethodSymbol targetMethod, PatchDescription patchDescription)
@@ -1012,7 +1013,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             var argumentOverridesOnMethodAndClass =
                 from argument in patchMethod.PatchDescription.ArgumentOverrides
                 where argument.NewName is { Value: not null }
-                select (argument, name: argument.NewName.Value);
+                select (argument, name: argument.NewName!.Value);
             var argumentOverridesPerParameter = argumentOverridesOnParameters
                 .Concat(argumentOverridesOnMethodAndClass)
                 .GroupBy(p => p.name, p => p.argument);
@@ -1056,6 +1057,19 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 if (patchMethods.Length > 1)
                     Context.ReportDiagnostic(Diagnostic.Create(DontDefineMultipleAuxiliaryPatchMethodsRule,
                         patchMethods.GetLocation(), patchMethods.GetAdditionalLocations()));
+            }
+        }
+
+        private void CheckDontUseBulkPatchingMethodsWithReversePatches(PatchDescriptionSet<TPatchDescription> set)
+        {
+            if (set.TypePatchDescription?.IsPatchAll?.Value != true &&
+                !set.PatchMethods.Any(patchMethod => patchMethod.Is(PatchMethodKind.TargetMethods)))
+                return;
+
+            foreach (var patchMethod in set.PatchMethods.Where(patchMethod => patchMethod.Is(PatchMethodKind.ReversePatch)))
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(DontUseBulkPatchingMethodsWithReversePatchesRule,
+                    patchMethod.GetLocation(Context.CancellationToken)));
             }
         }
 

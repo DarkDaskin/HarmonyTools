@@ -151,6 +151,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined. Only the first one will be executed..
+        /// </summary>
+        internal static string DontDefineMultipleAuxiliaryPatchMethodsMessageFormat {
+            get {
+                return ResourceManager.GetString("DontDefineMultipleAuxiliaryPatchMethodsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined.
+        /// </summary>
+        internal static string DontDefineMultipleAuxiliaryPatchMethodsTitle {
+            get {
+                return ResourceManager.GetString("DontDefineMultipleAuxiliaryPatchMethodsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HarmonyArgument is used on special patch method &apos;{0}&apos; parameter &apos;{1}&apos;. It will have no effect..
         /// </summary>
         internal static string DontUseArgumentsWithSpecialParametersMessageFormat {
@@ -169,6 +187,42 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reverse patch cannot be used with bulk patching..
+        /// </summary>
+        internal static string DontUseBulkPatchingMethodsWithReversePatchesMessageFormat {
+            get {
+                return ResourceManager.GetString("DontUseBulkPatchingMethodsWithReversePatchesMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverse patch cannot be used with bulk patching.
+        /// </summary>
+        internal static string DontUseBulkPatchingMethodsWithReversePatchesTitle {
+            get {
+                return ResourceManager.GetString("DontUseBulkPatchingMethodsWithReversePatchesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bulk patching can&apos;t be combined with individual target method annotations..
+        /// </summary>
+        internal static string DontUseIndividualAnnotationsWithBulkPatchingMessageFormat {
+            get {
+                return ResourceManager.GetString("DontUseIndividualAnnotationsWithBulkPatchingMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bulk patching can&apos;t be combined with individual target method annotations.
+        /// </summary>
+        internal static string DontUseIndividualAnnotationsWithBulkPatchingTitle {
+            get {
+                return ResourceManager.GetString("DontUseIndividualAnnotationsWithBulkPatchingTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;__instance&apos; parameter is used with static target method &apos;{0}&apos;. The parameter will be always null..
         /// </summary>
         internal static string DontUseInstanceParameterWithStaticMethodsMessageFormat {
@@ -183,6 +237,24 @@ namespace HarmonyTools.Analyzers {
         internal static string DontUseInstanceParameterWithStaticMethodsTitle {
             get {
                 return ResourceManager.GetString("DontUseInstanceParameterWithStaticMethodsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only single method of bulk patching is allowed..
+        /// </summary>
+        internal static string DontUseMultipleBulkPatchingMethodsMessageFormat {
+            get {
+                return ResourceManager.GetString("DontUseMultipleBulkPatchingMethodsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only single method of bulk patching is allowed.
+        /// </summary>
+        internal static string DontUseMultipleBulkPatchingMethodsTitle {
+            get {
+                return ResourceManager.GetString("DontUseMultipleBulkPatchingMethodsTitle", resourceCulture);
             }
         }
         
@@ -237,60 +309,6 @@ namespace HarmonyTools.Analyzers {
         internal static string DontUseResultWithMethodsReturningVoidTitle {
             get {
                 return ResourceManager.GetString("DontUseResultWithMethodsReturningVoidTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined. Only the first one will be executed..
-        /// </summary>
-        internal static string DontDefineMultipleAuxiliaryPatchMethodsMessageFormat {
-            get {
-                return ResourceManager.GetString("DontDefineMultipleAuxiliaryPatchMethodsMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined.
-        /// </summary>
-        internal static string DontDefineMultipleAuxiliaryPatchMethodsTitle {
-            get {
-                return ResourceManager.GetString("DontDefineMultipleAuxiliaryPatchMethodsTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bulk patching can&apos;t be combined with individual target method annotations..
-        /// </summary>
-        internal static string DontUseIndividualAnnotationsWithBulkPatchingMessageFormat {
-            get {
-                return ResourceManager.GetString("DontUseIndividualAnnotationsWithBulkPatchingMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bulk patching can&apos;t be combined with individual target method annotations.
-        /// </summary>
-        internal static string DontUseIndividualAnnotationsWithBulkPatchingTitle {
-            get {
-                return ResourceManager.GetString("DontUseIndividualAnnotationsWithBulkPatchingTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Only single method of bulk patching is allowed..
-        /// </summary>
-        internal static string DontUseMultipleBulkPatchingMethodsMessageFormat {
-            get {
-                return ResourceManager.GetString("DontUseMultipleBulkPatchingMethodsMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Only single method of bulk patching is allowed.
-        /// </summary>
-        internal static string DontUseMultipleBulkPatchingMethodsTitle {
-            get {
-                return ResourceManager.GetString("DontUseMultipleBulkPatchingMethodsTitle", resourceCulture);
             }
         }
         

@@ -71,6 +71,11 @@ public partial class HarmonyToolsAnalyzer
         CreateRule(DiagnosticIds.TargetMethodMustNotBeGeneric,
             nameof(Resources.TargetMethodMustNotBeGenericTitle), nameof(Resources.TargetMethodMustNotBeGenericMessageFormat),
             TargetMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DontUseBulkPatchingMethodsWithReversePatchesRule =
+        CreateRule(DiagnosticIds.DontUseBulkPatchingMethodsWithReversePatches,
+            nameof(Resources.DontUseBulkPatchingMethodsWithReversePatchesTitle), 
+            nameof(Resources.DontUseBulkPatchingMethodsWithReversePatchesMessageFormat),
+            TargetMethodCategory, DiagnosticSeverity.Warning);
 
     private const string PatchMethodCategory = "PatchMethod";
     private static readonly DiagnosticDescriptor PatchMethodsMustBeStaticRule =
@@ -251,6 +256,7 @@ public partial class HarmonyToolsAnalyzer
         TargetTypeMustBeNamedTypeRule,
         TargetTypeMustNotBeOpenGenericTypeRule,
         TargetMethodMustNotBeGenericRule,
+        DontUseBulkPatchingMethodsWithReversePatchesRule,
 
         PatchMethodsMustBeStaticRule,
         PatchMethodMustHaveSingleKindRule,
