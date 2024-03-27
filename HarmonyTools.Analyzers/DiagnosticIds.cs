@@ -37,10 +37,10 @@ public static class DiagnosticIds
     public const string TargetTypeFieldWithSpecifiedNameMustExist = "HT2013";
     public const string TargetTypeFieldWithSpecifiedIndexMustExist = "HT2014";
     public const string PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegate = "HT2015";
-    public const string DoNotUseInstanceParameterWithStaticMethods = "HT2016";
-    public const string DoNotUseResultRefWithMethodsNotReturningByRef = "HT2017";
-    public const string DoNotUseResultWithMethodsReturningByRef = "HT2018";
-    public const string DoNotUseResultWithMethodsReturningVoid = "HT2019";
+    public const string DontUseInstanceParameterWithStaticMethods = "HT2016";
+    public const string DontUseResultRefWithMethodsNotReturningByRef = "HT2017";
+    public const string DontUseResultWithMethodsReturningByRef = "HT2018";
+    public const string DontUseResultWithMethodsReturningVoid = "HT2019";
     public const string ParameterMustBeByRef = "HT2020";
     public const string ParameterMustNotBeByRef = "HT2021";
     public const string StateTypeMustNotDiffer = "HT2022";
@@ -51,5 +51,5 @@ public static class DiagnosticIds
     public const string InstanceParameterMustBePresent = "HT2027";
     public const string InstanceParameterMustNotBePresent = "HT2028";
     public const string PatchMethodsMustNotReturnByRef = "HT2029";
-    public const string DoNotUseArgumentsWithSpecialParameters = "HT2030";
+    public const string DontUseArgumentsWithSpecialParameters = "HT2030";
 }

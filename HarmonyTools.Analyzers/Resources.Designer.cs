@@ -153,90 +153,90 @@ namespace HarmonyTools.Analyzers {
         /// <summary>
         ///   Looks up a localized string similar to HarmonyArgument is used on special patch method &apos;{0}&apos; parameter &apos;{1}&apos;. It will have no effect..
         /// </summary>
-        internal static string DoNotUseArgumentsWithSpecialParametersMessageFormat {
+        internal static string DontUseArgumentsWithSpecialParametersMessageFormat {
             get {
-                return ResourceManager.GetString("DoNotUseArgumentsWithSpecialParametersMessageFormat", resourceCulture);
+                return ResourceManager.GetString("DontUseArgumentsWithSpecialParametersMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to HarmonyArgument is used on special patch method parameter.
         /// </summary>
-        internal static string DoNotUseArgumentsWithSpecialParametersTitle {
+        internal static string DontUseArgumentsWithSpecialParametersTitle {
             get {
-                return ResourceManager.GetString("DoNotUseArgumentsWithSpecialParametersTitle", resourceCulture);
+                return ResourceManager.GetString("DontUseArgumentsWithSpecialParametersTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__instance&apos; parameter is used with static target method &apos;{0}&apos;. The parameter will be always null..
         /// </summary>
-        internal static string DoNotUseInstanceParameterWithStaticMethodsMessageFormat {
+        internal static string DontUseInstanceParameterWithStaticMethodsMessageFormat {
             get {
-                return ResourceManager.GetString("DoNotUseInstanceParameterWithStaticMethodsMessageFormat", resourceCulture);
+                return ResourceManager.GetString("DontUseInstanceParameterWithStaticMethodsMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__instance&apos; parameter is used with static target method.
         /// </summary>
-        internal static string DoNotUseInstanceParameterWithStaticMethodsTitle {
+        internal static string DontUseInstanceParameterWithStaticMethodsTitle {
             get {
-                return ResourceManager.GetString("DoNotUseInstanceParameterWithStaticMethodsTitle", resourceCulture);
+                return ResourceManager.GetString("DontUseInstanceParameterWithStaticMethodsTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__resultRef&apos; parameter is used with target method &apos;{0}&apos; which does not return by reference..
         /// </summary>
-        internal static string DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat {
+        internal static string DontUseResultRefWithMethodsNotReturningByRefMessageFormat {
             get {
-                return ResourceManager.GetString("DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat", resourceCulture);
+                return ResourceManager.GetString("DontUseResultRefWithMethodsNotReturningByRefMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__resultRef&apos; parameter is used with target method which does not return by reference.
         /// </summary>
-        internal static string DoNotUseResultRefWithMethodsNotReturningByRefTitle {
+        internal static string DontUseResultRefWithMethodsNotReturningByRefTitle {
             get {
-                return ResourceManager.GetString("DoNotUseResultRefWithMethodsNotReturningByRefTitle", resourceCulture);
+                return ResourceManager.GetString("DontUseResultRefWithMethodsNotReturningByRefTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method &apos;{0}&apos; which returns by reference..
         /// </summary>
-        internal static string DoNotUseResultWithMethodsReturningByRefMessageFormat {
+        internal static string DontUseResultWithMethodsReturningByRefMessageFormat {
             get {
-                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningByRefMessageFormat", resourceCulture);
+                return ResourceManager.GetString("DontUseResultWithMethodsReturningByRefMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method which returns by reference.
         /// </summary>
-        internal static string DoNotUseResultWithMethodsReturningByRefTitle {
+        internal static string DontUseResultWithMethodsReturningByRefTitle {
             get {
-                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningByRefTitle", resourceCulture);
+                return ResourceManager.GetString("DontUseResultWithMethodsReturningByRefTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method &apos;{0}&apos; which returns &apos;void&apos;..
         /// </summary>
-        internal static string DoNotUseResultWithMethodsReturningVoidMessageFormat {
+        internal static string DontUseResultWithMethodsReturningVoidMessageFormat {
             get {
-                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningVoidMessageFormat", resourceCulture);
+                return ResourceManager.GetString("DontUseResultWithMethodsReturningVoidMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &apos;__result&apos; parameter is used with target method which returns &apos;void&apos;.
         /// </summary>
-        internal static string DoNotUseResultWithMethodsReturningVoidTitle {
+        internal static string DontUseResultWithMethodsReturningVoidTitle {
             get {
-                return ResourceManager.GetString("DoNotUseResultWithMethodsReturningVoidTitle", resourceCulture);
+                return ResourceManager.GetString("DontUseResultWithMethodsReturningVoidTitle", resourceCulture);
             }
         }
         

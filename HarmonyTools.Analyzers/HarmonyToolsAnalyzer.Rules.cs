@@ -165,25 +165,25 @@ public partial class HarmonyToolsAnalyzer
             nameof(Resources.PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateTitle),
             nameof(Resources.PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor DoNotUseInstanceParameterWithStaticMethodsRule =
-        CreateRule(DiagnosticIds.DoNotUseInstanceParameterWithStaticMethods,
-            nameof(Resources.DoNotUseInstanceParameterWithStaticMethodsTitle),
-            nameof(Resources.DoNotUseInstanceParameterWithStaticMethodsMessageFormat),
+    private static readonly DiagnosticDescriptor DontUseInstanceParameterWithStaticMethodsRule =
+        CreateRule(DiagnosticIds.DontUseInstanceParameterWithStaticMethods,
+            nameof(Resources.DontUseInstanceParameterWithStaticMethodsTitle),
+            nameof(Resources.DontUseInstanceParameterWithStaticMethodsMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor DoNotUseResultRefWithMethodsNotReturningByRefRule =
-        CreateRule(DiagnosticIds.DoNotUseResultRefWithMethodsNotReturningByRef,
-            nameof(Resources.DoNotUseResultRefWithMethodsNotReturningByRefTitle),
-            nameof(Resources.DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat),
+    private static readonly DiagnosticDescriptor DontUseResultRefWithMethodsNotReturningByRefRule =
+        CreateRule(DiagnosticIds.DontUseResultRefWithMethodsNotReturningByRef,
+            nameof(Resources.DontUseResultRefWithMethodsNotReturningByRefTitle),
+            nameof(Resources.DontUseResultRefWithMethodsNotReturningByRefMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor DoNotUseResultWithMethodsReturningByRefRule =
-        CreateRule(DiagnosticIds.DoNotUseResultWithMethodsReturningByRef,
-            nameof(Resources.DoNotUseResultWithMethodsReturningByRefTitle),
-            nameof(Resources.DoNotUseResultWithMethodsReturningByRefMessageFormat),
+    private static readonly DiagnosticDescriptor DontUseResultWithMethodsReturningByRefRule =
+        CreateRule(DiagnosticIds.DontUseResultWithMethodsReturningByRef,
+            nameof(Resources.DontUseResultWithMethodsReturningByRefTitle),
+            nameof(Resources.DontUseResultWithMethodsReturningByRefMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor DoNotUseResultWithMethodsReturningVoidRule =
-        CreateRule(DiagnosticIds.DoNotUseResultWithMethodsReturningVoid,
-            nameof(Resources.DoNotUseResultWithMethodsReturningVoidTitle),
-            nameof(Resources.DoNotUseResultWithMethodsReturningVoidMessageFormat),
+    private static readonly DiagnosticDescriptor DontUseResultWithMethodsReturningVoidRule =
+        CreateRule(DiagnosticIds.DontUseResultWithMethodsReturningVoid,
+            nameof(Resources.DontUseResultWithMethodsReturningVoidTitle),
+            nameof(Resources.DontUseResultWithMethodsReturningVoidMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor ParameterMustBeByRefRule =
         CreateRule(DiagnosticIds.ParameterMustBeByRef,
@@ -228,9 +228,9 @@ public partial class HarmonyToolsAnalyzer
         CreateRule(DiagnosticIds.PatchMethodsMustNotReturnByRef,
             nameof(Resources.PatchMethodsMustNotReturnByRefTitle), nameof(Resources.PatchMethodsMustNotReturnByRefMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor DoNotUseArgumentsWithSpecialParametersRule =
-        CreateRule(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters,
-            nameof(Resources.DoNotUseArgumentsWithSpecialParametersTitle), nameof(Resources.DoNotUseArgumentsWithSpecialParametersMessageFormat),
+    private static readonly DiagnosticDescriptor DontUseArgumentsWithSpecialParametersRule =
+        CreateRule(DiagnosticIds.DontUseArgumentsWithSpecialParameters,
+            nameof(Resources.DontUseArgumentsWithSpecialParametersTitle), nameof(Resources.DontUseArgumentsWithSpecialParametersMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
@@ -271,10 +271,10 @@ public partial class HarmonyToolsAnalyzer
         TargetTypeFieldWithSpecifiedNameMustExistRule,
         TargetTypeFieldWithSpecifiedIndexMustExistRule,
         PatchMethodDelegateParametersMustBeAnnotatedWithHarmonyDelegateRule,
-        DoNotUseInstanceParameterWithStaticMethodsRule,
-        DoNotUseResultRefWithMethodsNotReturningByRefRule,
-        DoNotUseResultWithMethodsReturningByRefRule,
-        DoNotUseResultWithMethodsReturningVoidRule,
+        DontUseInstanceParameterWithStaticMethodsRule,
+        DontUseResultRefWithMethodsNotReturningByRefRule,
+        DontUseResultWithMethodsReturningByRefRule,
+        DontUseResultWithMethodsReturningVoidRule,
         ParameterMustBeByRefRule,
         ParameterMustNotBeByRefRule,
         StateTypeMustNotDifferRule,
@@ -285,7 +285,7 @@ public partial class HarmonyToolsAnalyzer
         InstanceParameterMustBePresentRule,
         InstanceParameterMustNotBePresentRule,
         PatchMethodsMustNotReturnByRefRule,
-        DoNotUseArgumentsWithSpecialParametersRule,
+        DontUseArgumentsWithSpecialParametersRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,

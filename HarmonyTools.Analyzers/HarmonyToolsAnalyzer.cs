@@ -137,7 +137,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckPatchMethodsMustNotReturnByRef(patchMethod);
             CheckPatchMethodParameters(patchMethod);
             CheckMultipleArgumentsMustNotTargetSameParameter(patchMethod);
-            CheckDoNotUseArgumentsWithSpecialParameters(patchMethod);
+            CheckDontUseArgumentsWithSpecialParameters(patchMethod);
         }
 
         protected virtual void PatchDescriptionSetChecks(PatchDescriptionSet<TPatchDescription> set)
@@ -809,7 +809,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     }
 
                     if (patchMethod.TargetMethod is { IsStatic: true })
-                        Context.ReportDiagnostic(Diagnostic.Create(DoNotUseInstanceParameterWithStaticMethodsRule,
+                        Context.ReportDiagnostic(Diagnostic.Create(DontUseInstanceParameterWithStaticMethodsRule,
                             parameter.GetLocation(Context.CancellationToken),
                             patchMethod.TargetMethod.Name));
 
@@ -820,11 +820,11 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                     if (patchMethod.TargetMethod is not null)
                     {
                         if (patchMethod.TargetMethod.ReturnsVoid)
-                            Context.ReportDiagnostic(Diagnostic.Create(DoNotUseResultWithMethodsReturningVoidRule,
+                            Context.ReportDiagnostic(Diagnostic.Create(DontUseResultWithMethodsReturningVoidRule,
                                 parameter.GetLocation(Context.CancellationToken),
                                 patchMethod.TargetMethod.Name));
                         else if (patchMethod.TargetMethod.ReturnsByRef)
-                            Context.ReportDiagnostic(Diagnostic.Create(DoNotUseResultWithMethodsReturningByRefRule,
+                            Context.ReportDiagnostic(Diagnostic.Create(DontUseResultWithMethodsReturningByRefRule,
                                 parameter.GetLocation(Context.CancellationToken),
                                 patchMethod.TargetMethod.Name));
                         else
@@ -848,7 +848,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                         }
                         else
                         {
-                            Context.ReportDiagnostic(Diagnostic.Create(DoNotUseResultRefWithMethodsNotReturningByRefRule,
+                            Context.ReportDiagnostic(Diagnostic.Create(DontUseResultRefWithMethodsNotReturningByRefRule,
                                 parameter.GetLocation(Context.CancellationToken),
                                 patchMethod.TargetMethod.Name));
                         }
@@ -1024,7 +1024,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        private void CheckDoNotUseArgumentsWithSpecialParameters(PatchMethod patchMethod)
+        private void CheckDontUseArgumentsWithSpecialParameters(PatchMethod patchMethod)
         {
             if (patchMethod.PatchDescription is null)
                 return;
@@ -1042,7 +1042,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 select (arguments, parameter);
             foreach (var (arguments, parameter) in argumentOverridesOnSpecialParameters)
             {
-                Context.ReportDiagnostic(Diagnostic.Create(DoNotUseArgumentsWithSpecialParametersRule,
+                Context.ReportDiagnostic(Diagnostic.Create(DontUseArgumentsWithSpecialParametersRule,
                     arguments.GetLocation(), arguments.GetAdditionalLocations(),
                     patchMethod.Method.Name, parameter.Parameter.Name));
             }

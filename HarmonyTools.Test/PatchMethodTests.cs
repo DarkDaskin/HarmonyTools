@@ -121,14 +121,14 @@ public class PatchMethodTests
     public async Task WhenArgumentsWithSpecialParameters_Report(string code, ReferenceAssemblies referenceAssemblies)
     {
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
-            new DiagnosticResult(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
+            new DiagnosticResult(DiagnosticIds.DontUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
                 .WithSpan(8, 6, 8, 31)
                 .WithArguments("Postfix", "__0"),
-            new DiagnosticResult(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
+            new DiagnosticResult(DiagnosticIds.DontUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
                 .WithSpan(11, 10, 11, 42)
                 .WithSpan(12, 84, 12, 102)
                 .WithArguments("Postfix", "____answer"),
-            new DiagnosticResult(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
+            new DiagnosticResult(DiagnosticIds.DontUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
                 .WithSpan(12, 49, 12, 67)
                 .WithArguments("Postfix", "__result"));
     }
@@ -367,32 +367,32 @@ public class PatchMethodTests
             new DiagnosticResult(DiagnosticIds.TargetTypeFieldWithSpecifiedIndexMustExist, DiagnosticSeverity.Warning)
                 .WithSpan(54, 87, 54, 92)
                 .WithArguments("HarmonyTools.Test.PatchBase.SimpleClass2", "10", "Postfix", "___10"),
-            new DiagnosticResult(DiagnosticIds.DoNotUseInstanceParameterWithStaticMethods, DiagnosticSeverity.Warning)
+            new DiagnosticResult(DiagnosticIds.DontUseInstanceParameterWithStaticMethods, DiagnosticSeverity.Warning)
                 .WithSpan(60, 48, 60, 58)
                 .WithArguments("SimpleStaticMethod"),
-            new DiagnosticResult(DiagnosticIds.DoNotUseResultWithMethodsReturningVoid, DiagnosticSeverity.Warning)
+            new DiagnosticResult(DiagnosticIds.DontUseResultWithMethodsReturningVoid, DiagnosticSeverity.Warning)
                 .WithSpan(66, 43, 66, 51)
                 .WithArguments("DoNothing"),
         };
         if (version == 2)
             expected.AddRange(
             [
-                new DiagnosticResult(DiagnosticIds.DoNotUseResultRefWithMethodsNotReturningByRef, DiagnosticSeverity.Warning)
+                new DiagnosticResult(DiagnosticIds.DontUseResultRefWithMethodsNotReturningByRef, DiagnosticSeverity.Warning)
                     .WithSpan(72, 54, 72, 65)
                     .WithArguments("SimpleMethod"),
-                new DiagnosticResult(DiagnosticIds.DoNotUseResultRefWithMethodsNotReturningByRef, DiagnosticSeverity.Warning)
+                new DiagnosticResult(DiagnosticIds.DontUseResultRefWithMethodsNotReturningByRef, DiagnosticSeverity.Warning)
                     .WithSpan(74, 55, 74, 66)
                     .WithArguments("SimpleMethod"),
-                new DiagnosticResult(DiagnosticIds.DoNotUseResultRefWithMethodsNotReturningByRef, DiagnosticSeverity.Warning)
+                new DiagnosticResult(DiagnosticIds.DontUseResultRefWithMethodsNotReturningByRef, DiagnosticSeverity.Warning)
                     .WithSpan(76, 57, 76, 68)
                     .WithArguments("SimpleMethod"),
-                new DiagnosticResult(DiagnosticIds.DoNotUseResultWithMethodsReturningByRef, DiagnosticSeverity.Warning)
+                new DiagnosticResult(DiagnosticIds.DontUseResultWithMethodsReturningByRef, DiagnosticSeverity.Warning)
                     .WithSpan(82, 39, 82, 47)
                     .WithArguments("GetAnswerRef"),
-                new DiagnosticResult(DiagnosticIds.DoNotUseResultWithMethodsReturningByRef, DiagnosticSeverity.Warning)
+                new DiagnosticResult(DiagnosticIds.DontUseResultWithMethodsReturningByRef, DiagnosticSeverity.Warning)
                     .WithSpan(84, 40, 84, 48)
                     .WithArguments("GetAnswerRef"),
-                new DiagnosticResult(DiagnosticIds.DoNotUseResultWithMethodsReturningByRef, DiagnosticSeverity.Warning)
+                new DiagnosticResult(DiagnosticIds.DontUseResultWithMethodsReturningByRef, DiagnosticSeverity.Warning)
                     .WithSpan(86, 42, 86, 50)
                     .WithArguments("GetAnswerRef"),
                 new DiagnosticResult(DiagnosticIds.TargetMethodParameterWithSpecifiedNameMustExist, DiagnosticSeverity.Warning)

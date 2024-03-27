@@ -261,28 +261,28 @@
   <data name="PatchMethodParameterTypesMustBeCorrectTitle" xml:space="preserve">
     <value>Incorrect patch method parameter type</value>
   </data>
-  <data name="DoNotUseInstanceParameterWithStaticMethodsMessageFormat" xml:space="preserve">
+  <data name="DontUseInstanceParameterWithStaticMethodsMessageFormat" xml:space="preserve">
     <value>'__instance' parameter is used with static target method '{0}'. The parameter will be always null.</value>
   </data>
-  <data name="DoNotUseInstanceParameterWithStaticMethodsTitle" xml:space="preserve">
+  <data name="DontUseInstanceParameterWithStaticMethodsTitle" xml:space="preserve">
     <value>'__instance' parameter is used with static target method</value>
   </data>
-  <data name="DoNotUseResultRefWithMethodsNotReturningByRefMessageFormat" xml:space="preserve">
+  <data name="DontUseResultRefWithMethodsNotReturningByRefMessageFormat" xml:space="preserve">
     <value>'__resultRef' parameter is used with target method '{0}' which does not return by reference.</value>
   </data>
-  <data name="DoNotUseResultRefWithMethodsNotReturningByRefTitle" xml:space="preserve">
+  <data name="DontUseResultRefWithMethodsNotReturningByRefTitle" xml:space="preserve">
     <value>'__resultRef' parameter is used with target method which does not return by reference</value>
   </data>
-  <data name="DoNotUseResultWithMethodsReturningByRefMessageFormat" xml:space="preserve">
+  <data name="DontUseResultWithMethodsReturningByRefMessageFormat" xml:space="preserve">
     <value>'__result' parameter is used with target method '{0}' which returns by reference.</value>
   </data>
-  <data name="DoNotUseResultWithMethodsReturningByRefTitle" xml:space="preserve">
+  <data name="DontUseResultWithMethodsReturningByRefTitle" xml:space="preserve">
     <value>'__result' parameter is used with target method which returns by reference</value>
   </data>
-  <data name="DoNotUseResultWithMethodsReturningVoidMessageFormat" xml:space="preserve">
+  <data name="DontUseResultWithMethodsReturningVoidMessageFormat" xml:space="preserve">
     <value>'__result' parameter is used with target method '{0}' which returns 'void'.</value>
   </data>
-  <data name="DoNotUseResultWithMethodsReturningVoidTitle" xml:space="preserve">
+  <data name="DontUseResultWithMethodsReturningVoidTitle" xml:space="preserve">
     <value>'__result' parameter is used with target method which returns 'void'</value>
   </data>
   <data name="ParameterMustBeByRefMessageFormat" xml:space="preserve">
@@ -393,10 +393,10 @@
   <data name="ArgumentNewNamesMustCorrespondToParameterNamesTitle" xml:space="preserve">
     <value>Argument new name does not correspond to a patch method parameter</value>
   </data>
-  <data name="DoNotUseArgumentsWithSpecialParametersMessageFormat" xml:space="preserve">
+  <data name="DontUseArgumentsWithSpecialParametersMessageFormat" xml:space="preserve">
     <value>HarmonyArgument is used on special patch method '{0}' parameter '{1}'. It will have no effect.</value>
   </data>
-  <data name="DoNotUseArgumentsWithSpecialParametersTitle" xml:space="preserve">
+  <data name="DontUseArgumentsWithSpecialParametersTitle" xml:space="preserve">
     <value>HarmonyArgument is used on special patch method parameter</value>
   </data>
 </root>
