@@ -83,7 +83,7 @@ internal class PatchMethodParameter(IParameterSymbol parameter, InjectionKind ki
                 return new PatchMethodParameter(parameter, InjectionKind.Instance, ParameterMatchKind.ByName);
             if (parameter.Name == ResultParameterName)
                 return new PatchMethodParameter(parameter, InjectionKind.Result, ParameterMatchKind.ByName);
-            if (parameter.Name == ResultRefParameterName && patchMethod.PatchDescription?.HarmonyVersion == 2)
+            if (parameter.Name == ResultRefParameterName && wellKnownTypes.RefResultOfT is not null)
                 return new PatchMethodParameter(parameter, InjectionKind.ResultRef, ParameterMatchKind.ByName);
             if (parameter.Name == StateParameterName)
                 return new PatchMethodParameter(parameter, InjectionKind.State, ParameterMatchKind.ByName);
