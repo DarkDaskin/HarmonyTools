@@ -84,14 +84,53 @@ public class PatchMethodTests
                 .WithSpan(10, 10, 10, 30));
     }
 
-    [TestMethod, CodeDataSource("DuplicateArgumentNewName.cs")]
-    public async Task WhenDuplicateArgumentNewName_Report(string code, ReferenceAssemblies referenceAssemblies)
+    [TestMethod, CodeDataSource("ConflictingArguments.cs")]
+    public async Task WhenConflictingArguments_Report(string code, ReferenceAssemblies referenceAssemblies)
     {
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
-            new DiagnosticResult(DiagnosticIds.ArgumentNewNamesMustBeUnique, DiagnosticSeverity.Warning)
-                .WithSpan(7, 25, 7, 30)
-                .WithSpan(10, 29, 10, 34)
-                .WithArguments("foo"));
+            new DiagnosticResult(DiagnosticIds.MultipleArgumentsMustNotTargetSameParameter, DiagnosticSeverity.Warning)
+                .WithSpan(7, 6, 7, 31)
+                .WithSpan(10, 26, 10, 51)
+                .WithArguments("Postfix1", "foo"),
+            new DiagnosticResult(DiagnosticIds.MultipleArgumentsMustNotTargetSameParameter, DiagnosticSeverity.Warning)
+                .WithSpan(7, 6, 7, 31)
+                .WithSpan(14, 38, 14, 56)
+                .WithArguments("Postfix2", "foo"), 
+            new DiagnosticResult(DiagnosticIds.MultipleArgumentsMustNotTargetSameParameter, DiagnosticSeverity.Warning)
+                .WithSpan(16, 26, 16, 51)
+                .WithSpan(17, 47, 17, 65)
+                .WithArguments("Postfix3", "bar"));
+    }
+
+    [TestMethod, CodeDataSource("OrphanArguments.cs")]
+    public async Task WhenOrphanArguments_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.ArgumentNewNamesMustCorrespondToParameterNames, DiagnosticSeverity.Warning)
+                .WithSpan(8, 34, 8, 45)
+                .WithArguments("question1"),
+            new DiagnosticResult(DiagnosticIds.ArgumentNewNamesMustCorrespondToParameterNames, DiagnosticSeverity.Warning)
+                .WithSpan(13, 38, 13, 49)
+                .WithArguments("question2"),
+            new DiagnosticResult(DiagnosticIds.ArgumentNewNamesMustCorrespondToParameterNames, DiagnosticSeverity.Warning)
+                .WithSpan(16, 38, 16, 49)
+                .WithArguments("question2"));
+    }
+
+    [TestMethod, CodeDataSource("ArgumentsWithSpecialParameters.cs")]
+    public async Task WhenArgumentsWithSpecialParameters_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
+                .WithSpan(8, 6, 8, 31)
+                .WithArguments("Postfix", "__0"),
+            new DiagnosticResult(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
+                .WithSpan(11, 10, 11, 42)
+                .WithSpan(12, 84, 12, 102)
+                .WithArguments("Postfix", "____answer"),
+            new DiagnosticResult(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters, DiagnosticSeverity.Warning)
+                .WithSpan(12, 49, 12, 67)
+                .WithArguments("Postfix", "__result"));
     }
 
     [TestMethod, CodeDataSource("ValidPatchMethodReturnTypes.cs")]

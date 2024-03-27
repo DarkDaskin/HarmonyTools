@@ -79,20 +79,20 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate argument name &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Argument new name &apos;{0}&apos; does not correspond to a patch method parameter..
         /// </summary>
-        internal static string ArgumentNewNamesMustBeUniqueMessageFormat {
+        internal static string ArgumentNewNamesMustCorrespondToParameterNamesMessageFormat {
             get {
-                return ResourceManager.GetString("ArgumentNewNamesMustBeUniqueMessageFormat", resourceCulture);
+                return ResourceManager.GetString("ArgumentNewNamesMustCorrespondToParameterNamesMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate argument name.
+        ///   Looks up a localized string similar to Argument new name does not correspond to a patch method parameter.
         /// </summary>
-        internal static string ArgumentNewNamesMustBeUniqueTitle {
+        internal static string ArgumentNewNamesMustCorrespondToParameterNamesTitle {
             get {
-                return ResourceManager.GetString("ArgumentNewNamesMustBeUniqueTitle", resourceCulture);
+                return ResourceManager.GetString("ArgumentNewNamesMustCorrespondToParameterNamesTitle", resourceCulture);
             }
         }
         
@@ -147,6 +147,24 @@ namespace HarmonyTools.Analyzers {
         internal static string AttributeArgumentsMustBeValidTitle {
             get {
                 return ResourceManager.GetString("AttributeArgumentsMustBeValidTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HarmonyArgument is used on special patch method &apos;{0}&apos; parameter &apos;{1}&apos;. It will have no effect..
+        /// </summary>
+        internal static string DoNotUseArgumentsWithSpecialParametersMessageFormat {
+            get {
+                return ResourceManager.GetString("DoNotUseArgumentsWithSpecialParametersMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HarmonyArgument is used on special patch method parameter.
+        /// </summary>
+        internal static string DoNotUseArgumentsWithSpecialParametersTitle {
+            get {
+                return ResourceManager.GetString("DoNotUseArgumentsWithSpecialParametersTitle", resourceCulture);
             }
         }
         
@@ -345,6 +363,24 @@ namespace HarmonyTools.Analyzers {
         internal static string InstanceParameterMustNotBePresentTitle {
             get {
                 return ResourceManager.GetString("InstanceParameterMustNotBePresentTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple arguments target the same target method &apos;{0}&apos; parameter &apos;{1}&apos;..
+        /// </summary>
+        internal static string MultipleArgumentsMustNotTargetSameParameterMessageFormat {
+            get {
+                return ResourceManager.GetString("MultipleArgumentsMustNotTargetSameParameterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple arguments target the same target method parameter.
+        /// </summary>
+        internal static string MultipleArgumentsMustNotTargetSameParameterTitle {
+            get {
+                return ResourceManager.GetString("MultipleArgumentsMustNotTargetSameParameterTitle", resourceCulture);
             }
         }
         

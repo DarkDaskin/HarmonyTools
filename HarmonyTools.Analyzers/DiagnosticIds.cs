@@ -27,7 +27,7 @@ public static class DiagnosticIds
     public const string DontDefineMultipleAuxiliaryPatchMethods = "HT2003";
     public const string PatchMethodsMustNotBeGeneric = "HT2004";
     public const string ArgumentsOnTypesAndMethodsMustHaveNewName = "HT2005";
-    public const string ArgumentNewNamesMustBeUnique = "HT2006";
+    public const string MultipleArgumentsMustNotTargetSameParameter = "HT2006";
     public const string ArgumentNewNamesMustCorrespondToParameterNames = "HT2007";
     public const string PatchMethodReturnTypesMustBeCorrect = "HT2008";
     public const string PatchMethodParameterTypesMustBeCorrect = "HT2009";
@@ -51,4 +51,5 @@ public static class DiagnosticIds
     public const string InstanceParameterMustBePresent = "HT2027";
     public const string InstanceParameterMustNotBePresent = "HT2028";
     public const string PatchMethodsMustNotReturnByRef = "HT2029";
+    public const string DoNotUseArgumentsWithSpecialParameters = "HT2030";
 }

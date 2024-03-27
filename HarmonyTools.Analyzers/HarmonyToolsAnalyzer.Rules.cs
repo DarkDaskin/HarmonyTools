@@ -95,9 +95,15 @@ public partial class HarmonyToolsAnalyzer
             nameof(Resources.ArgumentsOnTypesAndMethodsMustHaveNewNameTitle),
             nameof(Resources.ArgumentsOnTypesAndMethodsMustHaveNewNameMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
-    private static readonly DiagnosticDescriptor ArgumentNewNamesMustBeUniqueRule =
-        CreateRule(DiagnosticIds.ArgumentNewNamesMustBeUnique,
-            nameof(Resources.ArgumentNewNamesMustBeUniqueTitle), nameof(Resources.ArgumentNewNamesMustBeUniqueMessageFormat),
+    private static readonly DiagnosticDescriptor MultipleArgumentsMustNotTargetSameParameterRule =
+        CreateRule(DiagnosticIds.MultipleArgumentsMustNotTargetSameParameter,
+            nameof(Resources.MultipleArgumentsMustNotTargetSameParameterTitle), 
+            nameof(Resources.MultipleArgumentsMustNotTargetSameParameterMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor ArgumentNewNamesMustCorrespondToParameterNamesRule =
+        CreateRule(DiagnosticIds.ArgumentNewNamesMustCorrespondToParameterNames,
+            nameof(Resources.ArgumentNewNamesMustCorrespondToParameterNamesTitle),
+            nameof(Resources.ArgumentNewNamesMustCorrespondToParameterNamesMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor PatchMethodReturnTypesMustBeCorrectWithSubtypesRule =
         CreateRule(DiagnosticIds.PatchMethodReturnTypesMustBeCorrect,
@@ -222,6 +228,10 @@ public partial class HarmonyToolsAnalyzer
         CreateRule(DiagnosticIds.PatchMethodsMustNotReturnByRef,
             nameof(Resources.PatchMethodsMustNotReturnByRefTitle), nameof(Resources.PatchMethodsMustNotReturnByRefMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DoNotUseArgumentsWithSpecialParametersRule =
+        CreateRule(DiagnosticIds.DoNotUseArgumentsWithSpecialParameters,
+            nameof(Resources.DoNotUseArgumentsWithSpecialParametersTitle), nameof(Resources.DoNotUseArgumentsWithSpecialParametersMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
     [
@@ -247,7 +257,8 @@ public partial class HarmonyToolsAnalyzer
         DontDefineMultipleAuxiliaryPatchMethodsRule,
         PatchMethodsMustNotBeGenericRule,
         ArgumentsOnTypesAndMethodsMustHaveNewNameRule,
-        ArgumentNewNamesMustBeUniqueRule,
+        MultipleArgumentsMustNotTargetSameParameterRule,
+        ArgumentNewNamesMustCorrespondToParameterNamesRule,
         PatchMethodReturnTypesMustBeCorrectWithSubtypesRule,
         PatchMethodReturnTypesMustBeCorrectWithSupertypesRule,
         PatchMethodReturnTypesMustBeCorrectExactRule,
@@ -274,6 +285,7 @@ public partial class HarmonyToolsAnalyzer
         InstanceParameterMustBePresentRule,
         InstanceParameterMustNotBePresentRule,
         PatchMethodsMustNotReturnByRefRule,
+        DoNotUseArgumentsWithSpecialParametersRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,

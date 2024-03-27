@@ -30,6 +30,6 @@ namespace HarmonyTools.Test.Source.V1.General
     [HarmonyArgument(-1, "foo")]
     internal class InvalidArguments24
     {
-        public static void Postfix() { }
+        public static void Postfix(string foo) { }
     }
 }

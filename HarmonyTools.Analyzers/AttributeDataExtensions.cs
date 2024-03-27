@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -12,7 +13,8 @@ internal static class AttributeDataExtensions
     public static bool IsMatch(this AttributeData attribute, params ITypeSymbol[] argumentTypes) =>
         attribute.AttributeConstructor.IsMatch(argumentTypes);
 
-    public static SyntaxNode? GetSyntax(this AttributeData attribute) => attribute.ApplicationSyntaxReference?.GetSyntax();
+    public static SyntaxNode? GetSyntax(this AttributeData attribute, CancellationToken cancellationToken = default) => 
+        attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken);
 
     public static DetailWithSyntax<T> GetDetailWithSyntax<T>(this AttributeData attribute, int constructorParameterIndex)
     {

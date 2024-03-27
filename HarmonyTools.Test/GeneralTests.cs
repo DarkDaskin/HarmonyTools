@@ -116,7 +116,10 @@ public class GeneralTests
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
                 .WithSpan(29, 26, 29, 28),
             new DiagnosticResult(DiagnosticIds.AttributeArgumentsMustBeValid, DiagnosticSeverity.Warning)
-                .WithSpan(30, 22, 30, 24));
+                .WithSpan(30, 22, 30, 24),
+            new DiagnosticResult(DiagnosticIds.TargetMethodParameterWithSpecifiedIndexMustExist, DiagnosticSeverity.Warning)
+                .WithSpan(33, 43, 33, 46)
+                .WithArguments("SimpleMethod", "-1", "Postfix", "foo"));
     }
     
     [TestMethod, CodeDataSource("MissingHarmonyPatchOnType.cs", FixedPath = "MissingHarmonyPatchOnType_Fixed.cs")]

@@ -44,6 +44,8 @@ internal class PatchMethod(IMethodSymbol method, ImmutableArray<DetailWithSyntax
 
     public bool IsPrimary => MethodKinds.Any(kind => kind.Value.IsPrimary());
 
+    public bool CanHaveNamedInjections => Is(PatchMethodKind.Prefix) || Is(PatchMethodKind.Postfix) || Is(PatchMethodKind.Finalizer);
+
     public bool IsPatchAll => PatchDescription is { IsPatchAll.Value: true };
 
     public IEnumerable<IMethodSymbol> GetTargetMethods()

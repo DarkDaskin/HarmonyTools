@@ -169,7 +169,7 @@ internal abstract class PatchDescription(ISymbol symbol)
             IsDebug = new DetailWithSyntax<bool>(true, attribute.GetSyntax());
         else if (attribute.Is(wellKnownTypes.HarmonyArgument))
         {
-            var harmonyArgument = HarmonyArgument.Parse(attribute, wellKnownTypes);
+            var harmonyArgument = HarmonyArgument.Parse(attribute, Symbol, wellKnownTypes);
             if (harmonyArgument is not null)
                 ArgumentOverrides = ArgumentOverrides.Add(harmonyArgument);
         }

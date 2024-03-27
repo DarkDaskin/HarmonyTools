@@ -195,11 +195,11 @@
   <data name="TargetTypeMustExistTitle" xml:space="preserve">
     <value>Target type does not exist</value>
   </data>
-  <data name="ArgumentNewNamesMustBeUniqueMessageFormat" xml:space="preserve">
-    <value>Duplicate argument name '{0}'.</value>
+  <data name="MultipleArgumentsMustNotTargetSameParameterMessageFormat" xml:space="preserve">
+    <value>Multiple arguments target the same target method '{0}' parameter '{1}'.</value>
   </data>
-  <data name="ArgumentNewNamesMustBeUniqueTitle" xml:space="preserve">
-    <value>Duplicate argument name</value>
+  <data name="MultipleArgumentsMustNotTargetSameParameterTitle" xml:space="preserve">
+    <value>Multiple arguments target the same target method parameter</value>
   </data>
   <data name="ArgumentsOnTypesAndMethodsMustHaveNewNameMessageFormat" xml:space="preserve">
     <value>Missing new name for an argument.</value>
@@ -386,5 +386,17 @@
   </data>
   <data name="StateTypeMustNotDifferTitle" xml:space="preserve">
     <value>'__state' parameter type must not differ</value>
+  </data>
+  <data name="ArgumentNewNamesMustCorrespondToParameterNamesMessageFormat" xml:space="preserve">
+    <value>Argument new name '{0}' does not correspond to a patch method parameter.</value>
+  </data>
+  <data name="ArgumentNewNamesMustCorrespondToParameterNamesTitle" xml:space="preserve">
+    <value>Argument new name does not correspond to a patch method parameter</value>
+  </data>
+  <data name="DoNotUseArgumentsWithSpecialParametersMessageFormat" xml:space="preserve">
+    <value>HarmonyArgument is used on special patch method '{0}' parameter '{1}'. It will have no effect.</value>
+  </data>
+  <data name="DoNotUseArgumentsWithSpecialParametersTitle" xml:space="preserve">
+    <value>HarmonyArgument is used on special patch method parameter</value>
   </data>
 </root>

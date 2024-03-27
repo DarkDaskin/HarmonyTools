@@ -123,7 +123,6 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckMethodMustBeSpecified(patchDescription, set);
             CheckMethodMustNotBeOverspecified(patchDescription);
             CheckArgumentsOnTypesAndMethodsMustHaveNewName(patchDescription);
-            CheckArgumentNewNamesMustBeUniqueRule(patchDescription);
         }
 
         protected virtual void PatchMethodChecks(PatchMethod<TPatchDescription> patchMethod)
@@ -137,6 +136,8 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckPatchMethodReturnTypeMustBeCorrect(patchMethod);
             CheckPatchMethodsMustNotReturnByRef(patchMethod);
             CheckPatchMethodParameters(patchMethod);
+            CheckMultipleArgumentsMustNotTargetSameParameter(patchMethod);
+            CheckDoNotUseArgumentsWithSpecialParameters(patchMethod);
         }
 
         protected virtual void PatchDescriptionSetChecks(PatchDescriptionSet<TPatchDescription> set)
@@ -145,6 +146,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             CheckDontDefineMultipleAuxiliaryPatchMethods(set);
             CheckBulkPatching(set);
             CheckPatchMethodStateParameters(set);
+            CheckArgumentNewNamesMustCorrespondToParameterNames(set);
         }
 
         protected virtual void TargetMethodChecks(IMethodSymbol targetMethod, PatchDescription patchDescription)
@@ -445,21 +447,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             foreach (var argument in patchDescription.ArgumentOverrides.Where(argument => argument.NewName is null))
             {
                 Context.ReportDiagnostic(Diagnostic.Create(ArgumentsOnTypesAndMethodsMustHaveNewNameRule,
-                    argument.Attribute.GetSyntax()?.GetLocation()));
-            }
-        }
-
-        private void CheckArgumentNewNamesMustBeUniqueRule(PatchDescription patchDescription)
-        {
-            var argumentRenamesPerNewName =
-                from argument in patchDescription.ArgumentOverrides
-                where argument.NewName is { Value: not null }
-                group argument.NewName! by argument.NewName!.Value!;
-            foreach (var argumentGroup in argumentRenamesPerNewName.Where(argumentGroup => argumentGroup.Count() > 1))
-            {
-                Context.ReportDiagnostic(Diagnostic.Create(ArgumentNewNamesMustBeUniqueRule,
-                    argumentGroup.GetLocation(), argumentGroup.GetAdditionalLocations(),
-                    argumentGroup.Key));
+                    argument.Attribute.GetSyntax(Context.CancellationToken)?.GetLocation()));
             }
         }
 
@@ -474,7 +462,7 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
                 from patchMethod in set.PatchMethods
                 let methodKindAttributeSyntax = patchMethod.MethodKinds.FirstOrDefault(detail => detail.Syntax is AttributeSyntax)?.Syntax
                 let patchDescriptionAttributeSyntax =
-                    patchMethod.PatchDescription?.Attrubutes.FirstOrDefault().GetSyntax()
+                    patchMethod.PatchDescription?.Attrubutes.FirstOrDefault().GetSyntax(Context.CancellationToken)
                 let syntax = patchDescriptionAttributeSyntax ?? methodKindAttributeSyntax
                 where syntax is not null
                 select (patchMethod, syntax)).FirstOrDefault();
@@ -549,6 +537,28 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             if (stateParameters.Any() && stateParameters.All(parameter => parameter.Parameter.RefKind is not (RefKind.Ref or RefKind.Out)))
                 Context.ReportDiagnostic(Diagnostic.Create(StateShouldBeInitializedRule,
                     stateParameters.GetLocation(), stateParameters.GetAdditionalLocations()));
+        }
+
+        private void CheckArgumentNewNamesMustCorrespondToParameterNames(PatchDescriptionSet<TPatchDescription> set)
+        {
+            var patchMethodsCandidates = set.PatchMethods.Where(patchMethod => patchMethod.CanHaveNamedInjections).ToArray();
+            var argumentOverrides = set.PatchMethods
+                .SelectMany(patchMethod => patchMethod.PatchDescription?.ArgumentOverrides ?? [])
+                .Where(argument => !string.IsNullOrWhiteSpace(argument.NewName?.Value))
+                .Distinct();
+            foreach (var argument in argumentOverrides)
+            {
+                IEnumerable<PatchMethod> patchMethods = patchMethodsCandidates;
+                if (argument.Symbol is IMethodSymbol)
+                    patchMethods = patchMethodsCandidates.Where(patchMethod => patchMethod.Method.Equals(argument.Symbol, SymbolEqualityComparer.Default));
+
+                if (!patchMethods.Any(patchMethod => patchMethod.Parameters.Any(parameter => parameter.Parameter.Name == argument.NewName!.Value)))
+                {
+                    Context.ReportDiagnostic(Diagnostic.Create(ArgumentNewNamesMustCorrespondToParameterNamesRule,
+                        argument.NewName!.Syntax?.GetLocation(),
+                        argument.NewName.Value));
+                }
+            }
         }
 
         private void CheckDontUseTargetMethodAnnotationsOnNonPrimaryPatchMethods(PatchMethod patchMethod)
@@ -986,6 +996,54 @@ public partial class HarmonyToolsAnalyzer : DiagnosticAnalyzer
             {
                 Context.ReportDiagnostic(Diagnostic.Create(ParameterMustNotBeByRefRule,
                     parameter.GetRefLocation(Context.CancellationToken) ?? parameter.GetLocation(Context.CancellationToken),
+                    patchMethod.Method.Name, parameter.Parameter.Name));
+            }
+        }
+
+        private void CheckMultipleArgumentsMustNotTargetSameParameter(PatchMethod patchMethod)
+        {
+            if (patchMethod.PatchDescription is null)
+                return;
+
+            var argumentOverridesOnParameters =
+                from parameter in patchMethod.Parameters
+                where parameter.Kind is InjectionKind.ParameterByName or InjectionKind.ParameterByIndex && parameter.ArgumentOverride is not null
+                select (argument: parameter.ArgumentOverride, name: parameter.Parameter.Name);
+            var argumentOverridesOnMethodAndClass =
+                from argument in patchMethod.PatchDescription.ArgumentOverrides
+                where argument.NewName is { Value: not null }
+                select (argument, name: argument.NewName.Value);
+            var argumentOverridesPerParameter = argumentOverridesOnParameters
+                .Concat(argumentOverridesOnMethodAndClass)
+                .GroupBy(p => p.name, p => p.argument);
+            foreach (var argumentGroup in argumentOverridesPerParameter.Where(argumentGroup => argumentGroup.Count() > 1))
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(MultipleArgumentsMustNotTargetSameParameterRule,
+                    argumentGroup.GetLocation(), argumentGroup.GetAdditionalLocations(),
+                    patchMethod.Method.Name, argumentGroup.Key));
+            }
+        }
+
+        private void CheckDoNotUseArgumentsWithSpecialParameters(PatchMethod patchMethod)
+        {
+            if (patchMethod.PatchDescription is null)
+                return;
+
+            var argumentOverridesOnSpecialParameters =
+                from parameter in patchMethod.Parameters
+                where parameter.Kind is not (InjectionKind.ParameterByName or InjectionKind.ParameterByIndex) ||
+                      parameter is PatchMethodParameterByIndexParameter { IsByArgumentOverride: false }
+                let arguments = new[] { parameter.ArgumentOverride }
+                    .Where(argument => argument is not null)
+                    .Concat(patchMethod.PatchDescription.ArgumentOverrides.Where(
+                        argument => argument.NewName?.Value == parameter.Parameter.Name))
+                    .ToArray()
+                where arguments.Any()
+                select (arguments, parameter);
+            foreach (var (arguments, parameter) in argumentOverridesOnSpecialParameters)
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(DoNotUseArgumentsWithSpecialParametersRule,
+                    arguments.GetLocation(), arguments.GetAdditionalLocations(),
                     patchMethod.Method.Name, parameter.Parameter.Name));
             }
         }

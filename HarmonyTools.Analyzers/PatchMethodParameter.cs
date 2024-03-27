@@ -24,13 +24,18 @@ internal class PatchMethodParameter(IParameterSymbol parameter, InjectionKind ki
     public IParameterSymbol Parameter { get; } = parameter;
     public InjectionKind Kind { get; } = kind;
     public ParameterMatchKind MatchKind { get; } = matchKind;
+    public HarmonyArgument? ArgumentOverride { get; private set; }
 
     public static ImmutableArray<PatchMethodParameter> GetParameters(PatchMethod patchMethod, WellKnownTypes wellKnownTypes, Compilation compilation)
     {
         var parameters = ImmutableArray.CreateBuilder<PatchMethodParameter>();
 
         foreach (var parameter in patchMethod.Method.Parameters)
-            parameters.Add(GetParameter(patchMethod, parameter, wellKnownTypes, compilation));
+        {
+            var patchMethodParameter = GetParameter(patchMethod, parameter, wellKnownTypes, compilation);
+            patchMethodParameter.UpdateArgumentOverride(wellKnownTypes);
+            parameters.Add(patchMethodParameter);
+        }
 
         return parameters.DrainToImmutable();
     }
@@ -105,21 +110,21 @@ internal class PatchMethodParameter(IParameterSymbol parameter, InjectionKind ki
             {
                 var indexString = parameter.Name[ParameterByIndexPrefix.Length..];
                 if (int.TryParse(indexString, out var index))
-                    return new PatchMethodParameterByIndexParameter(parameter, index);
+                    return new PatchMethodParameterByIndexParameter(parameter, index, false);
             }
 
             var harmonyArgument = parameter.GetAttributes()
                 .Concat(patchMethod.Method.GetAttributes())
                 .Concat(patchMethod.Method.ContainingType.GetAttributes())
                 .Where(attribute => attribute.Is(wellKnownTypes.HarmonyArgument))
-                .Select(attribute => HarmonyArgument.Parse(attribute, wellKnownTypes))
+                .Select(attribute => HarmonyArgument.Parse(attribute, parameter, wellKnownTypes))
                 .FirstOrDefault(argument => argument is not null && (argument.NewName is null || argument.NewName.Value == parameter.Name));
             if (harmonyArgument is not null)
             {
                 if (harmonyArgument.Name is not null)
                     return new PatchMethodParameterByNameParameter(parameter, harmonyArgument.Name.Value);
                 if (harmonyArgument.Index is not null)
-                    return new PatchMethodParameterByIndexParameter(parameter, harmonyArgument.Index.Value);
+                    return new PatchMethodParameterByIndexParameter(parameter, harmonyArgument.Index.Value, true);
             }
 
             if (parameter.Type.Is(wellKnownTypes.Delegate) && patchMethod.PatchDescription?.HarmonyVersion == 2)
@@ -150,6 +155,15 @@ internal class PatchMethodParameter(IParameterSymbol parameter, InjectionKind ki
             return new PatchMethodParameter(parameter, InjectionKind.ParameterByPosition, ParameterMatchKind.ByPosition);
 
         return new PatchMethodParameter(parameter, InjectionKind.None, ParameterMatchKind.None);
+    }
+
+    public void UpdateArgumentOverride(WellKnownTypes wellKnownTypes)
+    {
+        var attribute = Parameter.GetAttributes().FirstOrDefault(attribute => attribute.Is(wellKnownTypes.HarmonyArgument));
+        if (attribute is null)
+            return;
+
+        ArgumentOverride = HarmonyArgument.Parse(attribute, Parameter, wellKnownTypes);
     }
 
     public Location? GetLocation(CancellationToken cancellationToken = default) => 
@@ -183,10 +197,11 @@ internal class PatchMethodParameterByNameParameter(IParameterSymbol parameter, s
     public string? ParameterName { get; } = parameterName;
 }
 
-internal class PatchMethodParameterByIndexParameter(IParameterSymbol parameter, int parameterIndex)
+internal class PatchMethodParameterByIndexParameter(IParameterSymbol parameter, int parameterIndex, bool isByArgumentOverride)
     : PatchMethodParameter(parameter, InjectionKind.ParameterByIndex, ParameterMatchKind.ByName)
 {
     public int ParameterIndex { get; } = parameterIndex;
+    public bool IsByArgumentOverride { get; } = isByArgumentOverride;
 }
 
 internal class PatchMethodFieldByNameParameter(IParameterSymbol parameter, string fieldName)
