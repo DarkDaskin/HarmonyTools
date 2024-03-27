@@ -235,8 +235,15 @@ public partial class HarmonyToolsAnalyzer
             PatchMethodCategory, DiagnosticSeverity.Warning);
     private static readonly DiagnosticDescriptor DontUseArgumentsWithSpecialParametersRule =
         CreateRule(DiagnosticIds.DontUseArgumentsWithSpecialParameters,
-            nameof(Resources.DontUseArgumentsWithSpecialParametersTitle), nameof(Resources.DontUseArgumentsWithSpecialParametersMessageFormat),
+            nameof(Resources.DontUseArgumentsWithSpecialParametersTitle),
+            nameof(Resources.DontUseArgumentsWithSpecialParametersMessageFormat),
             PatchMethodCategory, DiagnosticSeverity.Warning);
+    private static readonly DiagnosticDescriptor DelegateMustBeCalledWithCorrectInstanceRule =
+        CreateRule(DiagnosticIds.DelegateMustBeCalledWithCorrectInstance,
+            nameof(Resources.DelegateMustBeCalledWithCorrectInstanceTitle),
+            nameof(Resources.DelegateMustBeCalledWithCorrectInstanceMessageFormat),
+            PatchMethodCategory, DiagnosticSeverity.Warning);
+
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
     [
@@ -292,6 +299,7 @@ public partial class HarmonyToolsAnalyzer
         InstanceParameterMustNotBePresentRule,
         PatchMethodsMustNotReturnByRefRule,
         DontUseArgumentsWithSpecialParametersRule,
+        DelegateMustBeCalledWithCorrectInstanceRule,
     ];
 
     private static DiagnosticDescriptor CreateRule(string id, string titleResource, string messageFormatResource,

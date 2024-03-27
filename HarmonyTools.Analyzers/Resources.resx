@@ -399,6 +399,12 @@
   <data name="DontUseArgumentsWithSpecialParametersTitle" xml:space="preserve">
     <value>HarmonyArgument is used on special patch method parameter</value>
   </data>
+  <data name="DelegateMustBeCalledWithCorrectInstanceMessageFormat" xml:space="preserve">
+    <value>Delegate is called with incorrent instance. It can only be called from patch methods, target method of which is an instance method of '{0}' type.</value>
+  </data>
+  <data name="DelegateMustBeCalledWithCorrectInstanceTitle" xml:space="preserve">
+    <value>Delegate is called with incorrent instance</value>
+  </data>
   <data name="DontUseBulkPatchingMethodsWithReversePatchesMessageFormat" xml:space="preserve">
     <value>Reverse patch cannot be used with bulk patching.</value>
   </data>

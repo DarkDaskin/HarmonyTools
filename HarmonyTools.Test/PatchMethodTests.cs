@@ -801,4 +801,22 @@ public class PatchMethodTests
 
         await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies, expected.ToArray());
     }
+
+    [TestMethod, CodeDataSource("CorrectDelegateInstance.cs")]
+    public async Task WhenCorrectDelegateInstance_DoNothing(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies);
+    }
+
+    [TestMethod, CodeDataSource("IncorrectDelegateInstance.cs")]
+    public async Task WhenIncorrectDelegateInstance_Report(string code, ReferenceAssemblies referenceAssemblies)
+    {
+        await VerifyCS.VerifyAnalyzerAsync(code, referenceAssemblies,
+            new DiagnosticResult(DiagnosticIds.DelegateMustBeCalledWithCorrectInstance, DiagnosticSeverity.Warning)
+                .WithSpan(13, 46, 13, 55)
+                .WithArguments("HarmonyTools.Test.PatchBase.SimpleClass"),
+            new DiagnosticResult(DiagnosticIds.DelegateMustBeCalledWithCorrectInstance, DiagnosticSeverity.Warning)
+                .WithSpan(19, 46, 19, 55)
+                .WithArguments("HarmonyTools.Test.PatchBase.SimpleClass"));
+    }
 }

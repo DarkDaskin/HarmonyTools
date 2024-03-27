@@ -151,6 +151,24 @@ namespace HarmonyTools.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delegate is called with incorrent instance. It can only be called from patch methods, target method of which is an instance method of &apos;{0}&apos; type..
+        /// </summary>
+        internal static string DelegateMustBeCalledWithCorrectInstanceMessageFormat {
+            get {
+                return ResourceManager.GetString("DelegateMustBeCalledWithCorrectInstanceMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delegate is called with incorrent instance.
+        /// </summary>
+        internal static string DelegateMustBeCalledWithCorrectInstanceTitle {
+            get {
+                return ResourceManager.GetString("DelegateMustBeCalledWithCorrectInstanceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple auxiliary patch methods of the same kind are defined. Only the first one will be executed..
         /// </summary>
         internal static string DontDefineMultipleAuxiliaryPatchMethodsMessageFormat {

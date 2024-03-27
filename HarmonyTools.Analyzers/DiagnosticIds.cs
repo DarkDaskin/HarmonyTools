@@ -53,4 +53,5 @@ public static class DiagnosticIds
     public const string InstanceParameterMustNotBePresent = "HT2028";
     public const string PatchMethodsMustNotReturnByRef = "HT2029";
     public const string DontUseArgumentsWithSpecialParameters = "HT2030";
+    public const string DelegateMustBeCalledWithCorrectInstance = "HT2031";
 }
