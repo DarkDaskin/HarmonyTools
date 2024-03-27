@@ -10,7 +10,8 @@
   <PropertyGroup>
     <PackageId>HarmonyTools.Analyzers</PackageId>
     <Authors>Dark Daskin</Authors>
-    <PackageLicenseUrl>https://github.com/DarkDaskin/HarmonyTools/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DarkDaskin/HarmonyTools</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/DarkDaskin/HarmonyTools/blob/master/HarmonyTools.png</PackageIconUrl>
     <PackageIcon>HarmonyTools.png</PackageIcon>
@@ -31,6 +32,7 @@
 
   <ItemGroup>
     <None Include="..\HarmonyTools.png" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="" />
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
   </ItemGroup>
 
